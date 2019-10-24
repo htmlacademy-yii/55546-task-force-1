@@ -1,0 +1,11 @@
+{
+  "name": "test app",
+  "type": "project",
+  "require": {},
+  "require-dev": {},
+  "autoload": {
+    "psr-4": {
+      "app\\": "app/"
+    }
+  }
+}
