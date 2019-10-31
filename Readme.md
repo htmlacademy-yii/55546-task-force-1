@@ -1,7 +1,7 @@
 # Личный проект «TaskForce»
 
 * Студент: [Николай Блинов](https://up.htmlacademy.ru/yii/1/user/55546).
-* Наставник: [`Неизвестно`](https://up.htmlacademy.ru/yii/1/user/55546)
+* Наставник: [Денис Ходаковский](https://htmlacademy.ru/profile/id1232355)
 
 ---
 
