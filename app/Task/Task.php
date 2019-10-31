@@ -20,6 +20,13 @@ class Task
     const ACTION_CANCEL = 'cancel'; // отменить
     const ACTION_RESPOND = 'respond'; // откликнуться
 
+    const ACTION_STATUS_MAP
+        = [
+            self::ACTION_COMPLETED => self::STATUS_COMPLETED,
+            self::ACTION_DENIAL => self::STATUS_FAILING,
+            self::ACTION_CANCEL => self::STATUS_CANCELED,
+        ];
+
     private $id;
     private $title;
     private $description;
@@ -50,8 +57,8 @@ class Task
 
         if (in_array($data['status'], $this->getStatusList())) {
             $this->currentStatus = $data['status'];
-        } elseif (isset($this->date_end)
-            && strtotime($this->date_end) < time()
+        } elseif (isset($this->dateEnd)
+            && strtotime($this->dateEnd) < time()
         ) {
             $this->currentStatus = self::STATUS_EXPIRED;
         } else {
@@ -96,35 +103,21 @@ class Task
     public function getNextStatus($action)
     {
         return in_array($action, $this->getAvailableActions()) ?
-            $this->currentStatus = [
-                self::ACTION_COMPLETED => self::STATUS_COMPLETED,
-                self::ACTION_DENIAL => self::STATUS_FAILING,
-                self::ACTION_CANCEL => self::STATUS_CANCELED,
-            ][$action] : null;
+            $this->currentStatus = self::ACTION_STATUS_MAP[$action] : null;
     }
 
     private function getAvailableActions()
     {
-        $actions = [];
+        $actions = [
+            self::ROLE_CLIENT => [self::ACTION_COMPLETED],
+            self::ROLE_EXECUTOR => [self::ACTION_RESPOND],
+            self::ROLE_SELECTED_EXECUTOR => [self::ACTION_DENIAL],
+        ];
 
-        switch ($this->role) {
-            case self::ROLE_CLIENT: // заказчик
-                $actions[] = self::ACTION_COMPLETED; // завершить
-
-                if ($this->currentStatus
-                    === self::STATUS_NEW
-                ) { // если задание новое
-                    $actions[] = self::ACTION_CANCEL; // отменить
-                }
-                break;
-            case self::ROLE_EXECUTOR: // исполнитель
-                $actions[] = self::ACTION_RESPOND; // отозваться
-                break;
-            case self::ROLE_SELECTED_EXECUTOR: // выбранный исполнитель
-                $actions[] = self::ACTION_DENIAL; // отказаться
-                break;
+        if ($this->currentStatus === self::STATUS_NEW) {
+            $actions[self::ROLE_CLIENT][] = self::ACTION_CANCEL;
         }
 
-        return $actions;
+        return $actions[$this->role];
     }
 }
