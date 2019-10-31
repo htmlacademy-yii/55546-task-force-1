@@ -20,45 +20,46 @@ class Task
     const ACTION_CANCEL = 'cancel'; // отменить
     const ACTION_RESPOND = 'respond'; // откликнуться
 
-    private $id = null;
-    private $title = null;
-    private $description = null;
-    private $category = null;
-    private $files = null;
-    private $location = null;
-    private $price = null;
-    private $date_end = null;
+    private $id;
+    private $title;
+    private $description;
+    private $category;
+    private $files;
+    private $location;
+    private $price;
+    private $dateEnd;
 
-    private $role = null;
-    private $executor_id = null;
-    private $client_id = null;
-    private $current_status = null;
+    private $role;
+    private $executorId;
+    private $clientId;
+    private $currentStatus;
 
     private $errors = [];
 
     public function __construct($data = [])
     {
-        $this->id = $data['id'] ?? null;
-        $this->title = $data['title'] ?? null;
-        $this->description = $data['description'] ?? null;
-        $this->category = $data['category'] ?? null;
-        $this->files = $data['files'] ?? null;
-        $this->location = $data['location'] ?? null;
-        $this->price = $data['price'] ?? null;
-        $this->date_end = $data['date_end'] ?? null;
+        foreach ($data as $key => $value) {
+            if ($key === 'status' || $key === 'role'
+                || !property_exists($this, $key)
+            ) {
+                continue;
+            }
 
-        $this->executor_id = $data['executor_id'] ?? null;
-        $this->client_id = $data['client_id'] ?? null;
-
-        if(in_array($data['status'], $this->getStatusList())) {
-            $this->current_status = $data['status'];
-        } elseif(isset($this->date_end) && strtotime($this->date_end) < time()) {
-            $this->current_status = self::STATUS_EXPIRED;
-        } else {
-            $this->current_status = self::STATUS_NEW;
+            $this->$key = $value;
         }
 
-        $this->role = in_array($data['role'], $this->getRoleList()) ? $data['role'] : self::ROLE_EXECUTOR;
+        if (in_array($data['status'], $this->getStatusList())) {
+            $this->currentStatus = $data['status'];
+        } elseif (isset($this->date_end)
+            && strtotime($this->date_end) < time()
+        ) {
+            $this->currentStatus = self::STATUS_EXPIRED;
+        } else {
+            $this->currentStatus = self::STATUS_NEW;
+        }
+
+        $this->role = in_array($data['role'], $this->getRoleList())
+            ? $data['role'] : self::ROLE_EXECUTOR;
     }
 
     public function getRoleList()
@@ -66,7 +67,7 @@ class Task
         return [
             self::ROLE_CLIENT,
             self::ROLE_EXECUTOR,
-            self::ROLE_SELECTED_EXECUTOR
+            self::ROLE_SELECTED_EXECUTOR,
         ];
     }
 
@@ -95,10 +96,10 @@ class Task
     public function getNextStatus($action)
     {
         return in_array($action, $this->getAvailableActions()) ?
-            $this->current_status = [
+            $this->currentStatus = [
                 self::ACTION_COMPLETED => self::STATUS_COMPLETED,
                 self::ACTION_DENIAL => self::STATUS_FAILING,
-                self::ACTION_CANCEL => self::STATUS_CANCELED
+                self::ACTION_CANCEL => self::STATUS_CANCELED,
             ][$action] : null;
     }
 
@@ -106,20 +107,22 @@ class Task
     {
         $actions = [];
 
-        switch($this->role) {
+        switch ($this->role) {
             case self::ROLE_CLIENT: // заказчик
                 $actions[] = self::ACTION_COMPLETED; // завершить
 
-                if($this->current_status === self::STATUS_NEW) { // если задание новое
+                if ($this->currentStatus
+                    === self::STATUS_NEW
+                ) { // если задание новое
                     $actions[] = self::ACTION_CANCEL; // отменить
                 }
-            break;
+                break;
             case self::ROLE_EXECUTOR: // исполнитель
                 $actions[] = self::ACTION_RESPOND; // отозваться
-            break;
+                break;
             case self::ROLE_SELECTED_EXECUTOR: // выбранный исполнитель
                 $actions[] = self::ACTION_DENIAL; // отказаться
-            break;
+                break;
         }
 
         return $actions;

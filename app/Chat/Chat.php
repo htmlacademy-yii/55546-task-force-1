@@ -4,27 +4,29 @@ namespace app\Chat;
 
 class Chat
 {
-    private $id = null;
-    private $user_id = null;
-    private $task_id = null;
+    private $id;
+    private $userId;
+    private $taskId;
 
     private $messages = [];
 
     public function __construct($data = [])
     {
-        $this->id = $data['id'] ?? null;
-        $this->user_id = $data['user_id'] ?? null;
-        $this->task_id = $data['task_id'] ?? null;
+        foreach ($data as $key => $value) {
+            if (property_exists($this, $key)) {
+                $this->$key = $value;
+            }
+        }
     }
 
     public function getAllMessages()
     {
-        return $this->messages = [];
+        return $this->messages;
     }
 
-    public function addMessage()
+    public function addMessage($data)
     {
-        $this->messages[] = null;
+        $this->messages[] = $data;
     }
 
 }

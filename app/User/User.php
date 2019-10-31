@@ -4,19 +4,19 @@ namespace app\User;
 
 class User
 {
-    private $id = null;
-    private $login = null;
-    private $email = null;
-    private $password = null;
-    private $date_registration = null;
+    private $id;
+    private $login;
+    private $email;
+    private $password;
+    private $dateRegistration;
 
     public function __construct($data = [])
     {
-        $this->id = $data['id'] ?? null;
-        $this->login = $data['id'] ?? null;
-        $this->email = $data['id'] ?? null;
-        $this->password = $data['id'] ?? null;
-        $this->date_registration = $data['id'] ?? null;
+        foreach ($data as $key => $value) {
+            if (property_exists($this, $key)) {
+                $this->$key = $value;
+            }
+        }
     }
 
     public function getReviews()
