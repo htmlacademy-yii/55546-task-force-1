@@ -2,30 +2,20 @@
 
 namespace app\Task;
 
+use app\Action\AvailableActions;
+
 class Task
 {
-    const ROLE_CLIENT = 'client'; // заказчик
-    const ROLE_EXECUTOR = 'executor'; // исполнитель
-    const ROLE_SELECTED_EXECUTOR = 'selected-executor'; // выбранный исполнитель
+    const ROLE_CLIENT = AvailableActions::ROLE_CLIENT;
+    const ROLE_EXECUTOR = AvailableActions::ROLE_EXECUTOR;
+    const ROLE_SELECTED_EXECUTOR = AvailableActions::ROLE_SELECTED_EXECUTOR;
 
-    const STATUS_NEW = 'new'; // новое
-    const STATUS_EXECUTION = 'execution'; // выполняется
-    const STATUS_COMPLETED = 'completed'; // завершено
-    const STATUS_CANCELED = 'canceled'; // отменено
-    const STATUS_FAILING = 'failing'; // провалено
-    const STATUS_EXPIRED = 'expired'; // просрочено
-
-    const ACTION_COMPLETED = 'completed'; // выполнить
-    const ACTION_DENIAL = 'denial'; // отказаться
-    const ACTION_CANCEL = 'cancel'; // отменить
-    const ACTION_RESPOND = 'respond'; // откликнуться
-
-    const ACTION_STATUS_MAP
-        = [
-            self::ACTION_COMPLETED => self::STATUS_COMPLETED,
-            self::ACTION_DENIAL => self::STATUS_FAILING,
-            self::ACTION_CANCEL => self::STATUS_CANCELED,
-        ];
+    const STATUS_NEW = AvailableActions::STATUS_NEW;
+    const STATUS_EXECUTION = AvailableActions::STATUS_EXECUTION;
+    const STATUS_COMPLETED = AvailableActions::STATUS_COMPLETED;
+    const STATUS_CANCELED = AvailableActions::STATUS_CANCELED;
+    const STATUS_FAILING = AvailableActions::STATUS_FAILING;
+    const STATUS_EXPIRED = AvailableActions::STATUS_EXPIRED;
 
     private $id;
     private $title;
@@ -36,10 +26,10 @@ class Task
     private $price;
     private $dateEnd;
 
-    private $role;
+    public $role;
     private $executorId;
     private $clientId;
-    private $currentStatus;
+    public $status;
 
     private $errors = [];
 
@@ -56,13 +46,13 @@ class Task
         }
 
         if (in_array($data['status'], $this->getStatusList())) {
-            $this->currentStatus = $data['status'];
+            $this->status = $data['status'];
         } elseif (isset($this->dateEnd)
             && strtotime($this->dateEnd) < time()
         ) {
-            $this->currentStatus = self::STATUS_EXPIRED;
+            $this->status = self::STATUS_EXPIRED;
         } else {
-            $this->currentStatus = self::STATUS_NEW;
+            $this->status = self::STATUS_NEW;
         }
 
         $this->role = in_array($data['role'], $this->getRoleList())
@@ -90,34 +80,4 @@ class Task
         ];
     }
 
-    public function getActionsList()
-    {
-        return [
-            self::ACTION_COMPLETED,
-            self::ACTION_DENIAL,
-            self::ACTION_CANCEL,
-            self::ACTION_RESPOND,
-        ];
-    }
-
-    public function getNextStatus($action)
-    {
-        return in_array($action, $this->getAvailableActions()) ?
-            $this->currentStatus = self::ACTION_STATUS_MAP[$action] : null;
-    }
-
-    private function getAvailableActions()
-    {
-        $actions = [
-            self::ROLE_CLIENT => [self::ACTION_COMPLETED],
-            self::ROLE_EXECUTOR => [self::ACTION_RESPOND],
-            self::ROLE_SELECTED_EXECUTOR => [self::ACTION_DENIAL],
-        ];
-
-        if ($this->currentStatus === self::STATUS_NEW) {
-            $actions[self::ROLE_CLIENT][] = self::ACTION_CANCEL;
-        }
-
-        return $actions[$this->role];
-    }
 }
