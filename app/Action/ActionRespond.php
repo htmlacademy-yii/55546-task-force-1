@@ -5,14 +5,9 @@ namespace app\Action;
 class ActionRespond
 {
 
-    public static function getName()
-    {
-        return self::class;
-    }
-
     public static function getInternalName()
     {
-        return 'action_respond';
+        return Action::ACTION_RESPOND;
     }
 
     public static function checkRight()

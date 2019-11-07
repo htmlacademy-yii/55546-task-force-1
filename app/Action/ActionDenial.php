@@ -5,14 +5,9 @@ namespace app\Action;
 class ActionDenial extends Action
 {
 
-    public static function getName()
-    {
-        return self::class;
-    }
-
     public static function getInternalName()
     {
-        return 'action_denial';
+        return Action::ACTION_DENIAL;
     }
 
     public static function checkRight()

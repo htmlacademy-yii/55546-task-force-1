@@ -2,20 +2,21 @@
 
 namespace app\Task;
 
-use app\Action\AvailableActions;
+use app\Action\Action;
 
 class Task
 {
-    const ROLE_CLIENT = AvailableActions::ROLE_CLIENT;
-    const ROLE_EXECUTOR = AvailableActions::ROLE_EXECUTOR;
-    const ROLE_SELECTED_EXECUTOR = AvailableActions::ROLE_SELECTED_EXECUTOR;
 
-    const STATUS_NEW = AvailableActions::STATUS_NEW;
-    const STATUS_EXECUTION = AvailableActions::STATUS_EXECUTION;
-    const STATUS_COMPLETED = AvailableActions::STATUS_COMPLETED;
-    const STATUS_CANCELED = AvailableActions::STATUS_CANCELED;
-    const STATUS_FAILING = AvailableActions::STATUS_FAILING;
-    const STATUS_EXPIRED = AvailableActions::STATUS_EXPIRED;
+    const ROLE_CLIENT = 'client'; // заказчик
+    const ROLE_EXECUTOR = 'executor'; // исполнитель
+    const ROLE_SELECTED_EXECUTOR = 'selected-executor'; // выбранный исполнитель
+
+    const STATUS_NEW = 'new'; // новое
+    const STATUS_EXECUTION = 'execution'; // выполняется
+    const STATUS_COMPLETED = 'completed'; // завершено
+    const STATUS_CANCELED = 'canceled'; // отменено
+    const STATUS_FAILING = 'failing'; // провалено
+    const STATUS_EXPIRED = 'expired'; // просрочено
 
     private $id;
     private $title;
