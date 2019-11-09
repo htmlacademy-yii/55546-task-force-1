@@ -31,25 +31,29 @@ class AvailableActions
 
     public static function getAvailableActions()
     {
+        $role = self::$task->getRole(self::$userId);
+
+        if(!in_array($role, [Task::ROLE_OWNER, Task::ROLE_EXECUTOR])) {
+            return [Action::ACTION_RESPOND];
+        }
+
         $actions = [
             Task::ROLE_OWNER => [],
             Task::ROLE_EXECUTOR => [],
-            Task::ROLE_SELECTED_EXECUTOR => [],
         ];
 
         $status = self::$task->getStatus();
 
         if ($status === Task::STATUS_EXECUTION) {
-            $actions[Task::ROLE_SELECTED_EXECUTOR][] = Action::ACTION_DENIAL;
             $actions[Task::ROLE_OWNER][] = Action::ACTION_COMPLETED;
+            $actions[Task::ROLE_EXECUTOR][] = Action::ACTION_DENIAL;
         }
 
         if ($status === Task::STATUS_NEW) {
             $actions[Task::ROLE_OWNER][] = Action::ACTION_CANCELED;
-            $actions[Task::ROLE_EXECUTOR][] = Action::ACTION_RESPOND;
         }
 
-        return $actions[self::$task->getRole(self::$userId)];
+        return $actions[$role];
     }
 
 }

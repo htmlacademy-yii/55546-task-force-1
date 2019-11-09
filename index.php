@@ -9,8 +9,8 @@ require_once './vendor/autoload.php';
 use app\Task\Task;
 use app\Action\{Action, AvailableActions};
 
-$task = new Task(['authorId' => 1, 'status' => Task::STATUS_NEW]);
+$task = new Task(['authorId' => 1, 'executorId' => 2, 'status' => Task::STATUS_EXECUTION]);
 
-AvailableActions::setData($task, 1);
+AvailableActions::setData($task, 3);
 debug(AvailableActions::getAvailableActions());
 debug(AvailableActions::getNextStatus(Action::ACTION_CANCELED));
