@@ -7,11 +7,10 @@ function debug($data) {
 require_once './vendor/autoload.php';
 
 use app\Task\Task;
-use app\Action\Action;
-use app\Action\AvailableActions;
+use app\Action\{Action, AvailableActions};
 
-$task = new Task(['role' => Task::ROLE_CLIENT]);
+$task = new Task(['authorId' => 1, 'status' => Task::STATUS_NEW]);
 
-AvailableActions::setTask($task);
-$nextStatus = AvailableActions::getNextStatus(Action::ACTION_EXECUTION);
-var_dump($nextStatus);
+AvailableActions::setData($task, 1);
+debug(AvailableActions::getAvailableActions());
+debug(AvailableActions::getNextStatus(Action::ACTION_CANCELED));

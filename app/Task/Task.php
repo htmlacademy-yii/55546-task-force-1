@@ -7,7 +7,7 @@ use app\Action\Action;
 class Task
 {
 
-    const ROLE_CLIENT = 'client'; // заказчик
+    const ROLE_OWNER = 'owner'; // заказчик
     const ROLE_EXECUTOR = 'executor'; // исполнитель
     const ROLE_SELECTED_EXECUTOR = 'selected-executor'; // выбранный исполнитель
 
@@ -27,43 +27,39 @@ class Task
     private $price;
     private $dateEnd;
 
-    public $role;
     private $executorId;
-    private $clientId;
-    public $status;
-
-    private $errors = [];
+    private $authorId;
+    private $status;
 
     public function __construct($data = [])
     {
         foreach ($data as $key => $value) {
-            if ($key === 'status' || $key === 'role'
-                || !property_exists($this, $key)
-            ) {
-                continue;
+            if (property_exists($this, $key)) {
+                $this->$key = $value;
             }
-
-            $this->$key = $value;
         }
+    }
 
-        if (in_array($data['status'], $this->getStatusList())) {
-            $this->status = $data['status'];
-        } elseif (isset($this->dateEnd)
-            && strtotime($this->dateEnd) < time()
-        ) {
-            $this->status = self::STATUS_EXPIRED;
-        } else {
-            $this->status = self::STATUS_NEW;
-        }
+    public function getStatus()
+    {
+        return $this->status;
+    }
 
-        $this->role = in_array($data['role'], $this->getRoleList())
-            ? $data['role'] : self::ROLE_EXECUTOR;
+    public function getRole($userId)
+    {
+        return [
+                // (владелец) если переданный id совпадает с id создателя задания из таблицы
+                $this->authorId => self::ROLE_OWNER,
+                // (выбранный исполнитель) если переданный id совпадает с executorId у задания из таблицы
+                $this->executorId => self::ROLE_SELECTED_EXECUTOR,
+            ][$userId] ?? self::ROLE_EXECUTOR;
+        // (исполнитель) в противном случае
     }
 
     public function getRoleList()
     {
         return [
-            self::ROLE_CLIENT,
+            self::ROLE_OWNER,
             self::ROLE_EXECUTOR,
             self::ROLE_SELECTED_EXECUTOR,
         ];

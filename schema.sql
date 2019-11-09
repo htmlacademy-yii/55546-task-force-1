@@ -7,7 +7,7 @@ CREATE TABLE `user` (
   `login` varchar(255),
   `email` varchar(255),
   `password` varchar(255),
-  `date_registration` timestamp DEFAULT CURRENT_TIMESTAMP
+  `date_registration` timestamp
 );
 
 CREATE TABLE `user_data` (
@@ -21,15 +21,15 @@ CREATE TABLE `user_data` (
   `other_messenger` varchar(255),
   `avatar` varchar(255),
   `rating` int,
-  `views` int DEFAULT 0,
+  `views` int,
   `order_count` int,
   `status` varchar(255)
 );
 
 CREATE TABLE `user_settings` (
   `user_id` int,
-  `is_hidden_contacts` bool DEFAULT FALSE,
-  `is_hidden_profile` bool DEFAULT FALSE
+  `is_hidden_contacts` bool,
+  `is_hidden_profile` bool
 );
 
 CREATE TABLE `user_photo` (
@@ -55,7 +55,7 @@ CREATE TABLE `task` (
   `description` text,
   `category_id` int,
   `price` int,
-  `date_start` timestamp DEFAULT CURRENT_TIMESTAMP,
+  `date_start` timestamp,
   `date_end` timestamp,
   `executor_id` int,
   `status` varchar(255)
@@ -64,6 +64,11 @@ CREATE TABLE `task` (
 CREATE TABLE `task_file` (
   `task_id` int,
   `file` varchar(255)
+);
+
+CREATE TABLE `task_respond` (
+  `task_id` int,
+  `user_id` int
 );
 
 CREATE TABLE `category` (
@@ -82,7 +87,7 @@ CREATE TABLE `message` (
   `id` int PRIMARY KEY AUTO_INCREMENT,
   `chat_id` int,
   `author_id` int,
-  `public_date` timestamp DEFAULT CURRENT_TIMESTAMP,
+  `public_date` timestamp,
   `text` text
 );
 
@@ -102,19 +107,23 @@ ALTER TABLE `user_photo` ADD FOREIGN KEY (`user_id`) REFERENCES `user` (`id`) ON
 
 ALTER TABLE `user_specialization` ADD FOREIGN KEY (`user_id`) REFERENCES `user` (`id`) ON DELETE CASCADE;
 
-ALTER TABLE `user_specialization` ADD FOREIGN KEY (`specialization_id`) REFERENCES `specialization` (`id`) ON DELETE CASCADE;
+ALTER TABLE `user_specialization` ADD FOREIGN KEY (`specialization_id`) REFERENCES `specialization` (`id`);
 
 ALTER TABLE `task` ADD FOREIGN KEY (`author_id`) REFERENCES `user` (`id`) ON DELETE CASCADE;
 
 ALTER TABLE `task` ADD FOREIGN KEY (`category_id`) REFERENCES `category` (`id`) ON DELETE CASCADE;
 
-ALTER TABLE `task` ADD FOREIGN KEY (`executor_id`) REFERENCES `user` (`id`) ON DELETE CASCADE;
+ALTER TABLE `task` ADD FOREIGN KEY (`executor_id`) REFERENCES `user` (`id`);
 
 ALTER TABLE `task_file` ADD FOREIGN KEY (`task_id`) REFERENCES `task` (`id`) ON DELETE CASCADE;
 
+ALTER TABLE `task_respond` ADD FOREIGN KEY (`task_id`) REFERENCES `task` (`id`) ON DELETE CASCADE;
+
+ALTER TABLE `task_respond` ADD FOREIGN KEY (`user_id`) REFERENCES `user` (`id`) ON DELETE CASCADE;
+
 ALTER TABLE `chat` ADD FOREIGN KEY (`user_id`) REFERENCES `user` (`id`) ON DELETE CASCADE;
 
-ALTER TABLE `chat` ADD FOREIGN KEY (`task_id`) REFERENCES `task` (`id`) ON DELETE CASCADE;
+ALTER TABLE `chat` ADD FOREIGN KEY (`task_id`) REFERENCES `task` (`id`);
 
 ALTER TABLE `message` ADD FOREIGN KEY (`chat_id`) REFERENCES `chat` (`id`) ON DELETE CASCADE;
 
