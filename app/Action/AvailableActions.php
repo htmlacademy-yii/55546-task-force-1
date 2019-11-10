@@ -6,7 +6,6 @@ use app\Task\Task;
 
 class AvailableActions
 {
-
     const ACTION_STATUS_MAP
         = [
             Action::ACTION_COMPLETED => Task::STATUS_COMPLETED,
@@ -33,7 +32,7 @@ class AvailableActions
     {
         $role = self::$task->getRole(self::$userId);
 
-        if(!in_array($role, [Task::ROLE_OWNER, Task::ROLE_EXECUTOR])) {
+        if (!in_array($role, [Task::ROLE_OWNER, Task::ROLE_EXECUTOR])) {
             return [Action::ACTION_RESPOND];
         }
 
@@ -55,5 +54,4 @@ class AvailableActions
 
         return $actions[$role];
     }
-
 }

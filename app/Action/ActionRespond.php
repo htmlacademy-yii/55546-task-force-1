@@ -4,7 +4,6 @@ namespace app\Action;
 
 class ActionRespond
 {
-
     public static function getInternalName()
     {
         return Action::ACTION_RESPOND;
@@ -14,5 +13,4 @@ class ActionRespond
     {
         return true;
     }
-
 }

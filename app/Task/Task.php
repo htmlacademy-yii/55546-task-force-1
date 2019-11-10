@@ -6,7 +6,6 @@ use app\Action\Action;
 
 class Task
 {
-
     const ROLE_OWNER = 'owner'; // заказчик
     const ROLE_EXECUTOR = 'executor'; // исполнитель
 
@@ -47,9 +46,8 @@ class Task
     public function getRole($userId)
     {
         return [
-                $this->authorId => self::ROLE_OWNER,
-                $this->executorId => self::ROLE_EXECUTOR,
-            ][$userId];
+            $this->authorId => self::ROLE_OWNER,
+            $this->executorId => self::ROLE_EXECUTOR,
+        ][$userId];
     }
-
 }

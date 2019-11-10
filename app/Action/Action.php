@@ -4,7 +4,6 @@ namespace app\Action;
 
 abstract class Action
 {
-
     const ACTION_COMPLETED = 'action_completed'; // выполнить
     const ACTION_DENIAL = 'action_denial'; // отказаться
     const ACTION_CANCELED = 'action_canceled'; // отменить
@@ -18,5 +17,4 @@ abstract class Action
     abstract public static function getInternalName();
 
     abstract public static function checkRight();
-
 }

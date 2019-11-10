@@ -28,5 +28,4 @@ class Chat
     {
         $this->messages[] = $data;
     }
-
 }

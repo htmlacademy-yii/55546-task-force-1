@@ -4,7 +4,6 @@ namespace app\Action;
 
 class ActionCompleted extends Action
 {
-
     public static function getInternalName()
     {
         return Action::ACTION_COMPLETED;
@@ -14,5 +13,4 @@ class ActionCompleted extends Action
     {
         return true;
     }
-
 }

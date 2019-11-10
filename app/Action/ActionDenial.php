@@ -4,7 +4,6 @@ namespace app\Action;
 
 class ActionDenial extends Action
 {
-
     public static function getInternalName()
     {
         return Action::ACTION_DENIAL;
@@ -14,5 +13,4 @@ class ActionDenial extends Action
     {
         return true;
     }
-
 }
