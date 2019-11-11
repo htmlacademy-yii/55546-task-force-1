@@ -10,7 +10,7 @@ class Chat
 
     private $messages = [];
 
-    public function __construct($data = [])
+    public function __construct(array $data = [])
     {
         foreach ($data as $key => $value) {
             if (property_exists($this, $key)) {
@@ -19,12 +19,12 @@ class Chat
         }
     }
 
-    public function getAllMessages()
+    public function getAllMessages(): array
     {
         return $this->messages;
     }
 
-    public function addMessage($data)
+    public function addMessage(array $data): void
     {
         $this->messages[] = $data;
     }

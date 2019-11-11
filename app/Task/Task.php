@@ -3,6 +3,7 @@
 namespace app\Task;
 
 use app\Action\Action;
+use app\InvalidTaskStatusException\InvalidTaskStatusException;
 
 class Task
 {
@@ -29,25 +30,41 @@ class Task
     private $authorId;
     private $status;
 
-    public function __construct($data = [])
+    public function __construct(array $data = [])
     {
         foreach ($data as $key => $value) {
             if (property_exists($this, $key)) {
                 $this->$key = $value;
             }
         }
+
+        if (!in_array($this->status, $this->getStatusList())) {
+            throw new InvalidTaskStatusException('Переданный статус для задания недопустим');
+        }
     }
 
-    public function getStatus()
+    public function getStatusList(): array
+    {
+        return [
+            self::STATUS_NEW,
+            self::STATUS_EXECUTION,
+            self::STATUS_COMPLETED,
+            self::STATUS_CANCELED,
+            self::STATUS_FAILING,
+            self::STATUS_EXPIRED,
+        ];
+    }
+
+    public function getStatus(): string
     {
         return $this->status;
     }
 
-    public function getRole($userId)
+    public function getRole(int $userId): string
     {
         return [
-            $this->authorId => self::ROLE_OWNER,
-            $this->executorId => self::ROLE_EXECUTOR,
-        ][$userId];
+                $this->authorId => self::ROLE_OWNER,
+                $this->executorId => self::ROLE_EXECUTOR,
+            ][$userId] ?? '';
     }
 }
