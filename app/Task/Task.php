@@ -3,7 +3,7 @@
 namespace app\Task;
 
 use app\Action\Action;
-use app\TaskException\TaskException;
+use app\InvalidTaskStatusException\InvalidTaskStatusException;
 
 class Task
 {
@@ -39,7 +39,7 @@ class Task
         }
 
         if (!in_array($this->status, $this->getStatusList())) {
-            throw new TaskException('Переданный статус для задания недопустим');
+            throw new InvalidTaskStatusException('Переданный статус для задания недопустим');
         }
     }
 
