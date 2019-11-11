@@ -4,12 +4,12 @@ namespace app\Action;
 
 class ActionCanceled extends Action
 {
-    public static function getInternalName()
+    public static function getInternalName(): string
     {
         return Action::ACTION_CANCELED;
     }
 
-    public static function checkRight()
+    public static function checkRight(): bool
     {
         return true;
     }

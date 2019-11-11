@@ -10,7 +10,7 @@ class User
     private $password;
     private $dateRegistration;
 
-    public function __construct($data = [])
+    public function __construct(array $data = [])
     {
         foreach ($data as $key => $value) {
             if (property_exists($this, $key)) {
@@ -19,7 +19,7 @@ class User
         }
     }
 
-    public function getReviews()
+    public function getReviews(): array
     {
         return [];
         /*
@@ -27,7 +27,7 @@ class User
         */
     }
 
-    public function getDataProfile()
+    public function getDataProfile(): array
     {
         return [];
         /*
@@ -35,7 +35,7 @@ class User
         */
     }
 
-    public function getDataSettings()
+    public function getDataSettings(): array
     {
         return [];
         /*
@@ -43,7 +43,7 @@ class User
         */
     }
 
-    public function getChat()
+    public function getChat(): array
     {
         return [];
         /*
@@ -51,7 +51,7 @@ class User
         */
     }
 
-    public function getTasks()
+    public function getTasks(): array
     {
         return [];
         /*
@@ -59,7 +59,7 @@ class User
         */
     }
 
-    public static function getDataExecutorsList()
+    public static function getDataExecutorsList(): array
     {
         return [];
         /*

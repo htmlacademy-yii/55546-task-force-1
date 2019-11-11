@@ -16,19 +16,19 @@ class AvailableActions
     private static $task;
     private static $userId;
 
-    public static function setData($task, $userId)
+    public static function setData(Task $task, int $userId): void
     {
         self::$task = $task;
         self::$userId = $userId;
     }
 
-    public static function getNextStatus($action)
+    public static function getNextStatus(string $action): array
     {
         return in_array($action, self::getAvailableActions())
-            ? self::ACTION_STATUS_MAP[$action] : null;
+            ? self::ACTION_STATUS_MAP[$action] : [];
     }
 
-    public static function getAvailableActions()
+    public static function getAvailableActions(): array
     {
         $role = self::$task->getRole(self::$userId);
 
