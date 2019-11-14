@@ -22,11 +22,11 @@ try {
     debug(AvailableActions::getAvailableActions());
     debug(AvailableActions::getNextStatus(Action::ACTION_CANCELED));
 
-    $csv_files = array_map(function($file_name) {
-        return "./data/$file_name";
+    $csvFiles = array_map(function($fileName) {
+        return "./data/$fileName";
     }, array_diff(scandir('./data'), ['.', '..']));
 
-    SqlAppGenerator::createSqlCollection($csv_files,'./sql');
+    SqlAppGenerator::createSqlCollection($csvFiles,'./sql');
 } catch (InvalidTaskStatusException $err) {
     echo 'Возникла ошибка при формировании задачи: ' . $err->getMessage();
 } catch (InvalidSqlGeneratorPathException $err) {

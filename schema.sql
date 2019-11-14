@@ -37,15 +37,9 @@ CREATE TABLE `user_photo` (
   `photo` varchar(255)
 );
 
-CREATE TABLE `specialization` (
-  `id` int PRIMARY KEY AUTO_INCREMENT,
-  `title` varchar(255),
-  `code` varchar(255)
-);
-
 CREATE TABLE `user_specialization` (
   `user_id` int,
-  `specialization_id` int
+  `category_id` int
 );
 
 CREATE TABLE `task` (
@@ -116,7 +110,7 @@ CREATE TABLE `city` (
 --
 -- ALTER TABLE `user_specialization` ADD FOREIGN KEY (`user_id`) REFERENCES `user` (`id`);
 --
--- ALTER TABLE `user_specialization` ADD FOREIGN KEY (`specialization_id`) REFERENCES `specialization` (`id`);
+-- ALTER TABLE `user_specialization` ADD FOREIGN KEY (`category_id`) REFERENCES `category` (`id`);
 --
 -- ALTER TABLE `task` ADD FOREIGN KEY (`author_id`) REFERENCES `user` (`id`);
 --
