@@ -37,15 +37,9 @@ CREATE TABLE `user_photo` (
   `photo` varchar(255)
 );
 
-CREATE TABLE `specialization` (
-  `id` int PRIMARY KEY AUTO_INCREMENT,
-  `title` varchar(255),
-  `code` varchar(255)
-);
-
 CREATE TABLE `user_specialization` (
   `user_id` int,
-  `specialization_id` int
+  `category_id` int
 );
 
 CREATE TABLE `task` (
@@ -68,7 +62,9 @@ CREATE TABLE `task_file` (
 
 CREATE TABLE `task_respond` (
   `task_id` int,
-  `user_id` int
+  `user_id` int,
+  `text` text,
+  `public_date` timestamp
 );
 
 CREATE TABLE `category` (
@@ -93,40 +89,49 @@ CREATE TABLE `message` (
 
 CREATE TABLE `review` (
   `id` int PRIMARY KEY AUTO_INCREMENT,
+  `task_id` int,
   `author_id` int,
   `executor_id` int,
-  `text` text,
-  `rating` int
+  `text` text
 );
 
-ALTER TABLE `user_data` ADD FOREIGN KEY (`user_id`) REFERENCES `user` (`id`) ON DELETE CASCADE;
+CREATE TABLE `city` (
+  `id` int PRIMARY KEY AUTO_INCREMENT,
+  `name` varchar(255),
+  `lat` float,
+  `long` float
+);
 
-ALTER TABLE `user_settings` ADD FOREIGN KEY (`user_id`) REFERENCES `user` (`id`) ON DELETE CASCADE;
-
-ALTER TABLE `user_photo` ADD FOREIGN KEY (`user_id`) REFERENCES `user` (`id`) ON DELETE CASCADE;
-
-ALTER TABLE `user_specialization` ADD FOREIGN KEY (`user_id`) REFERENCES `user` (`id`) ON DELETE CASCADE;
-
-ALTER TABLE `user_specialization` ADD FOREIGN KEY (`specialization_id`) REFERENCES `specialization` (`id`);
-
-ALTER TABLE `task` ADD FOREIGN KEY (`author_id`) REFERENCES `user` (`id`) ON DELETE CASCADE;
-
-ALTER TABLE `task` ADD FOREIGN KEY (`category_id`) REFERENCES `category` (`id`) ON DELETE CASCADE;
-
-ALTER TABLE `task` ADD FOREIGN KEY (`executor_id`) REFERENCES `user` (`id`);
-
-ALTER TABLE `task_file` ADD FOREIGN KEY (`task_id`) REFERENCES `task` (`id`) ON DELETE CASCADE;
-
-ALTER TABLE `task_respond` ADD FOREIGN KEY (`task_id`) REFERENCES `task` (`id`) ON DELETE CASCADE;
-
-ALTER TABLE `task_respond` ADD FOREIGN KEY (`user_id`) REFERENCES `user` (`id`) ON DELETE CASCADE;
-
-ALTER TABLE `chat` ADD FOREIGN KEY (`user_id`) REFERENCES `user` (`id`) ON DELETE CASCADE;
-
-ALTER TABLE `chat` ADD FOREIGN KEY (`task_id`) REFERENCES `task` (`id`);
-
-ALTER TABLE `message` ADD FOREIGN KEY (`chat_id`) REFERENCES `chat` (`id`) ON DELETE CASCADE;
-
-ALTER TABLE `review` ADD FOREIGN KEY (`author_id`) REFERENCES `user` (`id`) ON DELETE CASCADE;
-
-ALTER TABLE `review` ADD FOREIGN KEY (`executor_id`) REFERENCES `user` (`id`) ON DELETE CASCADE;
+-- ALTER TABLE `user_data` ADD FOREIGN KEY (`user_id`) REFERENCES `user` (`id`);
+--
+-- ALTER TABLE `user_settings` ADD FOREIGN KEY (`user_id`) REFERENCES `user` (`id`);
+--
+-- ALTER TABLE `user_photo` ADD FOREIGN KEY (`user_id`) REFERENCES `user` (`id`);
+--
+-- ALTER TABLE `user_specialization` ADD FOREIGN KEY (`user_id`) REFERENCES `user` (`id`);
+--
+-- ALTER TABLE `user_specialization` ADD FOREIGN KEY (`category_id`) REFERENCES `category` (`id`);
+--
+-- ALTER TABLE `task` ADD FOREIGN KEY (`author_id`) REFERENCES `user` (`id`);
+--
+-- ALTER TABLE `task` ADD FOREIGN KEY (`category_id`) REFERENCES `category` (`id`);
+--
+-- ALTER TABLE `task` ADD FOREIGN KEY (`executor_id`) REFERENCES `user` (`id`);
+--
+-- ALTER TABLE `task_file` ADD FOREIGN KEY (`task_id`) REFERENCES `task` (`id`);
+--
+-- ALTER TABLE `task_respond` ADD FOREIGN KEY (`task_id`) REFERENCES `task` (`id`);
+--
+-- ALTER TABLE `task_respond` ADD FOREIGN KEY (`user_id`) REFERENCES `user` (`id`);
+--
+-- ALTER TABLE `chat` ADD FOREIGN KEY (`user_id`) REFERENCES `user` (`id`);
+--
+-- ALTER TABLE `chat` ADD FOREIGN KEY (`task_id`) REFERENCES `task` (`id`);
+--
+-- ALTER TABLE `message` ADD FOREIGN KEY (`chat_id`) REFERENCES `chat` (`id`);
+--
+-- ALTER TABLE `review` ADD FOREIGN KEY (`task_id`) REFERENCES `task` (`id`);
+--
+-- ALTER TABLE `review` ADD FOREIGN KEY (`author_id`) REFERENCES `user` (`id`);
+--
+-- ALTER TABLE `review` ADD FOREIGN KEY (`executor_id`) REFERENCES `user` (`id`);

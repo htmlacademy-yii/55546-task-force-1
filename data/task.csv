@@ -1,0 +1,5 @@
+id,title,category_id,date_start,date_end,description,price,author_id,executor_id,status
+
+1,test task 1,1,2019-11-13,2019-11-14,Suspendisse potenti.,1000,1,2,false
+2,test task 2,1,2019-11-13,2019-11-14,Suspendisse potenti.,1000,2,1,false
+3,test task 3,1,2019-11-13,2019-11-14,Suspendisse potenti.,1000,3,1,false
