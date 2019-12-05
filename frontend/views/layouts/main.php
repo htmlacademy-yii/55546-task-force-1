@@ -23,7 +23,7 @@ AppAsset::register($this);
     <link rel="stylesheet" href="css/normalize.css">
     <link rel="stylesheet" href="css/style.css">
     <?php $this->registerCsrfMetaTags() ?>
-    <title>TaskForce</title>
+    <title><?= Html::encode($this->title) ?></title>
     <?php $this->head() ?>
 </head>
 <body>
