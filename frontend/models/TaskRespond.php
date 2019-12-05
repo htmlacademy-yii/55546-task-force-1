@@ -3,6 +3,7 @@
 namespace app\models;
 
 use Yii;
+use \yii\db\ActiveRecord;
 
 /**
  * This is the model class for table "task_respond".
@@ -12,7 +13,7 @@ use Yii;
  * @property string|null $text
  * @property string|null $public_date
  */
-class TaskRespond extends \yii\db\ActiveRecord
+class TaskRespond extends ActiveRecord
 {
     /**
      * {@inheritdoc}

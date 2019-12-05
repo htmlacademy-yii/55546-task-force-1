@@ -3,6 +3,7 @@
 namespace app\models;
 
 use Yii;
+use \yii\db\ActiveRecord;
 
 /**
  * This is the model class for table "user_data".
@@ -21,7 +22,7 @@ use Yii;
  * @property int|null $order_count
  * @property string|null $status
  */
-class UserData extends \yii\db\ActiveRecord
+class UserData extends ActiveRecord
 {
     /**
      * {@inheritdoc}

@@ -3,6 +3,7 @@
 namespace app\models;
 
 use Yii;
+use \yii\db\ActiveRecord;
 
 /**
  * This is the model class for table "task".
@@ -18,7 +19,7 @@ use Yii;
  * @property int|null $executor_id
  * @property string|null $status
  */
-class Task extends \yii\db\ActiveRecord
+class Task extends ActiveRecord
 {
     const ROLE_OWNER = 'owner'; // заказчик
     const ROLE_EXECUTOR = 'executor'; // исполнитель

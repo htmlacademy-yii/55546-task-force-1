@@ -3,6 +3,7 @@
 namespace app\models;
 
 use Yii;
+use \yii\db\ActiveRecord;
 
 /**
  * This is the model class for table "user_settings".
@@ -11,7 +12,7 @@ use Yii;
  * @property int|null $is_hidden_contacts
  * @property int|null $is_hidden_profile
  */
-class UserSettings extends \yii\db\ActiveRecord
+class UserSettings extends ActiveRecord
 {
     /**
      * {@inheritdoc}

@@ -3,6 +3,7 @@
 namespace app\models;
 
 use Yii;
+use \yii\db\ActiveRecord;
 
 /**
  * This is the model class for table "message".
@@ -13,7 +14,7 @@ use Yii;
  * @property string|null $public_date
  * @property string|null $text
  */
-class Message extends \yii\db\ActiveRecord
+class Message extends ActiveRecord
 {
     /**
      * {@inheritdoc}

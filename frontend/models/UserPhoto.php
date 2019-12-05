@@ -3,6 +3,7 @@
 namespace app\models;
 
 use Yii;
+use \yii\db\ActiveRecord;
 
 /**
  * This is the model class for table "user_photo".
@@ -10,7 +11,7 @@ use Yii;
  * @property int|null $user_id
  * @property string|null $photo
  */
-class UserPhoto extends \yii\db\ActiveRecord
+class UserPhoto extends ActiveRecord
 {
     /**
      * {@inheritdoc}

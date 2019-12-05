@@ -3,6 +3,7 @@
 namespace app\models;
 
 use Yii;
+use \yii\db\ActiveRecord;
 
 /**
  * This is the model class for table "user_specialization".
@@ -10,7 +11,7 @@ use Yii;
  * @property int|null $user_id
  * @property int|null $category_id
  */
-class UserSpecialization extends \yii\db\ActiveRecord
+class UserSpecialization extends ActiveRecord
 {
     /**
      * {@inheritdoc}

@@ -3,6 +3,7 @@
 namespace app\models;
 
 use Yii;
+use \yii\db\ActiveRecord;
 
 /**
  * This is the model class for table "chat".
@@ -11,7 +12,7 @@ use Yii;
  * @property int|null $user_id
  * @property int|null $task_id
  */
-class Chat extends \yii\db\ActiveRecord
+class Chat extends ActiveRecord
 {
     /**
      * {@inheritdoc}

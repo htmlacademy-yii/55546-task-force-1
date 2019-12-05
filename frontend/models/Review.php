@@ -3,6 +3,7 @@
 namespace app\models;
 
 use Yii;
+use \yii\db\ActiveRecord;
 
 /**
  * This is the model class for table "review".
@@ -13,7 +14,7 @@ use Yii;
  * @property int|null $executor_id
  * @property string|null $text
  */
-class Review extends \yii\db\ActiveRecord
+class Review extends ActiveRecord
 {
     /**
      * {@inheritdoc}
