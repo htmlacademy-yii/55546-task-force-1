@@ -83,6 +83,12 @@ class Task extends ActiveRecord
         ];
     }
 
+//    public static function getTaskList(): array
+//    {
+//        self::find()->all();
+//        return [];
+//    }
+
     public function getStatus(): string
     {
         return $this->status;
