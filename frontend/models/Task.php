@@ -4,6 +4,7 @@ namespace app\models;
 
 use Yii;
 use yii\db\ActiveRecord;
+use app\models\{Category, UserData};
 
 /**
  * This is the model class for table "task".
@@ -83,11 +84,15 @@ class Task extends ActiveRecord
         ];
     }
 
-//    public static function getTaskList(): array
-//    {
-//        self::find()->all();
-//        return [];
-//    }
+    public function getCategory()
+    {
+        return $this->hasOne(Category::class, ['id' => 'category_id']);
+    }
+
+    public function getAuthor()
+    {
+        return $this->hasOne(UserData::class, ['user_id' => 'author_id']);
+    }
 
     public function getStatus(): string
     {

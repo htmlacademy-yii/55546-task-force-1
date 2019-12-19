@@ -1,21 +1,19 @@
-<?= $id; ?>
-
 <section class="new-task">
     <div class="new-task__wrapper">
         <h1>Новые задания</h1>
         <?php foreach ($tasks as $task): ?>
             <div class="new-task__card">
                 <div class="new-task__title">
-                    <a href="tasks/<?= $task['id']; ?>" class="link-regular"><h2><?= $task['title']; ?></h2></a>
-                    <a  class="new-task__type link-regular" href="category/<?= $task['category_id']; ?>">
-                        <p><?= $task['category']; ?></p>
+                    <a href="tasks/<?= $task->id; ?>" class="link-regular"><h2><?= $task->title; ?></h2></a>
+                    <a  class="new-task__type link-regular" href="category/<?= $task->category_id; ?>">
+                        <p><?= $task->category->title; ?></p>
                     </a>
                 </div>
-                <div class="new-task__icon new-task__icon--<?= $task['category_code']; ?>"></div>
-                <p class="new-task_description"><?= $task['description']; ?></p>
-                <b class="new-task__price new-task__price--<?= $task['category_code']; ?>"><?= $task['price']; ?><b> ₽</b></b>
-                <p class="new-task__place"><?= $task['address']; ?></p>
-                <span class="new-task__time"><?= $task['date_start']; ?></span>
+                <div class="new-task__icon new-task__icon--<?= $task->category->code; ?>"></div>
+                <p class="new-task_description"><?= $task->description; ?></p>
+                <b class="new-task__price new-task__price--<?= $task->category->code; ?>"><?= $task->price; ?><b> ₽</b></b>
+                <p class="new-task__place"><?= $task->author->address; ?></p>
+                <span class="new-task__time"><?= $task->date_start; ?></span>
             </div>
         <?php endforeach; ?>
     </div>
