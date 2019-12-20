@@ -34,8 +34,8 @@
             <fieldset class="search-task__categories">
                 <legend>Категории</legend>
                 <?php foreach ($categories as $category): ?>
-                    <input class="visually-hidden checkbox__input" id="<?= $category['id']; ?>" type="checkbox" name="" value="<?= $category['code']; ?>">
-                    <label for="<?= $category['id']; ?>"><?= $category['title']; ?></label>
+                    <input class="visually-hidden checkbox__input" id="<?= $category->id; ?>" type="checkbox" name="" value="<?= $category->code; ?>">
+                    <label for="<?= $category->id; ?>"><?= $category->title; ?></label>
                 <?php endforeach; ?>
             </fieldset>
             <fieldset class="search-task__categories">
