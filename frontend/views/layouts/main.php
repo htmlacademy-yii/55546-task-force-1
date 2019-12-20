@@ -2,7 +2,6 @@
 
 /* @var $this \yii\web\View */
 /* @var $content string */
-
 use yii\helpers\Html;
 use yii\bootstrap\Nav;
 use yii\bootstrap\NavBar;
@@ -23,7 +22,7 @@ AppAsset::register($this);
     <link rel="stylesheet" href="css/normalize.css">
     <link rel="stylesheet" href="css/style.css">
     <?php $this->registerCsrfMetaTags() ?>
-    <title><?= Html::encode($this->title) ?></title>
+    <title>TaskForce</title>
     <?php $this->head() ?>
 </head>
 <body>
@@ -127,7 +126,7 @@ AppAsset::register($this);
         </div>
     </header>
     <main class="page-main">
-        <div class="main-container">
+        <div class="main-container page-container">
             <?= $content; ?>
         </div>
     </main>
