@@ -2,11 +2,6 @@
 use yii\helpers\Html;
 use yii\widgets\ActiveForm;
 use yii\widgets\ActiveField;
-
-
-//var_dump($filters);
-echo '<pre>' . print_r($filters, true) . '</pre>';
-
 ?>
 
 <section class="new-task">
