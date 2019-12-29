@@ -1,3 +1,14 @@
+<?php
+use yii\helpers\Html;
+use yii\widgets\ActiveForm;
+use yii\widgets\ActiveField;
+
+
+//var_dump($filters);
+echo '<pre>' . print_r($filters, true) . '</pre>';
+
+?>
+
 <section class="new-task">
     <div class="new-task__wrapper">
         <h1>Новые задания</h1>
@@ -30,30 +41,44 @@
 </section>
 <section  class="search-task">
     <div class="search-task__wrapper">
-        <form class="search-task__form" name="test" method="post" action="#">
+        <?php $form = ActiveForm::begin([
+            'options' => [
+                'class' => 'search-task__form',
+                'name' => 'test',
+                'method' => 'post',
+                'action' => '#'
+            ]
+        ]); ?>
             <fieldset class="search-task__categories">
                 <legend>Категории</legend>
                 <?php foreach ($categories as $category): ?>
-                    <input class="visually-hidden checkbox__input" id="<?= $category->id; ?>" type="checkbox" name="" value="<?= $category->code; ?>">
-                    <label for="<?= $category->id; ?>"><?= $category->title; ?></label>
+                    <input class="visually-hidden checkbox__input" id="category-<?= $category->id; ?>"
+                           type="checkbox" name="filters[category][<?= $category->id; ?>]"
+                            <?= isset($filters['category'][$category->id]) ? 'checked' : ''; ?>>
+                    <label for="category-<?= $category->id; ?>"><?= $category->title; ?></label>
                 <?php endforeach; ?>
             </fieldset>
             <fieldset class="search-task__categories">
                 <legend>Дополнительно</legend>
-                <input class="visually-hidden checkbox__input" id="6" type="checkbox" name="" value="">
-                <label for="6">Без исполнителя </label>
-                <input class="visually-hidden checkbox__input" id="7" type="checkbox" name="" value="" checked>
-                <label for="7">Удаленная работа </label>
+                <input class="visually-hidden checkbox__input" id="is-no-executor"
+                       type="checkbox" name="filters[is-no-executor]"
+                    <?= isset($filters['is-no-executor']) ? 'checked' : ''; ?>>
+                <label for="is-no-executor">Без исполнителя </label>
+                <input class="visually-hidden checkbox__input" id="is-telework"
+                       type="checkbox" name="filters[is-telework]"
+                    <?= isset($filters['is-telework']) ? 'checked' : ''; ?>>
+                <label for="is-telework">Удаленная работа </label>
             </fieldset>
-            <label class="search-task__name" for="8">Период</label>
-            <select class="multiple-select input" id="8"size="1" name="time[]">
-                <option value="day">За день</option>
-                <option selected value="week">За неделю</option>
-                <option value="month">За месяц</option>
+            <label class="search-task__name" for="time">Период</label>
+            <select class="multiple-select input" id="time"size="1" name="filters[time]">
+                <option value="day" <?= $filters['time'] === 'day' ? 'selected' : ''; ?>>За день</option>
+                <option value="week" <?= $filters['time'] === 'week' ? 'selected' : ''; ?>>За неделю</option>
+                <option value="month" <?= $filters['time'] === 'month' ? 'selected' : ''; ?>>За месяц</option>
             </select>
-            <label class="search-task__name" for="9">Поиск по названию</label>
-            <input class="input-middle input" id="9" type="search" name="q" placeholder="">
+            <label class="search-task__name" for="title">Поиск по названию</label>
+            <input class="input-middle input" id="title" type="search" name="filters[title]"
+                value="<?= $filters['title'] ?? ''; ?>">
             <button class="button" type="submit">Искать</button>
-        </form>
+        <?php ActiveForm::end(); ?>
     </div>
 </section>
