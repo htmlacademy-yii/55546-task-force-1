@@ -12,19 +12,7 @@ class TasksController extends Controller
     public function actionIndex()
     {
         $filters = Yii::$app->request->post('filters');
-        $tasks = Task::find()->where(['status' => 'false']);
-
-
-        /*
-
-        (
-            [is-telework] => on
-            [time] => month
-            [title] => выаываыв
-        )
-
-         * */
-
+        $tasks = Task::find()->where(['status' => false]);
 
         if($filters) {
             if(isset($filters['category'])) {
@@ -32,6 +20,12 @@ class TasksController extends Controller
             }
             if(isset($filters['is-no-executor'])) {
                 $tasks->andWhere("`executor_id` IS NULL");
+            }
+            if(isset($filters['is-telework'])) {
+                $tasks->andWhere(['is_telework' => true]);
+            }
+            if(isset($filters['title'])) {
+                $tasks->andWhere(['like', 'title', $filters['title']]);
             }
         }
 
