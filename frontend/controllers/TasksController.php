@@ -6,6 +6,7 @@ use Yii;
 use yii\web\Controller;
 use app\models\Task;
 use app\models\Category;
+use app\models\TasksFilter;
 
 class TasksController extends Controller
 {
@@ -13,24 +14,15 @@ class TasksController extends Controller
     {
         $filters = Yii::$app->request->post('filters');
         $tasks = Task::find()->where(['status' => false]);
+        $taskModel = new TasksFilter($filters, $tasks);
 
-        if($filters) {
-            if(isset($filters['category'])) {
-                $tasks->andWhere("`category_id` IN (" . implode(',', array_keys($filters['category'])) . ")");
-            }
-            if(isset($filters['is-no-executor'])) {
-                $tasks->andWhere("`executor_id` IS NULL");
-            }
-            if(isset($filters['is-telework'])) {
-                $tasks->andWhere(['is_telework' => true]);
-            }
-            if(isset($filters['title'])) {
-                $tasks->andWhere(['like', 'title', $filters['title']]);
-            }
+        if(Yii::$app->request->isPost) {
+            $tasks = $taskModel->applyFilters();
         }
 
         return $this->render('index', [
             'tasks' => $tasks->with(['category', 'author'])->orderBy('date_start DESC')->all(),
+            'taskModel' => $taskModel,
             'filters' => $filters,
             'categories' => Category::find()->all(),
         ]);

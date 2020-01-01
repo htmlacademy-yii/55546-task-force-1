@@ -1,5 +1,4 @@
 <?php
-use yii\helpers\Html;
 use yii\widgets\ActiveForm;
 use yii\widgets\ActiveField;
 ?>
@@ -47,10 +46,13 @@ use yii\widgets\ActiveField;
             <fieldset class="search-task__categories">
                 <legend>Категории</legend>
                 <?php foreach ($categories as $category): ?>
-                    <input class="visually-hidden checkbox__input" id="category-<?= $category->id; ?>"
-                           type="checkbox" name="filters[category][<?= $category->id; ?>]"
-                            <?= isset($filters['category'][$category->id]) ? 'checked' : ''; ?>>
-                    <label for="category-<?= $category->id; ?>"><?= $category->title; ?></label>
+                    <?= $form->field($taskModel, 'category')
+                        ->checkbox([
+                        'id' => "category-{$category->id}",
+                        'class' => "visually-hidden checkbox__input",
+                        'name' => "filters[category][$category->id]",
+                        'checked' => isset($filters['category'][$category->id]),
+                    ])->label($category->title); ?>
                 <?php endforeach; ?>
             </fieldset>
             <fieldset class="search-task__categories">
