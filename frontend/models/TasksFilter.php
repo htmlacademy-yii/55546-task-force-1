@@ -30,10 +30,10 @@ class TasksFilter extends Model
         if(isset($this->category)) {
             $this->taskQuery->andWhere("`category_id` IN (" . implode(',', array_keys($this->category)) . ")");
         }
-        if(isset($this->isNoExecutor)) {
+        if($this->isNoExecutor === 'on') {
             $this->taskQuery->andWhere("`executor_id` IS NULL");
         }
-        if(isset($this->isTelework)) {
+        if($this->isTelework === 'on') {
             $this->taskQuery->andWhere(['is_telework' => true]);
         }
         if(isset($this->title)) {

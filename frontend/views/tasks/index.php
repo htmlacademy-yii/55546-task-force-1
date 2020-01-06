@@ -1,6 +1,8 @@
 <?php
+use yii\helpers\Html;
 use yii\widgets\ActiveForm;
-use yii\widgets\ActiveField;
+
+echo "<pre>".print_r($filters, true)."</pre>";
 ?>
 
 <section class="new-task">
@@ -35,47 +37,60 @@ use yii\widgets\ActiveField;
 </section>
 <section  class="search-task">
     <div class="search-task__wrapper">
-        <?php $form = ActiveForm::begin([
-            'options' => [
-                'class' => 'search-task__form',
-                'name' => 'test',
-                'method' => 'post',
-                'action' => '#'
-            ]
-        ]); ?>
+        <?php $form = ActiveForm::begin(['options' => ['class' => 'search-task__form', 'method' => 'post']]); ?>
             <fieldset class="search-task__categories">
                 <legend>Категории</legend>
-                <?php foreach ($categories as $category): ?>
-                    <?= $form->field($taskModel, 'category')
-                        ->checkbox([
-                        'id' => "category-{$category->id}",
-                        'class' => "visually-hidden checkbox__input",
-                        'name' => "filters[category][$category->id]",
-                        'checked' => isset($filters['category'][$category->id]),
-                    ])->label($category->title); ?>
-                <?php endforeach; ?>
+                <?= $form->field($taskModel, 'category')
+                    ->checkboxList(yii\helpers\ArrayHelper::map($categories, 'id', 'title'),
+                        ['item' => function ($_index, $title, $_name, $_checked, $id) use ($filters) {
+                            $checked = isset($filters['category'][$id]) ? 'checked' : '';
+                            return "<input
+                                class='visually-hidden checkbox__input'
+                                type='checkbox'
+                                name='filters[category][$id]'
+                                id='category-$id'
+                                $checked>
+                                <label for='category-$id'>$title</label>";
+                        }]
+                    )->label(false); ?>
             </fieldset>
             <fieldset class="search-task__categories">
                 <legend>Дополнительно</legend>
-                <input class="visually-hidden checkbox__input" id="is-no-executor"
-                       type="checkbox" name="filters[is-no-executor]"
-                    <?= isset($filters['is-no-executor']) ? 'checked' : ''; ?>>
-                <label for="is-no-executor">Без исполнителя </label>
-                <input class="visually-hidden checkbox__input" id="is-telework"
-                       type="checkbox" name="filters[is-telework]"
-                    <?= isset($filters['is-telework']) ? 'checked' : ''; ?>>
-                <label for="is-telework">Удаленная работа </label>
+                <?php
+                    foreach ([
+                        'isNoExecutor' => ['Без исполнителя', 'is-no-executor'],
+                        'isTelework' => ['Удаленная работа', 'is-telework'],
+                    ] as $attr => $data) {
+                        echo $form->field($taskModel, $attr, [
+                            'template' => "{input}\n{label}",
+                            'options' => ['tag' => false]
+                        ])->checkbox([
+                            'class' => 'visually-hidden checkbox__input',
+                            'name' => "filters[$data[1]]",
+                            'checked' => $filters[$data[1]] === 'on',
+                            'value' => 'on'
+                        ], false)->label($data[0]);
+                    }
+                ?>
             </fieldset>
-            <label class="search-task__name" for="time">Период</label>
-            <select class="multiple-select input" id="time"size="1" name="filters[time]">
-                <option value="day" <?= $filters['time'] === 'day' ? 'selected' : ''; ?>>За день</option>
-                <option value="week" <?= $filters['time'] === 'week' ? 'selected' : ''; ?>>За неделю</option>
-                <option value="month" <?= $filters['time'] === 'month' ? 'selected' : ''; ?>>За месяц</option>
-            </select>
-            <label class="search-task__name" for="title">Поиск по названию</label>
-            <input class="input-middle input" id="title" type="search" name="filters[title]"
-                value="<?= $filters['title'] ?? ''; ?>">
-            <button class="button" type="submit">Искать</button>
+            <?php
+            echo $form->field($taskModel, 'time', [
+                'template' => "{label}\n{input}",
+                'options' => ['tag' => false]
+            ])->dropDownList(['day' => 'За день', 'week' => 'За неделю', 'month' => 'За месяц'],
+                ['class' => 'multiple-select input', 'name' => 'filters[time]']
+            )->label('Период', ['class' => 'search-task__name']);
+
+            echo $form->field($taskModel, 'title', [
+                'template' => "{label}\n{input}",
+                'options' => ['tag' => false]
+            ])->textInput([
+                'class' => 'input-middle input',
+                'name' => 'filters[title]'
+            ])->label('Поиск по названию', ['class' => 'search-task__name']);
+
+            echo Html::submitButton('Искать', ['class' => 'button'])
+            ?>
         <?php ActiveForm::end(); ?>
     </div>
 </section>
