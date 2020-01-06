@@ -1,8 +1,6 @@
 <?php
 use yii\helpers\Html;
 use yii\widgets\ActiveForm;
-
-echo "<pre>".print_r($filters, true)."</pre>";
 ?>
 
 <section class="new-task">
