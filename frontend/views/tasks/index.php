@@ -41,18 +41,6 @@ use yii\widgets\ActiveForm;
 
                 <?= $form->field($taskModel, 'category')
                     ->checkboxList(yii\helpers\ArrayHelper::map($categories, 'id', 'title'),
-                        ['item' => function ($_index, $title, $_name, $_checked, $id) {
-                            return "<input
-                                class='visually-hidden checkbox__input'
-                                type='checkbox'
-                                name='category[$id]'
-                                id='category-$id'>
-                                <label for='category-$id'>$title</label>";
-                        }]
-                    )->label(false); ?>
-
-                <!--<?= $form->field($taskModel, 'category')
-                    ->checkboxList(yii\helpers\ArrayHelper::map($categories, 'id', 'title'),
                         ['item' => function ($_index, $title, $_name, $_checked, $id) use ($filters) {
                             $checked = isset($filters['category'][$id]) ? 'checked' : '';
                             return "<input
@@ -63,7 +51,7 @@ use yii\widgets\ActiveForm;
                                 $checked>
                                 <label for='category-$id'>$title</label>";
                         }]
-                    )->label(false); ?>-->
+                    )->label(false); ?>
             </fieldset>
             <fieldset class="search-task__categories">
                 <legend>Дополнительно</legend>
