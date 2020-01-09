@@ -37,7 +37,5 @@ class TasksFilter extends Model
         if(isset($this->title)) {
             $taskQuery->andWhere(['like', 'title', $this->title]);
         }
-
-        return $taskQuery;
     }
 }

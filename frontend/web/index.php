@@ -14,4 +14,8 @@ $config = yii\helpers\ArrayHelper::merge(
     require __DIR__ . '/../config/main-local.php'
 );
 
+function debug($data) {
+    echo "<pre>" . print_r($data, true) . "</pre>";
+}
+
 (new yii\web\Application($config))->run();

@@ -38,8 +38,18 @@ use yii\widgets\ActiveForm;
         <?php $form = ActiveForm::begin(['options' => ['class' => 'search-task__form', 'method' => 'post']]); ?>
             <fieldset class="search-task__categories">
                 <legend>Категории</legend>
+
                 <?= $form->field($taskModel, 'category')
-                    ->dropDownList($categories); ?>
+                    ->checkboxList(yii\helpers\ArrayHelper::map($categories, 'id', 'title'),
+                        ['item' => function ($_index, $title, $_name, $_checked, $id) {
+                            return "<input
+                                class='visually-hidden checkbox__input'
+                                type='checkbox'
+                                name='category[$id]'
+                                id='category-$id'>
+                                <label for='category-$id'>$title</label>";
+                        }]
+                    )->label(false); ?>
 
                 <!--<?= $form->field($taskModel, 'category')
                     ->checkboxList(yii\helpers\ArrayHelper::map($categories, 'id', 'title'),
