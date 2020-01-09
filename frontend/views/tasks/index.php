@@ -39,6 +39,9 @@ use yii\widgets\ActiveForm;
             <fieldset class="search-task__categories">
                 <legend>Категории</legend>
                 <?= $form->field($taskModel, 'category')
+                    ->dropDownList($categories); ?>
+
+                <!--<?= $form->field($taskModel, 'category')
                     ->checkboxList(yii\helpers\ArrayHelper::map($categories, 'id', 'title'),
                         ['item' => function ($_index, $title, $_name, $_checked, $id) use ($filters) {
                             $checked = isset($filters['category'][$id]) ? 'checked' : '';
@@ -50,11 +53,11 @@ use yii\widgets\ActiveForm;
                                 $checked>
                                 <label for='category-$id'>$title</label>";
                         }]
-                    )->label(false); ?>
+                    )->label(false); ?>-->
             </fieldset>
             <fieldset class="search-task__categories">
                 <legend>Дополнительно</legend>
-                <?php
+                <!--<?php
                     foreach ([
                         'isNoExecutor' => ['Без исполнителя', 'is-no-executor'],
                         'isTelework' => ['Удаленная работа', 'is-telework'],
@@ -69,23 +72,23 @@ use yii\widgets\ActiveForm;
                             'value' => 'on'
                         ], false)->label($data[0]);
                     }
-                ?>
+                ?>-->
             </fieldset>
             <?php
-            echo $form->field($taskModel, 'time', [
-                'template' => "{label}\n{input}",
-                'options' => ['tag' => false]
-            ])->dropDownList(['day' => 'За день', 'week' => 'За неделю', 'month' => 'За месяц'],
-                ['class' => 'multiple-select input', 'name' => 'filters[time]']
-            )->label('Период', ['class' => 'search-task__name']);
-
-            echo $form->field($taskModel, 'title', [
-                'template' => "{label}\n{input}",
-                'options' => ['tag' => false]
-            ])->textInput([
-                'class' => 'input-middle input',
-                'name' => 'filters[title]'
-            ])->label('Поиск по названию', ['class' => 'search-task__name']);
+//            echo $form->field($taskModel, 'time', [
+//                'template' => "{label}\n{input}",
+//                'options' => ['tag' => false]
+//            ])->dropDownList(['day' => 'За день', 'week' => 'За неделю', 'month' => 'За месяц'],
+//                ['class' => 'multiple-select input', 'name' => 'filters[time]']
+//            )->label('Период', ['class' => 'search-task__name']);
+//
+//            echo $form->field($taskModel, 'title', [
+//                'template' => "{label}\n{input}",
+//                'options' => ['tag' => false]
+//            ])->textInput([
+//                'class' => 'input-middle input',
+//                'name' => 'filters[title]'
+//            ])->label('Поиск по названию', ['class' => 'search-task__name']);
 
             echo Html::submitButton('Искать', ['class' => 'button'])
             ?>

@@ -12,18 +12,17 @@ class TasksController extends Controller
 {
     public function actionIndex()
     {
-        $filters = Yii::$app->request->post('filters');
         $tasks = Task::find()->where(['status' => false]);
-        $taskModel = new TasksFilter($filters, $tasks);
+        $taskModel = new TasksFilter();
 
         if(Yii::$app->request->isPost) {
-            $tasks = $taskModel->applyFilters();
+            $taskModel->load(Yii::$app->request->post());
+            $taskModel->applyFilters($tasks);
         }
 
         return $this->render('index', [
             'tasks' => $tasks->with(['category', 'author'])->orderBy('date_start DESC')->all(),
             'taskModel' => $taskModel,
-            'filters' => $filters,
             'categories' => Category::find()->all(),
         ]);
     }
