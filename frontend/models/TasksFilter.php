@@ -7,11 +7,18 @@ use yii\db\ActiveQuery;
 
 class TasksFilter extends Model
 {
-    public $category;
+    public $category = [];
     public $isNoExecutor;
     public $isTelework;
     public $title;
     public $time;
+
+    public function rules()
+    {
+        return [
+            [['category', 'isNoExecutor', 'isTelework', 'title', 'time'], 'safe'],
+        ];
+    }
 
     public function attributeLabels()
     {
@@ -25,15 +32,18 @@ class TasksFilter extends Model
     }
 
     public function applyFilters(ActiveQuery &$taskQuery) {
-        if(isset($this->category)) {
+        if(is_array($this->category)) {
             $taskQuery->andWhere("`category_id` IN (" . implode(',', array_keys($this->category)) . ")");
         }
-        if($this->isNoExecutor === 'on') {
+
+        if($this->isNoExecutor) {
             $taskQuery->andWhere("`executor_id` IS NULL");
         }
-        if($this->isTelework === 'on') {
+
+        if($this->isTelework) {
             $taskQuery->andWhere(['is_telework' => true]);
         }
+
         if(isset($this->title)) {
             $taskQuery->andWhere(['like', 'title', $this->title]);
         }

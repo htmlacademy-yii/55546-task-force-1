@@ -23,7 +23,6 @@ class TasksController extends Controller
         return $this->render('index', [
             'tasks' => $tasks->with(['category', 'author'])->orderBy('date_start DESC')->all(),
             'taskModel' => $taskModel,
-            'filters' => Yii::$app->request->post('filters'),
             'categories' => Category::find()->all(),
         ]);
     }
