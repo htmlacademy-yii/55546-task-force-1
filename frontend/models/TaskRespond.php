@@ -4,6 +4,7 @@ namespace app\models;
 
 use Yii;
 use yii\db\ActiveRecord;
+use app\models\{UserData};
 
 /**
  * This is the model class for table "task_respond".
@@ -46,5 +47,10 @@ class TaskRespond extends ActiveRecord
             'text' => 'Text',
             'public_date' => 'Public Date',
         ];
+    }
+
+    public function getUser()
+    {
+        return $this->hasOne(UserData::class, ['user_id' => 'user_id']);
     }
 }

@@ -4,7 +4,7 @@ namespace app\models;
 
 use Yii;
 use yii\db\ActiveRecord;
-use app\models\{Category, UserData, Review, TaskFile};
+use app\models\{Category, UserData, Review, TaskFile, TaskRespond};
 
 /**
  * This is the model class for table "task".
@@ -96,12 +96,17 @@ class Task extends ActiveRecord
 
     public function getReviewsCount()
     {
-        return $this->hasOne(Review::class, ['author_id' => 'id'])->asArray();
+        return $this->hasOne(Review::class, ['author_id' => 'id']);
     }
 
     public function getFiles()
     {
         return $this->hasMany(TaskFile::class, ['task_id' => 'id'])->asArray();
+    }
+
+    public function getResponds()
+    {
+        return $this->hasMany(TaskRespond::class, ['task_id' => 'id']);
     }
 
     public function getStatus(): string

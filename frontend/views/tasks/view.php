@@ -61,58 +61,36 @@ $this->title = "Задание: $task->title";
         </div>
     </div>
     <div class="content-view__feedback">
-        <h2>Отклики <span>(2)</span></h2>
+        <h2>Отклики <span>(<?= count($task->responds); ?>)</span></h2>
+
         <div class="content-view__feedback-wrapper">
-            <div class="content-view__feedback-card">
-                <div class="feedback-card__top">
-                    <a href="#"><img src="/img/man-glasses.jpg" width="55" height="55"></a>
-                    <div class="feedback-card__top--name">
-                        <p><a href="#" class="link-regular">Астахов Павел</a></p>
-                        <span></span><span></span><span></span><span></span><span class="star-disabled"></span>
-                        <b>4.25</b>
+            <?php foreach ($task->responds as $respond): ?>
+                <div class="content-view__feedback-card">
+                    <div class="feedback-card__top">
+                        <a href="#"><img src="/img/man-glasses.jpg" width="55" height="55"></a>
+                        <div class="feedback-card__top--name">
+                            <p><a href="#" class="link-regular"><?= $respond->user->name; ?></a></p>
+                            <?php for ($i = 1; $i <= 5; $i++): ?>
+                                <span <?= ($respond->user->rating >= $i) ? '' : 'class="star-disabled"'; ?>></span>
+                            <?php endfor; ?>
+                            <b><?= $respond->user->rating; ?></b>
+                        </div>
+                        <span class="new-task__time"><?= $respond->public_date; ?> назад</span>
                     </div>
-                    <span class="new-task__time">25 минут назад</span>
-                </div>
-                <div class="feedback-card__content">
-                    <p>
-                        Могу сделать всё в лучшем виде. У меня есть необходимый опыт и инструменты.
-                    </p>
-                    <span>1500 ₽</span>
-                </div>
-                <div class="feedback-card__actions">
-                    <button class="button__small-color response-button button"
-                            type="button">Откликнуться</button>
-                    <button class="button__small-color refusal-button button"
-                            type="button">Отказаться</button>
-                    <button class="button__chat button"
-                            type="button"></button>
-                </div>
-            </div>
-            <div class="content-view__feedback-card">
-                <div class="feedback-card__top">
-                    <a href="#"><img src="/img/man-blond.jpg" width="55" height="55"></a>
-                    <div class="feedback-card__top--name">
-                        <p class="link-name"><a href="#" class="link-regular">Богатырев Дмитрий</a></p>
-                        <span></span><span></span><span></span><span></span><span class="star-disabled"></span>
-                        <b>4.25</b>
+                    <div class="feedback-card__content">
+                        <p><?= $respond->text; ?></p>
+                        <span><?= $respond->price; ?> ₽</span>
                     </div>
-                    <span class="new-task__time">25 минут назад</span>
+                    <div class="feedback-card__actions">
+                        <button class="button__small-color response-button button"
+                                type="button">Откликнуться</button>
+                        <button class="button__small-color refusal-button button"
+                                type="button">Отказаться</button>
+                        <button class="button__chat button"
+                                type="button"></button>
+                    </div>
                 </div>
-                <div class="feedback-card__content">
-                    <p>
-                        Примусь за выполнение задания в течение часа, сделаю быстро и качественно.
-                    </p>
-                    <span>1500 ₽</span>
-                </div>
-                <div class="feedback-card__actions">
-                    <button class="button__small-color response-button button"
-                            type="button">Откликнуться</button>
-                    <button class="button__small-color refusal-button button"
-                            type="button">Отказаться</button>
-                    <button class="button__chat button"
-                            type="button"></button>
-                </div>
-            </div>
+            <?php endforeach; ?>
         </div>
     </div>
 </section>
@@ -125,7 +103,7 @@ $this->title = "Задание: $task->title";
                 <div class="profile-mini__name five-stars__rate">
                     <p><?= $task->author->name; ?></p>
                     <?php for ($i = 1; $i <= 5; $i++): ?>
-                        <span <?= ($task->author->rating > $i) ? '' : 'class="star-disabled"'; ?>></span>
+                        <span <?= ($task->author->rating >= $i) ? '' : 'class="star-disabled"'; ?>></span>
                     <?php endfor; ?>
                     <b><?= $task->author->rating ?></b>
                 </div>
