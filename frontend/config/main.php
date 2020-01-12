@@ -39,7 +39,9 @@ return [
         'urlManager' => [
             'enablePrettyUrl' => true,
             'showScriptName' => false,
-            'rules' => [],
+            'rules' => [
+                'tasks/view/<id>' => 'tasks/view'
+            ],
         ],
     ],
     'params' => $params,
