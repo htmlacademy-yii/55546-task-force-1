@@ -1,3 +1,8 @@
+<?php
+use yii\helpers\Html;
+use yii\widgets\ActiveForm;
+?>
+
 <section class="new-task">
     <div class="new-task__wrapper">
         <h1>Новые задания</h1>
@@ -30,30 +35,55 @@
 </section>
 <section  class="search-task">
     <div class="search-task__wrapper">
-        <form class="search-task__form" name="test" method="post" action="#">
+        <?php $form = ActiveForm::begin(['options' => ['class' => 'search-task__form']]); ?>
             <fieldset class="search-task__categories">
                 <legend>Категории</legend>
-                <?php foreach ($categories as $category): ?>
-                    <input class="visually-hidden checkbox__input" id="<?= $category->id; ?>" type="checkbox" name="" value="<?= $category->code; ?>">
-                    <label for="<?= $category->id; ?>"><?= $category->title; ?></label>
-                <?php endforeach; ?>
+
+                <?= $form->field($taskModel, 'category')
+                    ->checkboxList(yii\helpers\ArrayHelper::map($categories, 'id', 'title'), [
+                    'item' => function ($_index, $label, $name, $checked, $id) {
+                        //@todo refactoring
+                        $checked = $checked ? "checked" : "";
+                        return "<input
+                            class='visually-hidden checkbox__input'
+                            type='checkbox'
+                            name='$name'
+                            id='category-$id'
+                            value='$id'
+                            $checked>
+                            <label for='category-$id'>$label</label>";
+                    }
+                ])->label(false); ?>
             </fieldset>
             <fieldset class="search-task__categories">
                 <legend>Дополнительно</legend>
-                <input class="visually-hidden checkbox__input" id="6" type="checkbox" name="" value="">
-                <label for="6">Без исполнителя </label>
-                <input class="visually-hidden checkbox__input" id="7" type="checkbox" name="" value="" checked>
-                <label for="7">Удаленная работа </label>
+
+                <?php
+                foreach (['isNoExecutor', 'isTelework'] as $attr) {
+                    echo $form->field($taskModel, $attr, [
+                        'template' => "{input}\n{label}",
+                        'options' => ['tag' => false]
+                    ])->checkbox(['class' => 'visually-hidden checkbox__input'], false);
+                }
+                ?>
             </fieldset>
-            <label class="search-task__name" for="8">Период</label>
-            <select class="multiple-select input" id="8"size="1" name="time[]">
-                <option value="day">За день</option>
-                <option selected value="week">За неделю</option>
-                <option value="month">За месяц</option>
-            </select>
-            <label class="search-task__name" for="9">Поиск по названию</label>
-            <input class="input-middle input" id="9" type="search" name="q" placeholder="">
-            <button class="button" type="submit">Искать</button>
-        </form>
+            <?php
+            echo $form->field($taskModel, 'time', [
+                'template' => "{label}\n{input}",
+                'options' => ['tag' => false]
+            ])->dropDownList(['day' => 'За день', 'week' => 'За неделю', 'month' => 'За месяц'],
+                ['class' => 'multiple-select input']
+            )->label('Период', ['class' => 'search-task__name']);
+
+            echo $form->field($taskModel, 'title', [
+                    'template' => "{label}\n{input}",
+                    'options' => ['tag' => false]
+                ])
+                ->textInput(['class' => 'input-middle input'])
+                ->label('Поиск по названию', ['class' => 'search-task__name']);
+
+            echo Html::submitButton('Искать', ['class' => 'button'])
+            ?>
+        <?php ActiveForm::end(); ?>
     </div>
 </section>
