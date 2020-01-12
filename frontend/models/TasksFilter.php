@@ -32,8 +32,8 @@ class TasksFilter extends Model
     }
 
     public function applyFilters(ActiveQuery &$taskQuery) {
-        if(is_array($this->category)) {
-            $taskQuery->andWhere("`category_id` IN (" . implode(',', array_keys($this->category)) . ")");
+        if(!empty($this->category)) {
+            $taskQuery->andWhere(['category_id' => $this->category]);
         }
 
         if($this->isNoExecutor) {

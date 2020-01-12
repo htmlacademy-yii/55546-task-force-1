@@ -39,13 +39,11 @@ use yii\widgets\ActiveForm;
             <fieldset class="search-task__categories">
                 <legend>Категории</legend>
 
-                <?= $form->field($taskModel, 'category', [
-                    'template' => "{input}\n{label}",
-                    'options' => ['tag' => false],
-                ])->checkboxList(yii\helpers\ArrayHelper::map($categories, 'id', 'title'), [
+                <?= $form->field($taskModel, 'category')
+                    ->checkboxList(yii\helpers\ArrayHelper::map($categories, 'id', 'title'), [
                     'item' => function ($_index, $label, $name, $checked, $id) {
+                        //@todo refactoring
                         $checked = $checked ? "checked" : "";
-                        $name = rtrim($name, ']') . "$id]";
                         return "<input
                             class='visually-hidden checkbox__input'
                             type='checkbox'
