@@ -7,12 +7,12 @@ CREATE TABLE `user` (
   `login` varchar(255) NOT NULL,
   `email` varchar(255) NOT NULL,
   `password` varchar(255) NOT NULL,
+  `city_id` int NOT NULL,
   `date_registration` timestamp DEFAULT now()
 );
 
 CREATE TABLE `user_data` (
   `user_id` int,
-  `name` varchar(255),
   `description` text,
   `age` int,
   `address` text,

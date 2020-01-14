@@ -4,31 +4,30 @@ use yii\bootstrap\ActiveForm;
 
 $this->title = 'Регистрация аккаунта';
 $this->params['breadcrumbs'][] = $this->title;
+$fieldConfig = ['template' => "{label}\n{input}", 'options' => ['tag' => false]];
 ?>
 <section class="registration__user">
     <h1>Регистрация аккаунта</h1>
     <div class="registration-wrapper">
-        <form class="registration__user-form form-create">
-            <label for="16">Электронная почта</label>
-            <textarea class="input textarea" rows="1" id="16" name="" placeholder="kumarm@mail.ru"></textarea>
+        <?php $form = ActiveForm::begin(['options' => ['class' => 'registration__user-form form-create']]) ?>
+            <?= $form->field($model, 'email', $fieldConfig)
+                ->textarea(['class' => 'input textarea', 'rows' => 1, 'placeholder' => 'kumarm@mail.ru', 'value' => 'kumarm@mail.ru']); ?>
             <span>Введите валидный адрес электронной почты</span>
-            <label for="17">Ваше имя</label>
-            <textarea class="input textarea" rows="1" id="17" name="" placeholder="Мамедов Кумар"></textarea>
+
+            <?= $form->field($model, 'login', $fieldConfig)
+                ->textarea(['class' => 'input textarea', 'rows' => 1, 'placeholder' => 'Мамедов Кумар', 'value' => 'Мамедов Кумар']); ?>
             <span>Введите ваше имя и фамилию</span>
-            <label for="18">Город проживания</label>
-            <select id="18" class="multiple-select input town-select registration-town" size="1" name="town[]">
-                <option value="Moscow">Москва</option>
-                <option selected value="SPB">Санкт-Петербург</option>
-                <option value="Krasnodar">Краснодар</option>
-                <option value="Irkutsk">Иркутск</option>
-                <option value="Bladivostok">Владивосток</option>
-            </select>
+
+            <?= $form->field($model, 'city_id', $fieldConfig)
+                ->dropDownList($cities, ['class' => 'multiple-select input town-select registration-town']); ?>
             <span>Укажите город, чтобы находить подходящие задачи</span>
-            <label class="input-danger" for="19">Пароль</label>
-            <input class="input textarea " type="password" id="19" name="">
+
+            <?= $form->field($model, 'password', $fieldConfig)
+                ->passwordInput(['class' => 'input textarea', 'value' => '123123123'])->label(null, ['class' => 'input-danger']); ?>
             <span>Длина пароля от 8 символов</span>
-            <button class="button button__registration" type="submit">Cоздать аккаунт</button>
-        </form>
+
+            <?= Html::submitButton('Cоздать аккаунт', ['class' => 'button button__registration']); ?>
+        <?php ActiveForm::end() ?>
     </div>
 </section>
 

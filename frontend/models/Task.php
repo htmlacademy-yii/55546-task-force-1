@@ -4,22 +4,8 @@ namespace app\models;
 
 use Yii;
 use yii\db\ActiveRecord;
-use app\models\{Category, UserData, Review, TaskFile, TaskRespond};
+use app\models\{Category, UserData, Review, TaskFile, TaskRespond, User};
 
-/**
- * This is the model class for table "task".
- *
- * @property int $id
- * @property int|null $author_id
- * @property string|null $title
- * @property string|null $description
- * @property int|null $category_id
- * @property int|null $price
- * @property string|null $date_start
- * @property string|null $date_end
- * @property int|null $executor_id
- * @property string|null $status
- */
 class Task extends ActiveRecord
 {
     const ROLE_OWNER = 'owner'; // заказчик
@@ -32,17 +18,11 @@ class Task extends ActiveRecord
     const STATUS_FAILING = 'failing'; // провалено
     const STATUS_EXPIRED = 'expired'; // просрочено
 
-    /**
-     * {@inheritdoc}
-     */
     public static function tableName()
     {
         return 'task';
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function rules()
     {
         return [
@@ -53,9 +33,6 @@ class Task extends ActiveRecord
         ];
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function attributeLabels()
     {
         return [
@@ -91,7 +68,7 @@ class Task extends ActiveRecord
 
     public function getAuthor()
     {
-        return $this->hasOne(UserData::class, ['user_id' => 'author_id']);
+        return $this->hasOne(User::class, ['id' => 'author_id']);
     }
 
     public function getReviewsCount()

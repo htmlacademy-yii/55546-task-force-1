@@ -2,8 +2,8 @@
 
 namespace frontend\controllers;
 
-use frontend\models\ResendVerificationEmailForm;
-use frontend\models\VerifyEmailForm;
+use app\models\{City, SignupForm};
+use frontend\components\DebugHelper\DebugHelper;
 use Yii;
 use yii\base\InvalidArgumentException;
 use yii\web\BadRequestHttpException;
@@ -11,10 +11,7 @@ use yii\web\Controller;
 use yii\filters\VerbFilter;
 use yii\filters\AccessControl;
 use common\models\LoginForm;
-use frontend\models\PasswordResetRequestForm;
-use frontend\models\ResetPasswordForm;
-use frontend\models\SignupForm;
-use frontend\models\ContactForm;
+use frontend\models\{PasswordResetRequestForm, ResetPasswordForm, ContactForm, ResendVerificationEmailForm, VerifyEmailForm};
 
 /**
  * Site controller
@@ -153,7 +150,16 @@ class SiteController extends Controller
      */
     public function actionSignup()
     {
-        return $this->render('signup');
+        $model = new SignupForm();
+
+        if(Yii::$app->request->isPost && $model->load(Yii::$app->request->post()) && $model->signup()) {
+            return $this->goHome();
+        }
+
+        return $this->render('signup', [
+            'model' => $model,
+            'cities' => yii\helpers\ArrayHelper::map(City::find()->asArray()->all(), 'id', 'name')
+        ]);
 
 //        $model = new SignupForm();
 //        if ($model->load(Yii::$app->request->post()) && $model->signup()) {

@@ -2,11 +2,14 @@
 use yii\helpers\{Html, Url};
 use yii\widgets\ActiveForm;
 
+$this->title = 'Новые задания';
+$this->params['breadcrumbs'][] = $this->title;
+$fieldConfig = ['template' => "{label}\n{input}", 'options' => ['tag' => false]];
 ?>
 
 <section class="new-task">
     <div class="new-task__wrapper">
-        <h1>Новые задания</h1>
+        <h1><?= $this->title; ?></h1>
         <?php foreach ($tasks as $task): ?>
             <div class="new-task__card">
                 <div class="new-task__title">
@@ -39,7 +42,6 @@ use yii\widgets\ActiveForm;
         <?php $form = ActiveForm::begin(['options' => ['class' => 'search-task__form']]); ?>
             <fieldset class="search-task__categories">
                 <legend>Категории</legend>
-
                 <?= $form->field($taskModel, 'category')
                     ->checkboxList(yii\helpers\ArrayHelper::map($categories, 'id', 'title'), [
                     'item' => function ($_index, $label, $name, $checked, $id) {
@@ -58,28 +60,19 @@ use yii\widgets\ActiveForm;
             </fieldset>
             <fieldset class="search-task__categories">
                 <legend>Дополнительно</legend>
-
                 <?php
                 foreach (['isNoExecutor', 'isTelework'] as $attr) {
-                    echo $form->field($taskModel, $attr, [
-                        'template' => "{input}\n{label}",
-                        'options' => ['tag' => false]
-                    ])->checkbox(['class' => 'visually-hidden checkbox__input'], false);
+                    echo $form->field($taskModel, $attr, $fieldConfig)
+                        ->checkbox(['class' => 'visually-hidden checkbox__input'], false);
                 }
                 ?>
             </fieldset>
             <?php
-            echo $form->field($taskModel, 'time', [
-                'template' => "{label}\n{input}",
-                'options' => ['tag' => false]
-            ])->dropDownList(['day' => 'За день', 'week' => 'За неделю', 'month' => 'За месяц'],
-                ['class' => 'multiple-select input']
-            )->label('Период', ['class' => 'search-task__name']);
+            echo $form->field($taskModel, 'time', $fieldConfig)
+                ->dropDownList(['day' => 'За день', 'week' => 'За неделю', 'month' => 'За месяц'],
+                ['class' => 'multiple-select input'])->label('Период', ['class' => 'search-task__name']);
 
-            echo $form->field($taskModel, 'title', [
-                    'template' => "{label}\n{input}",
-                    'options' => ['tag' => false]
-                ])
+            echo $form->field($taskModel, 'title', $fieldConfig)
                 ->textInput(['class' => 'input-middle input'])
                 ->label('Поиск по названию', ['class' => 'search-task__name']);
 

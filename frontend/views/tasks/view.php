@@ -1,9 +1,7 @@
 <?php
-
 use yii\helpers\Html;
 
 $this->title = "Задание: $task->title";
-
 ?>
 
 <section class="content-view">
@@ -44,8 +42,8 @@ $this->title = "Задание: $task->title";
                                          alt="Москва, Новый арбат, 23 к. 1"></a>
                     </div>
                     <div class="content-view__address">
-                        <?= $task->author->address; ?>
-                        <span class="address__town">Москва</span><br>
+                        <span class="address__town"><?= $task->author->city->name; ?></span><br>
+                        <span><?= $task->author->userData->address; ?></span>
                         <span>Новый арбат, 23 к. 1</span>
                         <p>Вход под арку, код домофона 1122</p>
                     </div>
@@ -69,11 +67,11 @@ $this->title = "Задание: $task->title";
                     <div class="feedback-card__top">
                         <a href="#"><img src="/img/man-glasses.jpg" width="55" height="55"></a>
                         <div class="feedback-card__top--name">
-                            <p><a href="#" class="link-regular"><?= $respond->user->name; ?></a></p>
+                            <p><a href="#" class="link-regular"><?= $respond->user->login; ?></a></p>
                             <?php for ($i = 1; $i <= 5; $i++): ?>
-                                <span <?= ($respond->user->rating >= $i) ? '' : 'class="star-disabled"'; ?>></span>
+                                <span <?= ($respond->user->userData->rating >= $i) ? '' : 'class="star-disabled"'; ?>></span>
                             <?php endfor; ?>
-                            <b><?= $respond->user->rating; ?></b>
+                            <b><?= $respond->user->userData->rating; ?></b>
                         </div>
                         <span class="new-task__time"><?= $respond->public_date; ?> назад</span>
                     </div>
@@ -101,16 +99,16 @@ $this->title = "Задание: $task->title";
             <div class="profile-mini__top">
                 <img src="/img/man-brune.jpg" width="62" height="62" alt="Аватар заказчика">
                 <div class="profile-mini__name five-stars__rate">
-                    <p><?= $task->author->name; ?></p>
+                    <p><?= $task->author->login; ?></p>
                     <?php for ($i = 1; $i <= 5; $i++): ?>
-                        <span <?= ($task->author->rating >= $i) ? '' : 'class="star-disabled"'; ?>></span>
+                        <span <?= ($task->author->userData->rating >= $i) ? '' : 'class="star-disabled"'; ?>></span>
                     <?php endfor; ?>
-                    <b><?= $task->author->rating ?></b>
+                    <b><?= $task->author->userData->rating ?></b>
                 </div>
             </div>
             <p class="info-customer">
                 <span><?= count($task->reviewsCount); ?> отзывов</span>
-                <span class="last-"><?= $task->author->order_count ?> заказов</span>
+                <span class="last-"><?= $task->author->userData->order_count ?> заказов</span>
             </p>
             <a href="#" class="link-regular">Смотреть профиль</a>
         </div>
