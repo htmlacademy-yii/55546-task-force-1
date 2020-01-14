@@ -21,7 +21,7 @@ $fieldConfig = ['template' => "{label}\n{input}", 'options' => ['tag' => false]]
                 <div class="new-task__icon new-task__icon--<?= $task->category->code; ?>"></div>
                 <p class="new-task_description"><?= $task->description; ?></p>
                 <b class="new-task__price new-task__price--<?= $task->category->code; ?>"><?= $task->price; ?><b> ₽</b></b>
-                <p class="new-task__place"><?= $task->author->address; ?></p>
+                <p class="new-task__place"><?= $task->author->userData->address; ?></p>
                 <span class="new-task__time"><?= $task->date_start; ?></span>
             </div>
         <?php endforeach; ?>
