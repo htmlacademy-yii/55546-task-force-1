@@ -11,11 +11,11 @@ $fieldConfig = ['template' => "{label}\n{input}", 'options' => ['tag' => false]]
     <div class="registration-wrapper">
         <?php $form = ActiveForm::begin(['options' => ['class' => 'registration__user-form form-create']]) ?>
             <?= $form->field($model, 'email', $fieldConfig)
-                ->textarea(['class' => 'input textarea', 'rows' => 1, 'placeholder' => 'kumarm@mail.ru']); ?>
+                ->textarea(['class' => 'input textarea', 'rows' => 1]); ?>
             <span>Введите валидный адрес электронной почты</span>
 
             <?= $form->field($model, 'login', $fieldConfig)
-                ->textarea(['class' => 'input textarea', 'rows' => 1, 'placeholder' => 'Мамедов Кумар']); ?>
+                ->textarea(['class' => 'input textarea', 'rows' => 1]); ?>
             <span>Введите ваше имя и фамилию</span>
 
             <?= $form->field($model, 'cityId', $fieldConfig)
