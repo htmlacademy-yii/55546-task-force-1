@@ -1,9 +1,13 @@
+CREATE DATABASE `task-force` DEFAULT CHARACTER SET utf8 DEFAULT COLLATE utf8_general_ci;
+
+USE `task-force`;
+
 CREATE TABLE `user` (
   `id` int PRIMARY KEY AUTO_INCREMENT,
   `login` varchar(255) NOT NULL,
   `email` varchar(255) NOT NULL,
   `password` varchar(255) NOT NULL,
-  `date_registration` timestamp DEFAULT (now())
+  `date_registration` timestamp DEFAULT now()
 );
 
 CREATE TABLE `user_data` (

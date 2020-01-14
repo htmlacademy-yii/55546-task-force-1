@@ -3,20 +3,29 @@
 namespace frontend\controllers;
 
 use frontend\components\DebugHelper\DebugHelper;
+use Yii;
 use yii\web\Controller;
-
 use app\models\Task;
 use app\models\Category;
 use yii\web\NotFoundHttpException;
+use app\models\TasksFilter;
 
 class TasksController extends Controller
 {
     public function actionIndex()
     {
+        $tasks = Task::find()->where(['status' => false]);
+        $taskModel = new TasksFilter();
+
+        if(Yii::$app->request->isPost) {
+            $taskModel->load(Yii::$app->request->post());
+            $taskModel->applyFilters($tasks);
+        }
+
         return $this->render('index', [
-            'tasks' => Task::find()->where(['status' => 'false'])
-                ->orderBy('date_start DESC')->all(),
-            'categories' => Category::find()->all()
+            'tasks' => $tasks->with(['category', 'author'])->orderBy('date_start DESC')->all(),
+            'taskModel' => $taskModel,
+            'categories' => Category::find()->all(),
         ]);
     }
 
