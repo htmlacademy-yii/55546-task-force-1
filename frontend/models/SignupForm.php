@@ -13,7 +13,7 @@ class SignupForm extends Model
 {
     public $login;
     public $email;
-    public $city_id;
+    public $cityId;
     public $password;
 
     public function rules()
@@ -32,7 +32,7 @@ class SignupForm extends Model
             ['password', 'required'],
             ['password', 'string', 'min' => 6],
 
-            ['city_id', 'required'],
+            ['cityId', 'required'],
         ];
     }
 
@@ -41,7 +41,7 @@ class SignupForm extends Model
         return [
             'email' => 'Электронная почта',
             'login' => 'Ваше имя',
-            'city_id' => 'Город проживания',
+            'cityId' => 'Город проживания',
             'password' => 'Пароль',
         ];
     }
@@ -60,7 +60,7 @@ class SignupForm extends Model
         $user = new User();
         $user->login = $this->login;
         $user->email = $this->email;
-        $user->city_id = $this->city_id;
+        $user->city_id = $this->cityId;
         $user->password = $this->password;
 
         return $user->save();

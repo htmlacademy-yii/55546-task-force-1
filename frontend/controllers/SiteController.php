@@ -12,6 +12,7 @@ use yii\filters\VerbFilter;
 use yii\filters\AccessControl;
 use common\models\LoginForm;
 use frontend\models\{PasswordResetRequestForm, ResetPasswordForm, ContactForm, ResendVerificationEmailForm, VerifyEmailForm};
+use yii\helpers\ArrayHelper;
 
 /**
  * Site controller
@@ -158,7 +159,7 @@ class SiteController extends Controller
 
         return $this->render('signup', [
             'model' => $model,
-            'cities' => yii\helpers\ArrayHelper::map(City::find()->asArray()->all(), 'id', 'name')
+            'cities' => ArrayHelper::map(City::find()->asArray()->all(), 'id', 'name')
         ]);
     }
 

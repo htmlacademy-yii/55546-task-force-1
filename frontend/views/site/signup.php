@@ -18,7 +18,7 @@ $fieldConfig = ['template' => "{label}\n{input}", 'options' => ['tag' => false]]
                 ->textarea(['class' => 'input textarea', 'rows' => 1, 'placeholder' => 'Мамедов Кумар']); ?>
             <span>Введите ваше имя и фамилию</span>
 
-            <?= $form->field($model, 'city_id', $fieldConfig)
+            <?= $form->field($model, 'cityId', $fieldConfig)
                 ->dropDownList($cities, ['class' => 'multiple-select input town-select registration-town']); ?>
             <span>Укажите город, чтобы находить подходящие задачи</span>
 
