@@ -2,10 +2,12 @@
 
 namespace frontend\controllers;
 
+use frontend\components\DebugHelper\DebugHelper;
 use Yii;
 use yii\web\Controller;
 use app\models\Task;
 use app\models\Category;
+use yii\web\NotFoundHttpException;
 use app\models\TasksFilter;
 
 class TasksController extends Controller
@@ -25,5 +27,17 @@ class TasksController extends Controller
             'taskModel' => $taskModel,
             'categories' => Category::find()->all(),
         ]);
+    }
+
+    public function actionView($id)
+    {
+        $task = Task::find()->with('category', 'author', 'reviewsCount', 'files', 'responds')
+            ->where(['id' => (int) $id])->one();
+
+        if(!$task) {
+            throw new NotFoundHttpException("Страница не найдена!");
+        }
+
+        return $this->render('view', compact('task'));
     }
 }

@@ -65,6 +65,7 @@ CREATE TABLE `task_respond` (
   `task_id` int,
   `user_id` int,
   `text` text,
+  `price` int NOT NULL,
   `public_date` timestamp
 );
 
