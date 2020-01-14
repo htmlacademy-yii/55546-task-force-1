@@ -1,35 +1,33 @@
 <?php
-
-/* @var $this yii\web\View */
-/* @var $form yii\bootstrap\ActiveForm */
-/* @var $model \frontend\models\SignupForm */
-
 use yii\helpers\Html;
 use yii\bootstrap\ActiveForm;
 
-$this->title = 'Signup';
+$this->title = 'Регистрация аккаунта';
 $this->params['breadcrumbs'][] = $this->title;
+$fieldConfig = ['template' => "{label}\n{input}", 'options' => ['tag' => false]];
 ?>
-<div class="site-signup">
-    <h1><?= Html::encode($this->title) ?></h1>
+<section class="registration__user">
+    <h1>Регистрация аккаунта</h1>
+    <div class="registration-wrapper">
+        <?php $form = ActiveForm::begin(['options' => ['class' => 'registration__user-form form-create']]) ?>
+            <?= $form->field($model, 'email', $fieldConfig)
+                ->textarea(['class' => 'input textarea', 'rows' => 1]); ?>
+            <span>Введите валидный адрес электронной почты</span>
 
-    <p>Please fill out the following fields to signup:</p>
+            <?= $form->field($model, 'login', $fieldConfig)
+                ->textarea(['class' => 'input textarea', 'rows' => 1]); ?>
+            <span>Введите ваше имя и фамилию</span>
 
-    <div class="row">
-        <div class="col-lg-5">
-            <?php $form = ActiveForm::begin(['id' => 'form-signup']); ?>
+            <?= $form->field($model, 'cityId', $fieldConfig)
+                ->dropDownList($cities, ['class' => 'multiple-select input town-select registration-town']); ?>
+            <span>Укажите город, чтобы находить подходящие задачи</span>
 
-                <?= $form->field($model, 'username')->textInput(['autofocus' => true]) ?>
+            <?= $form->field($model, 'password', $fieldConfig)
+                ->passwordInput(['class' => 'input textarea'])->label(null, ['class' => 'input-danger']); ?>
+            <span>Длина пароля от 8 символов</span>
 
-                <?= $form->field($model, 'email') ?>
-
-                <?= $form->field($model, 'password')->passwordInput() ?>
-
-                <div class="form-group">
-                    <?= Html::submitButton('Signup', ['class' => 'btn btn-primary', 'name' => 'signup-button']) ?>
-                </div>
-
-            <?php ActiveForm::end(); ?>
-        </div>
+            <?= Html::submitButton('Cоздать аккаунт', ['class' => 'button button__registration']); ?>
+        <?php ActiveForm::end() ?>
     </div>
-</div>
+</section>
+
