@@ -13,6 +13,12 @@ class TasksFilter extends Model
     public $title;
     public $time;
 
+    const PERIOD_LIST = [
+        'day' => 'За день',
+        'week' => 'За неделю',
+        'month' => 'За месяц'
+    ];
+
     public function rules()
     {
         return [
