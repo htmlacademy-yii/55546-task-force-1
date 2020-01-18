@@ -116,7 +116,7 @@ $this->beginPage();
             });
             document.querySelector(`#btn-login`).addEventListener(`click`, async (evt) => {
                 evt.preventDefault();
-                const result = await fetch(`/site/index`, { method: `POST`, 'Type-Content': `json/application` })
+                const result = await fetch(`/site/index`, { method: `POST`, 'Content-Type': `json/application` })
                     .then(response => response.text());
                 console.log(result);
             });
