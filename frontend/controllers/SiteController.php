@@ -2,14 +2,16 @@
 
 namespace frontend\controllers;
 
-use app\models\{City, SignupForm};
+use app\models\{City, SignupForm, Task, MainLoginForm};
 use frontend\components\DebugHelper\DebugHelper;
 use Yii;
 use yii\base\InvalidArgumentException;
+use yii\bootstrap\ActiveForm;
 use yii\helpers\Url;
 use yii\web\BadRequestHttpException;
 use yii\filters\VerbFilter;
 use common\models\LoginForm;
+
 use frontend\models\{PasswordResetRequestForm, ResetPasswordForm, ContactForm, ResendVerificationEmailForm, VerifyEmailForm};
 use yii\helpers\ArrayHelper;
 
@@ -62,9 +64,21 @@ class SiteController extends SecuredController
         if (!Yii::$app->user->isGuest) {
             return $this->redirect(Url::to('/tasks'));
         }
-
         $this->layout = 'landing';
-        return $this->render('landing');
+
+        $model = new MainLoginForm();
+
+        if(Yii::$app->request->isAjax && Yii::$app->request->isPost) {
+            $model->load(Yii::$app->request->post());
+            Yii::$app->response->format = Response::FORMAT_JSON;
+            return $model->getUser();
+        }
+
+        return $this->render('landing', [
+            'model' => $model,
+            'tasks' => Task::find()->with(['category'])->where(['status' => false])
+                ->orderBy('date_start DESC')->limit(4)->all(),
+        ]);
     }
 
     /**
