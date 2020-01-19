@@ -50,7 +50,11 @@ $this->beginPage();
                     <p>Работа там, где ты!</p>
                 </div>
                 <div class="header__account--index">
-                    <?= Html::a('<span>Вход</span>', '#', ['id' => 'link-login', 'class' => 'header__account-enter']); ?>
+                    <?= Html::a('<span>Вход</span>', '#', [
+                        'id' => 'link-login',
+                        'class' => 'header__account-enter open-modal',
+                        'data-for' => 'enter-form'
+                    ]); ?>
                     или
                     <?= Html::a('Регистрация', 'signup.html', ['class' => 'header__account-registration']); ?>
                 </div>
@@ -104,24 +108,15 @@ $this->beginPage();
     </div>
     <script>
         (() => {
-            const modal = document.querySelector(`.modal.form-modal`);
-            const modalOverlay = document.querySelector(`.overlay`);
-            document.querySelector(`#link-login`).addEventListener(`click`, () => {
-                modal.classList.remove(`enter-form`);
-                modalOverlay.style.display = `block`;
-            });
-            document.querySelector(`.form-modal-close`).addEventListener(`click`, () => {
-                modal.classList.add(`enter-form`);
-                modalOverlay.style.display = `none`;
-            });
             document.querySelector(`#btn-login`).addEventListener(`click`, async (evt) => {
                 evt.preventDefault();
-                const result = await fetch(`/site/index`, { method: `POST`, 'Content-Type': `json/application` })
+                const result = await fetch(`/site/index`, { method: `POST`, headers: { 'Content-Type': `json/application` } })
                     .then(response => response.text());
                 console.log(result);
             });
         })();
     </script>
+    <script src="/js/main.js"></script>
     <?php $this->endBody(); ?>
 </body>
 </html>

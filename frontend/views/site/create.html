@@ -109,7 +109,7 @@
             <section class="create__task">
                 <h1>Публикация нового задания</h1>
                 <div class="create__task-main">
-                    <form class="create__task-form form-create" id="task-form">
+                    <form class="create__task-form form-create" action="/" enctype="multipart/form-data" id="task-form">
                         <label for="10">Мне нужно</label>
                         <textarea class="input textarea" rows="1" id="10" name="" placeholder="Повесить полку"></textarea>
                         <span>Кратко опишите суть работы</span>
@@ -127,6 +127,7 @@
                         <span>Загрузите файлы, которые помогут исполнителю лучше выполнить или оценить работу</span>
                         <div class="create__file">
                             <span>Добавить новый файл</span>
+<!--                          <input type="file" name="files[]" class="dropzone">-->
                         </div>
                         <label for="13">Локация</label>
                         <input class="input-navigation input-middle input" id="13" type="search" name="q" placeholder="Санкт-Петербург, Калининский район">
@@ -138,8 +139,8 @@
                                 <span>Не заполняйте для оценки исполнителем</span>
                             </div>
                             <div class="create__price-time--wrapper">
-                                <label for="15">Сроки исполнения</label>
-                                <input id="15"  class="input-middle input input-date" type="text" placeholder="10.11, 15:00">
+                                <label for="15">Срок исполнения</label>
+                                <input id="15"  class="input-middle input input-date" type="date" placeholder="10.11, 15:00">
                                 <span>Укажите крайний срок исполнения</span>
                             </div>
                         </div>
@@ -214,5 +215,9 @@
         </div>
     </footer>
 </div>
+<script src="js/dropzone.js"></script>
+<script>
+  var dropzone = new Dropzone("div.create__file", {url: "/", paramName: "Attach"});
+</script>
 </body>
 </html>

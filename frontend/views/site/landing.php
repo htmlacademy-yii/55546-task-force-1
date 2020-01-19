@@ -101,21 +101,23 @@ $fieldConfig = ['template' => "{label}{input}{error}", 'options' => ['tag' => fa
         </div>
     </div>
 </div>
-<section class="modal enter-form form-modal">
+
+<section class="modal enter-form form-modal" id="enter-form">
     <h2>Вход на сайт</h2>
-    <?php $form = ActiveForm::begin(['enableAjaxValidation' => true]); ?>
+
+    <?php $form = ActiveForm::begin(['enableAjaxValidation' => true, 'enableClientValidation' => true,]); ?>
         <p>
             <?= $form->field($model, 'email', $fieldConfig)
-                ->textInput(['class' => 'enter-form-email input input-middle'])
+                ->textInput(['class' => 'enter-form-email input input-middle', 'type' => 'email', 'id' => 'enter-email'])
                 ->label(null, ['class' => 'form-modal-description']); ?>
         </p>
         <p>
             <?= $form->field($model, 'password', $fieldConfig)
-                ->passwordInput(['class' => 'enter-form-email input input-middle'])
+                ->passwordInput(['class' => 'enter-form-email input input-middle', 'id' => 'enter-password'])
                 ->label(null, ['class' => 'form-modal-description']); ?>
         </p>
         <?= Html::submitButton('Войти', ['id' => 'btn-login', 'class' => 'button']); ?>
     <?php ActiveForm::end(); ?>
-    <?= Html::button('Закрыть', ['class' => 'form-modal-close']); ?>
+    <?= Html::button('Закрыть', ['id' => 'close-modal', 'class' => 'form-modal-close']); ?>
 </section>
 <div class="overlay"></div>
