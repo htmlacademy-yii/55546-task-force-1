@@ -16,8 +16,15 @@ class MainLoginForm extends Model
         ];
     }
 
-    public function getUser()
+    public function loginValidate()
     {
-        return User::find()->where(['email' => $this->email, 'password' => $this->password])->asArray()->one();
+        $user = User::findOne(['email' => $this->email]);
+        if(!$user) {
+            $this->addError('email', 'Пользователь с указанным Email не найден');
+        } else if($user->password !== $this->password) {
+            $this->addError('password', 'Не верный пароль');
+        }
+
+        return $this;
     }
 }

@@ -1,5 +1,4 @@
 <?php
-
 use frontend\assets\AppAsset;
 use yii\helpers\Html;
 

@@ -1,5 +1,5 @@
 <?php
-use yii\bootstrap\ActiveForm;
+use yii\widgets\ActiveForm;
 use yii\helpers\Html;
 
 $this->title = 'Главная страница сайта TaskForce';
@@ -105,7 +105,7 @@ $fieldConfig = ['template' => "{label}{input}{error}", 'options' => ['tag' => fa
 <section class="modal enter-form form-modal" id="enter-form">
     <h2>Вход на сайт</h2>
 
-    <?php $form = ActiveForm::begin(['enableAjaxValidation' => true, 'enableClientValidation' => true,]); ?>
+    <?php $form = ActiveForm::begin(['enableAjaxValidation' => true, 'enableClientValidation' => true]); ?>
         <p>
             <?= $form->field($model, 'email', $fieldConfig)
                 ->textInput(['class' => 'enter-form-email input input-middle', 'type' => 'email', 'id' => 'enter-email'])

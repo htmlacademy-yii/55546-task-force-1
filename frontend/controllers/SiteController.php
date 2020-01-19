@@ -1,12 +1,11 @@
 <?php
-
 namespace frontend\controllers;
 
 use app\models\{City, SignupForm, Task, MainLoginForm};
 use frontend\components\DebugHelper\DebugHelper;
 use Yii;
 use yii\base\InvalidArgumentException;
-use yii\bootstrap\ActiveForm;
+use yii\widgets\ActiveForm;
 use yii\helpers\Url;
 use yii\web\BadRequestHttpException;
 use yii\filters\VerbFilter;
@@ -14,6 +13,8 @@ use common\models\LoginForm;
 
 use frontend\models\{PasswordResetRequestForm, ResetPasswordForm, ContactForm, ResendVerificationEmailForm, VerifyEmailForm};
 use yii\helpers\ArrayHelper;
+use yii\web\Response;
+
 
 /**
  * Site controller
@@ -68,10 +69,10 @@ class SiteController extends SecuredController
 
         $model = new MainLoginForm();
 
-        if(Yii::$app->request->isAjax && Yii::$app->request->isPost) {
+        if(Yii::$app->request->isAjax) {
             $model->load(Yii::$app->request->post());
             Yii::$app->response->format = Response::FORMAT_JSON;
-            return $model->getUser();
+            return ActiveForm::validate($model->loginValidate());
         }
 
         return $this->render('landing', [
