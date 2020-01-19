@@ -105,16 +105,35 @@ $this->beginPage();
             </div>
         </footer>
     </div>
-    <script>
-        (() => {
-            document.querySelector(`#btn-login`).addEventListener(`click`, async (evt) => {
-                evt.preventDefault();
-                const result = await fetch(`/site/index`, { method: `POST`, headers: { 'Content-Type': `json/application` } })
-                    .then(response => response.text());
-                console.log(result);
+
+    <?php
+    $js = <<<JS
+        const emailError = document.querySelector(`#error-email`);
+        const passwordError = document.querySelector(`#error-password`);
+        $(`#btn-login`).click(function(evt) {
+          emailError.textContent = passwordError.textContent = '';
+            $.ajax(`/site/index`, {
+                type: `POST`,
+                data: {
+                  email: document.querySelector(`#enter-email`).value,
+                  password: document.querySelector(`#enter-password`).value,
+                },
+                success: function(data) {
+                  if(data.email) {
+                    emailError.textContent = data.email[0];
+                  } else if(data.password) {
+                    passwordError.textContent = data.password[0];
+                  }
+                }
             });
-        })();
-    </script>
+            
+            return false;
+        });
+JS;
+
+    $this->registerJs($js);
+    ?>
+
     <script src="/js/main.js"></script>
     <?php $this->endBody(); ?>
 </body>

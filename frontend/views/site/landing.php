@@ -109,12 +109,14 @@ $fieldConfig = ['template' => "{label}{input}{error}", 'options' => ['tag' => fa
         <p>
             <?= $form->field($model, 'email', $fieldConfig)
                 ->textInput(['class' => 'enter-form-email input input-middle', 'type' => 'email', 'id' => 'enter-email'])
-                ->label(null, ['class' => 'form-modal-description']); ?>
+                ->label(null, ['class' => 'form-modal-description'])
+                ->error(['id' => 'error-email']); ?>
         </p>
         <p>
             <?= $form->field($model, 'password', $fieldConfig)
                 ->passwordInput(['class' => 'enter-form-email input input-middle', 'id' => 'enter-password'])
-                ->label(null, ['class' => 'form-modal-description']); ?>
+                ->label(null, ['class' => 'form-modal-description'])
+                ->error(['id' => 'error-password']); ?>
         </p>
         <?= Html::submitButton('Войти', ['id' => 'btn-login', 'class' => 'button']); ?>
     <?php ActiveForm::end(); ?>

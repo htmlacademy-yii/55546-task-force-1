@@ -30,12 +30,12 @@ class SiteController extends SecuredController
             'access' => [
                 'except' => ['index', 'signup', 'login'],
             ],
-            'verbs' => [
-                'class' => VerbFilter::class,
-                'actions' => [
-                    'logout' => ['post'],
-                ],
-            ],
+//            'verbs' => [
+//                'class' => VerbFilter::class,
+//                'actions' => [
+//                    'logout' => ['post'],
+//                ],
+//            ],
         ], parent::behaviors());
     }
 
@@ -62,17 +62,24 @@ class SiteController extends SecuredController
      */
     public function actionIndex()
     {
+//        DebugHelper::debug(Yii::$app->user->identity);
+
         if (!Yii::$app->user->isGuest) {
             return $this->redirect(Url::to('/tasks'));
         }
         $this->layout = 'landing';
 
         $model = new MainLoginForm();
-
         if(Yii::$app->request->isAjax) {
-            $model->load(Yii::$app->request->post());
+            $user = $model->loginValidate(Yii::$app->request->post());
             Yii::$app->response->format = Response::FORMAT_JSON;
-            return ActiveForm::validate($model->loginValidate());
+
+            if(empty($model->getErrors())) {
+                Yii::$app->user->login($user);
+                return $this->redirect(Url::to('/tasks'));
+            }
+
+            return $model->getErrors();
         }
 
         return $this->render('landing', [

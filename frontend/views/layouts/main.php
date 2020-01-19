@@ -1,8 +1,12 @@
 <?php
 
 use frontend\assets\AppAsset;
+use yii\helpers\Html;
 
 AppAsset::register($this);
+
+$user = !Yii::$app->user->isGuest ? Yii::$app->user->identity : null;
+
 ?>
 <?php $this->beginPage() ?>
 <!DOCTYPE html>
@@ -98,19 +102,19 @@ AppAsset::register($this);
                          alt="Аватар пользователя">
                 </a>
                 <span class="header__account-name">
-                 Василий
+                 <?= $user->login; ?>
              </span>
             </div>
             <div class="account__pop-up">
                 <ul class="account__pop-up-list">
                     <li>
-                        <a href="#">Мои задания</a>
+                        <?= Html::a('Мои задания', '#') ?>
                     </li>
                     <li>
-                        <a href="#">Настройки</a>
+                        <?= Html::a('Настройки', '#') ?>
                     </li>
                     <li>
-                        <a href="#">Выход</a>
+                        <?= Html::a('Выход', '/site/logout') ?>
                     </li>
                 </ul>
             </div>

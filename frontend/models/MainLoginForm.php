@@ -2,6 +2,7 @@
 namespace app\models;
 
 use yii\base\Model;
+use common\models\User;
 
 class MainLoginForm extends Model
 {
@@ -16,15 +17,15 @@ class MainLoginForm extends Model
         ];
     }
 
-    public function loginValidate()
+    public function loginValidate($data)
     {
-        $user = User::findOne(['email' => $this->email]);
-        if(!$user) {
-            $this->addError('email', 'Пользователь с указанным Email не найден');
-        } else if($user->password !== $this->password) {
-            $this->addError('password', 'Не верный пароль');
+        $user = User::findOne(['email' => $data['email']]);
+        if(empty($user)) {
+            $this->addError('email', "Пользователь с указанным Email {$this->email} не найден");
+        } else if($user->password !== $data['password']) {
+            $this->addError('password', "Не верный пароль");
         }
 
-        return $this;
+        return $user;
     }
 }
