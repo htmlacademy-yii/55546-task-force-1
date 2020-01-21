@@ -1,53 +1,42 @@
 <?php
-
 namespace frontend\controllers;
 
-use app\models\{City, SignupForm};
+use app\models\{City, SignupForm, Task, MainLoginForm};
 use frontend\components\DebugHelper\DebugHelper;
 use Yii;
 use yii\base\InvalidArgumentException;
+use yii\widgets\ActiveForm;
+use yii\helpers\Url;
 use yii\web\BadRequestHttpException;
-use yii\web\Controller;
 use yii\filters\VerbFilter;
-use yii\filters\AccessControl;
 use common\models\LoginForm;
+
 use frontend\models\{PasswordResetRequestForm, ResetPasswordForm, ContactForm, ResendVerificationEmailForm, VerifyEmailForm};
 use yii\helpers\ArrayHelper;
+use yii\web\Response;
+
 
 /**
  * Site controller
  */
-class SiteController extends Controller
+class SiteController extends SecuredController
 {
     /**
      * {@inheritdoc}
      */
     public function behaviors()
     {
-        return [
+        return ArrayHelper::merge([
             'access' => [
-                'class' => AccessControl::className(),
-                'only' => ['logout', 'signup'],
-                'rules' => [
-                    [
-                        'actions' => ['signup'],
-                        'allow' => true,
-                        'roles' => ['?'],
-                    ],
-                    [
-                        'actions' => ['logout'],
-                        'allow' => true,
-                        'roles' => ['@'],
-                    ],
-                ],
+                'except' => ['index', 'signup', 'login'],
             ],
-            'verbs' => [
-                'class' => VerbFilter::className(),
-                'actions' => [
-                    'logout' => ['post'],
-                ],
-            ],
-        ];
+//            'verbs' => [
+//                'class' => VerbFilter::class,
+//                'actions' => [
+//                    'logout' => ['post'],
+//                ],
+//            ],
+        ], parent::behaviors());
     }
 
     /**
@@ -73,7 +62,31 @@ class SiteController extends Controller
      */
     public function actionIndex()
     {
-        return $this->render('index');
+//        DebugHelper::debug(Yii::$app->user->identity);
+
+        if (!Yii::$app->user->isGuest) {
+            return $this->redirect(Url::to('/tasks'));
+        }
+        $this->layout = 'landing';
+
+        $model = new MainLoginForm();
+        if(Yii::$app->request->isAjax) {
+            $user = $model->loginValidate(Yii::$app->request->post());
+            Yii::$app->response->format = Response::FORMAT_JSON;
+
+            if(empty($model->getErrors())) {
+                Yii::$app->user->login($user);
+                return $this->redirect(Url::to('/tasks'));
+            }
+
+            return $model->getErrors();
+        }
+
+        return $this->render('landing', [
+            'model' => $model,
+            'tasks' => Task::find()->with(['category'])->where(['status' => false])
+                ->orderBy('date_start DESC')->limit(4)->all(),
+        ]);
     }
 
     /**

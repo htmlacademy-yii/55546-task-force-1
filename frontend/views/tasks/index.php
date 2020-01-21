@@ -62,15 +62,15 @@ $fieldConfig = ['template' => "{label}\n{input}", 'options' => ['tag' => false]]
                 <legend>Дополнительно</legend>
                 <?php
                 foreach (['isNoExecutor', 'isTelework'] as $attr) {
-                    echo $form->field($taskModel, $attr, $fieldConfig)
+                    echo $form->field($taskModel, $attr, ['template' => "{input}\n{label}", 'options' => ['tag' => false]])
                         ->checkbox(['class' => 'visually-hidden checkbox__input'], false);
                 }
                 ?>
             </fieldset>
             <?php
             echo $form->field($taskModel, 'time', $fieldConfig)
-                ->dropDownList(['day' => 'За день', 'week' => 'За неделю', 'month' => 'За месяц'],
-                ['class' => 'multiple-select input'])->label('Период', ['class' => 'search-task__name']);
+                ->dropDownList($period, ['class' => 'multiple-select input'])
+                ->label('Период', ['class' => 'search-task__name']);
 
             echo $form->field($taskModel, 'title', $fieldConfig)
                 ->textInput(['class' => 'input-middle input'])

@@ -28,61 +28,48 @@ class User extends ActiveRecord implements IdentityInterface
     const STATUS_INACTIVE = 9;
     const STATUS_ACTIVE = 10;
 
-
-    /**
-     * {@inheritdoc}
-     */
     public static function tableName()
     {
-        return '{{%user}}';
+        return 'user';
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function behaviors()
-    {
-        return [
-            TimestampBehavior::className(),
-        ];
-    }
-
-    /**
-     * {@inheritdoc}
-     */
     public function rules()
     {
         return [
-            ['status', 'default', 'value' => self::STATUS_INACTIVE],
-            ['status', 'in', 'range' => [self::STATUS_ACTIVE, self::STATUS_INACTIVE, self::STATUS_DELETED]],
+            ['login', 'trim'],
+            ['login', 'required'],
+            ['login', 'string', 'min' => 2, 'max' => 255],
+
+            ['email', 'trim'],
+            ['email', 'required'],
+            ['email', 'email'],
+            ['email', 'string', 'max' => 255],
+            ['email', 'unique', 'message' => 'This email address has already been taken.'],
+
+            ['password', 'required'],
+            ['password', 'string', 'min' => 6],
         ];
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public static function findIdentity($id)
+    public function attributeLabels()
     {
-        return static::findOne(['id' => $id, 'status' => self::STATUS_ACTIVE]);
+        return [
+            'id' => 'ID',
+            'login' => 'Login',
+            'email' => 'Email',
+            'password' => 'Password',
+            'date_registration' => 'Date Registration',
+        ];
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    public static function findIdentity($id)
+    {
+        return static::findOne((int) $id);
+    }
+
     public static function findIdentityByAccessToken($token, $type = null)
     {
         throw new NotSupportedException('"findIdentityByAccessToken" is not implemented.');
-    }
-
-    /**
-     * Finds user by username
-     *
-     * @param string $username
-     * @return static|null
-     */
-    public static function findByUsername($username)
-    {
-        return static::findOne(['username' => $username, 'status' => self::STATUS_ACTIVE]);
     }
 
     /**

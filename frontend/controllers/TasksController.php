@@ -4,13 +4,14 @@ namespace frontend\controllers;
 
 use frontend\components\DebugHelper\DebugHelper;
 use Yii;
+use yii\filters\AccessControl;
 use yii\web\Controller;
 use app\models\Task;
 use app\models\Category;
 use yii\web\NotFoundHttpException;
 use app\models\TasksFilter;
 
-class TasksController extends Controller
+class TasksController extends SecuredController
 {
     public function actionIndex()
     {
@@ -26,6 +27,7 @@ class TasksController extends Controller
             'tasks' => $tasks->with(['category', 'author'])->orderBy('date_start DESC')->all(),
             'taskModel' => $taskModel,
             'categories' => Category::find()->all(),
+            'period' => TasksFilter::PERIOD_LIST,
         ]);
     }
 

@@ -26,9 +26,6 @@ class User extends ActiveRecord implements IdentityInterface
         return 'user';
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function rules()
     {
         return [
@@ -47,9 +44,6 @@ class User extends ActiveRecord implements IdentityInterface
         ];
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function attributeLabels()
     {
         return [
