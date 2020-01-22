@@ -55,7 +55,7 @@ $this->beginPage();
                         'data-for' => 'enter-form'
                     ]); ?>
                     или
-                    <?= Html::a('Регистрация', 'signup.html', ['class' => 'header__account-registration']); ?>
+                    <?= Html::a('Регистрация', '/site/signup', ['class' => 'header__account-registration']); ?>
                 </div>
             </div>
         </header>

@@ -2,9 +2,11 @@
 
 namespace frontend\controllers;
 
+use app\models\TaskCreate;
 use frontend\components\DebugHelper\DebugHelper;
 use Yii;
 use yii\filters\AccessControl;
+use yii\helpers\ArrayHelper;
 use yii\web\Controller;
 use app\models\Task;
 use app\models\Category;
@@ -41,5 +43,19 @@ class TasksController extends SecuredController
         }
 
         return $this->render('view', compact('task'));
+    }
+
+    public function actionCreate()
+    {
+        $model = new TaskCreate();
+
+        if(Yii::$app->request->post()) {
+            DebugHelper::debug(Yii::$app->request->post());
+        }
+
+        return $this->render('create', [
+            'model' => $model,
+            'categories' => ArrayHelper::map(Category::find()->all(), 'id', 'title'),
+        ]);
     }
 }
