@@ -4,8 +4,7 @@ namespace app\models;
 use frontend\components\DebugHelper\DebugHelper;
 use Yii;
 use yii\base\Model;
-use app\models\User;
-
+use common\models\User;
 /**
  * Signup form
  */

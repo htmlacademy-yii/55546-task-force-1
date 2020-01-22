@@ -3,6 +3,7 @@
 namespace frontend\controllers;
 
 use app\models\TaskCreate;
+use common\models\User;
 use frontend\components\DebugHelper\DebugHelper;
 use Yii;
 use yii\filters\AccessControl;
@@ -48,6 +49,10 @@ class TasksController extends SecuredController
 
     public function actionCreate()
     {
+        if(Yii::$app->user->identity->getRole() === User::ROLE_EXECUTOR) {
+            $this->redirect(Url::to('/tasks'));
+        }
+
         $model = new TaskCreate();
 
         if(Yii::$app->request->post()) {

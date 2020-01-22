@@ -1,11 +1,15 @@
 <?php
 namespace common\models;
 
+use app\models\City;
+use app\models\UserData;
+use app\models\UserSpecialization;
 use Yii;
 use yii\base\NotSupportedException;
 use yii\behaviors\TimestampBehavior;
 use yii\db\ActiveRecord;
 use yii\web\IdentityInterface;
+
 
 /**
  * User model
@@ -29,6 +33,7 @@ class User extends ActiveRecord implements IdentityInterface
     const STATUS_ACTIVE = 10;
 
     const ROLE_CLIENT = 'client';
+    const ROLE_EXECUTOR = 'executor';
 
     public static function tableName()
     {
@@ -62,6 +67,26 @@ class User extends ActiveRecord implements IdentityInterface
             'password' => 'Password',
             'date_registration' => 'Date Registration',
         ];
+    }
+
+    public function getUserData()
+    {
+        return $this->hasOne(UserData::class, ['user_id' => 'id']);
+    }
+
+    public function getCity()
+    {
+        return $this->hasOne(City::class, ['id' => 'city_id']);
+    }
+
+    public function getSpecializations()
+    {
+        return $this->hasMany(UserSpecialization::class, ['user_id' => 'id']);
+    }
+
+    public function getRole()
+    {
+        return empty($this->specializations) ? self::ROLE_CLIENT : self::ROLE_EXECUTOR;
     }
 
     public static function findIdentity($id)
