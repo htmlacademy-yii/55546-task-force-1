@@ -3,12 +3,15 @@ use yii\bootstrap\ActiveForm;
 use yii\helpers\Html;
 
 $fieldConfig = ['template' => '{label}{input}{hint}{error}', 'options' => ['tag' => false]];
+$labels = $model->attributeLabels();
 ?>
 
 <section class="create__task">
     <h1>Публикация нового задания</h1>
     <div class="create__task-main">
         <?php $form = ActiveForm::begin([
+            'enableClientValidation' => false,
+            'enableAjaxValidation' => false,
             'options' => [
                 'class' => 'create__task-form form-create',
                 'enctype' => 'multipart/form-data',
@@ -39,9 +42,11 @@ $fieldConfig = ['template' => '{label}{input}{hint}{error}', 'options' => ['tag'
                 <span>Добавить новый файл</span>
                 <!--                          <input type="file" name="files[]" class="dropzone">-->
             </div>
-            <label for="13">Локация</label>
-            <input class="input-navigation input-middle input" id="13" type="search" name="q" placeholder="Санкт-Петербург, Калининский район">
-            <span>Укажите адрес исполнения, если задание требует присутствия</span>
+            <?= $form->field($model, 'location', $fieldConfig)
+                ->input( 'search',[
+                    'class' => 'input-navigation input-middle input',
+                    'placeholder' => 'Санкт-Петербург, Калининский район',
+                ])->hint('<span>Укажите адрес исполнения, если задание требует присутствия</span>')?>
             <div class="create__price-time">
                 <div class="create__price-time--wrapper">
                     <?= $form->field($model, 'price', $fieldConfig)
@@ -73,12 +78,17 @@ $fieldConfig = ['template' => '{label}{input}{hint}{error}', 'options' => ['tag'
                     что всё в фокусе, а фото показывает объект со всех
                     ракурсов.</p>
             </div>
-            <div class="warning-item warning-item--error">
-                <h2>Ошибки заполнения формы</h2>
-                <h3>Категория</h3>
-                <p>Это поле должно быть выбрано.<br>
-                    Задание должно принадлежать одной из категорий</p>
-            </div>
+            <?php if (!empty($model->errors)): ?>
+                <div class="warning-item warning-item--error">
+                    <h2>Ошибки заполнения формы</h2>
+                    <?php foreach ($model->errors as $label => $errors): ?>
+                        <h3><?= $labels[$label]; ?></h3>
+                        <?php foreach ($errors as $error): ?>
+                            <p><?= $error; ?></p>
+                        <?php endforeach; ?>
+                    <?php endforeach; ?>
+                </div>
+            <?php endif; ?>
         </div>
     </div>
     <?= Html::submitButton('Опубликовать', ['form' => 'task-form', 'class' => 'button']); ?>
@@ -86,5 +96,5 @@ $fieldConfig = ['template' => '{label}{input}{hint}{error}', 'options' => ['tag'
 <script src="/js/dropzone.js"></script>
 
 <script>
-    var dropzone = new Dropzone("div.create__file", {url: "/", paramName: "Attach"});
+    var dropzone = new Dropzone("div.create__file", {url: "/tasks/create", paramName: "Attach"});
 </script>

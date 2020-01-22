@@ -62,8 +62,6 @@ class SiteController extends SecuredController
      */
     public function actionIndex()
     {
-//        DebugHelper::debug(Yii::$app->user->identity);
-
         if (!Yii::$app->user->isGuest) {
             return $this->redirect(Url::to('/tasks'));
         }
@@ -84,7 +82,7 @@ class SiteController extends SecuredController
 
         return $this->render('landing', [
             'model' => $model,
-            'tasks' => Task::find()->with(['category'])->where(['status' => false])
+            'tasks' => Task::find()->with(['category'])->where(['status' => Task::STATUS_NEW])
                 ->orderBy('date_start DESC')->limit(4)->all(),
         ]);
     }
