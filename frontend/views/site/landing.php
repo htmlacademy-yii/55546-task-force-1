@@ -83,12 +83,12 @@ $fieldConfig = ['template' => "{label}{input}{error}", 'options' => ['tag' => fa
                 <div class="landing-task">
                     <div class="landing-task-top task-<?= $task->category->code === 'translation' ? 'courier' : $task->category->code; ?>"></div>
                     <div class="landing-task-description">
-                        <h3><a href="#" class="link-regular"><?= $task->title; ?></a></h3>
+                        <h3><?= Html::a($task->title, '#', ['class' => 'link-regular']) ?></h3>
                         <p><?= $task->description; ?></p>
                     </div>
                     <div class="landing-task-info">
                         <div class="task-info-left">
-                            <p><a href="#" class="link-regular"><?= $task->category->title; ?></a></p>
+                            <p><?= Html::a($task->category->title, '#', ['class' => 'link-regular']) ?></p>
                             <p><?= $task->date_start; ?> назад</p>
                         </div>
                         <span><?= $task->price; ?> <b>₽</b></span>
@@ -108,7 +108,7 @@ $fieldConfig = ['template' => "{label}{input}{error}", 'options' => ['tag' => fa
     <?php $form = ActiveForm::begin(['enableAjaxValidation' => true, 'enableClientValidation' => true]); ?>
         <p>
             <?= $form->field($model, 'email', $fieldConfig)
-                ->textInput(['class' => 'enter-form-email input input-middle', 'type' => 'email', 'id' => 'enter-email'])
+                ->input('email', ['class' => 'enter-form-email input input-middle', 'id' => 'enter-email'])
                 ->label(null, ['class' => 'form-modal-description'])
                 ->error(['id' => 'error-email']); ?>
         </p>

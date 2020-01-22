@@ -50,7 +50,6 @@ $this->beginPage();
                 </div>
                 <div class="header__account--index">
                     <?= Html::a('<span>Вход</span>', '#', [
-                        'id' => 'link-login',
                         'class' => 'header__account-enter open-modal',
                         'data-for' => 'enter-form'
                     ]); ?>
