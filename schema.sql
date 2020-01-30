@@ -48,12 +48,13 @@ CREATE TABLE `task` (
   `title` varchar(255),
   `description` text,
   `category_id` int,
-  `price` int NOT NULL,
+  `price` int,
+  `location` varchar(255),
   `date_start` timestamp,
   `date_end` timestamp,
   `executor_id` int,
   `is_telework` boolean DEFAULT FALSE,
-  `status` boolean DEFAULT TRUE
+  `status` varchar(255)
 );
 
 CREATE TABLE `task_file` (

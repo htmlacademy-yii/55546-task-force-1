@@ -2,9 +2,13 @@
 
 namespace frontend\controllers;
 
+use app\models\TaskCreate;
+use common\models\User;
 use frontend\components\DebugHelper\DebugHelper;
 use Yii;
 use yii\filters\AccessControl;
+use yii\helpers\ArrayHelper;
+use yii\helpers\Url;
 use yii\web\Controller;
 use app\models\Task;
 use app\models\Category;
@@ -15,7 +19,7 @@ class TasksController extends SecuredController
 {
     public function actionIndex()
     {
-        $tasks = Task::find()->where(['status' => false]);
+        $tasks = Task::find()->where(['status' => Task::STATUS_NEW]);
         $taskModel = new TasksFilter();
 
         if(Yii::$app->request->isPost) {
@@ -41,5 +45,26 @@ class TasksController extends SecuredController
         }
 
         return $this->render('view', compact('task'));
+    }
+
+    public function actionCreate()
+    {
+        if(Yii::$app->user->identity->getRole() === User::ROLE_EXECUTOR) {
+            $this->redirect(Url::to('/tasks'));
+        }
+
+        $model = new TaskCreate();
+
+        if(Yii::$app->request->post()) {
+            $model->load(Yii::$app->request->post());
+            if($model->validate() && $model->create(new Task(), Task::STATUS_NEW)) {
+                $this->redirect(Url::to('/tasks'));
+            }
+        }
+
+        return $this->render('create', [
+            'model' => $model,
+            'categories' => ArrayHelper::map(Category::find()->all(), 'id', 'title'),
+        ]);
     }
 }

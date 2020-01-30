@@ -57,13 +57,13 @@ $user = !Yii::$app->user->isGuest ? Yii::$app->user->identity : null;
             <div class="header__nav">
                 <ul class="header-nav__list site-list">
                     <li class="site-list__item">
-                        <a href="#">Задания</a>
+                        <?= Html::a('Задания', '/tasks'); ?>
                     </li>
                     <li class="site-list__item">
                         <a href="#">Исполнители</a>
                     </li>
                     <li class="site-list__item">
-                        <a href="#">Создать задание</a>
+                        <?= Html::a('Создать задание', '/tasks/create'); ?>
                     </li>
                     <li class="site-list__item">
                         <a>Мой профиль</a>

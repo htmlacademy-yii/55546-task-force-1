@@ -4,13 +4,11 @@ namespace app\models;
 
 use Yii;
 use yii\db\ActiveRecord;
-use app\models\{Category, UserData, Review, TaskFile, TaskRespond, User};
+use app\models\{Category, UserData, Review, TaskFile, TaskRespond};
+use common\models\User;
 
 class Task extends ActiveRecord
 {
-    const ROLE_OWNER = 'owner'; // заказчик
-    const ROLE_EXECUTOR = 'executor'; // исполнитель
-
     const STATUS_NEW = 'new'; // новое
     const STATUS_EXECUTION = 'execution'; // выполняется
     const STATUS_COMPLETED = 'completed'; // завершено
@@ -89,13 +87,5 @@ class Task extends ActiveRecord
     public function getStatus(): string
     {
         return $this->status;
-    }
-
-    public function getRole(int $userId): string
-    {
-        return [
-                $this->authorId => self::ROLE_OWNER,
-                $this->executorId => self::ROLE_EXECUTOR,
-            ][$userId] ?? '';
     }
 }

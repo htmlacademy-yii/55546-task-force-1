@@ -50,12 +50,11 @@ $this->beginPage();
                 </div>
                 <div class="header__account--index">
                     <?= Html::a('<span>Вход</span>', '#', [
-                        'id' => 'link-login',
                         'class' => 'header__account-enter open-modal',
                         'data-for' => 'enter-form'
                     ]); ?>
                     или
-                    <?= Html::a('Регистрация', 'signup.html', ['class' => 'header__account-registration']); ?>
+                    <?= Html::a('Регистрация', '/site/signup', ['class' => 'header__account-registration']); ?>
                 </div>
             </div>
         </header>
