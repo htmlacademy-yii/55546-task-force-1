@@ -40,7 +40,8 @@ return [
             'enablePrettyUrl' => true,
             'showScriptName' => false,
             'rules' => [
-                'tasks/view/<id>' => 'tasks/view'
+                'tasks/view/<id>' => 'tasks/view',
+                'tasks/decision/<status>/<id>/<taskId>' => 'tasks/decision'
             ],
         ],
     ],

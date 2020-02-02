@@ -107,15 +107,9 @@ $user = !Yii::$app->user->isGuest ? Yii::$app->user->identity : null;
             </div>
             <div class="account__pop-up">
                 <ul class="account__pop-up-list">
-                    <li>
-                        <?= Html::a('Мои задания', '#') ?>
-                    </li>
-                    <li>
-                        <?= Html::a('Настройки', '#') ?>
-                    </li>
-                    <li>
-                        <?= Html::a('Выход', '/site/logout') ?>
-                    </li>
+                    <li><?= Html::a('Мои задания', '#') ?></li>
+                    <li><?= Html::a('Настройки', '#') ?></li>
+                    <li><?= Html::a('Выход', '/site/logout') ?></li>
                 </ul>
             </div>
         </div>
