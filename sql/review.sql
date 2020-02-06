@@ -1,1 +1,1 @@
-INSERT INTO `review` (`id`,`task_id`,`author_id`,`executor_id`,`text`) VALUES ('1','1','1','4','text review 1'),('2','2','1','4','text review 2'),('3','3','1','4','text review 3');review
+INSERT INTO `review` (`id`,`task_id`,`author_id`,`executor_id`,`text`,`rating`) VALUES ('1','1','1','2','text review 1','3'),('2','2','1','2','text review 2','4'),('3','3','1','2','text review 3','5');

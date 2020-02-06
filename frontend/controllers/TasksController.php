@@ -8,6 +8,7 @@ use app\models\TaskCreate;
 use app\models\TaskRespond;
 use common\models\User;
 use frontend\components\DebugHelper\DebugHelper;
+use frontend\components\SqlAppGenerator\SqlAppGenerator;
 use Yii;
 use yii\filters\AccessControl;
 use yii\helpers\ArrayHelper;

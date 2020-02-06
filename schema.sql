@@ -7,11 +7,12 @@ CREATE TABLE `user` (
   `login` varchar(255) NOT NULL,
   `email` varchar(255) NOT NULL,
   `password` varchar(255) NOT NULL,
-  `city_id` int NOT NULL,
+  `city_id` int DEFAULT NULL,
   `date_registration` timestamp DEFAULT now()
 );
 
 CREATE TABLE `user_data` (
+  `id` int PRIMARY KEY AUTO_INCREMENT,
   `user_id` int,
   `description` text,
   `age` int,
@@ -63,10 +64,12 @@ CREATE TABLE `task_file` (
 );
 
 CREATE TABLE `task_respond` (
+  `id` int PRIMARY KEY AUTO_INCREMENT,
   `task_id` int,
   `user_id` int,
   `text` text,
   `price` int NOT NULL,
+  `status` varchar(255) NOT NULL,
   `public_date` timestamp
 );
 
@@ -95,7 +98,8 @@ CREATE TABLE `review` (
   `task_id` int,
   `author_id` int,
   `executor_id` int,
-  `text` text
+  `text` text,
+  `rating` int
 );
 
 CREATE TABLE `city` (

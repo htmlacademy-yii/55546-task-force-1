@@ -44,7 +44,7 @@ class SqlAppGenerator
 
         foreach ($csvFiles as $path) {
             $data = self::create($path);
-            file_put_contents("$outputDir/{$data['table']}.sql", $data);
+            file_put_contents("$outputDir/{$data['table']}.sql", $data['sql']);
             $sql .= ($data['sql']."\r\n");
         }
 

@@ -3,6 +3,7 @@ namespace frontend\controllers;
 
 use app\models\{City, SignupForm, Task, MainLoginForm};
 use frontend\components\DebugHelper\DebugHelper;
+use frontend\components\SqlAppGenerator\SqlAppGenerator;
 use Yii;
 use yii\base\InvalidArgumentException;
 use yii\widgets\ActiveForm;
