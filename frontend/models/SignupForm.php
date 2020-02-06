@@ -60,8 +60,7 @@ class SignupForm extends Model
         $user->login = $this->login;
         $user->email = $this->email;
         $user->city_id = $this->cityId;
-        $user->password = $this->password;
-
+        $user->password = password_hash($this->password, PASSWORD_DEFAULT, ['cost' => 13]);
         return $user->save();
     }
 }
