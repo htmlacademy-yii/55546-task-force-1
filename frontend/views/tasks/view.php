@@ -48,10 +48,14 @@ $respondsCount = count($task->responds);
                                          alt="Москва, Новый арбат, 23 к. 1"></a>
                     </div>
                     <div class="content-view__address">
-                        <span class="address__town"><?= $task->author->city->name; ?></span><br>
-                        <span><?= $task->author->userData->address; ?></span>
-                        <span>Новый арбат, 23 к. 1</span>
-                        <p>Вход под арку, код домофона 1122</p>
+                        <?php if($task->author->city): ?>
+                            <span class="address__town"><?= $task->author->city->name; ?></span><br>
+                        <?php endif; ?>
+                        <?php if($task->author->userData->address): ?>
+                            <span><?= $task->author->userData->address; ?></span>
+                            <span>Новый арбат, 23 к. 1</span>
+                            <p>Вход под арку, код домофона 1122</p>
+                        <?php endif; ?>
                     </div>
                 </div>
             </div>
@@ -130,15 +134,11 @@ $respondsCount = count($task->responds);
                 <img src="/img/man-brune.jpg" width="62" height="62" alt="Аватар заказчика">
                 <div class="profile-mini__name five-stars__rate">
                     <p><?= $task->author->login; ?></p>
-                    <?php for ($i = 1; $i <= 5; $i++): ?>
-                        <span <?= ($task->author->userData->rating >= $i) ? '' : 'class="star-disabled"'; ?>></span>
-                    <?php endfor; ?>
-                    <b><?= $task->author->userData->rating ?></b>
                 </div>
             </div>
             <p class="info-customer">
-                <span><?= count($task->reviewsCount); ?> отзывов</span>
-                <span class="last-"><?= $task->author->userData->order_count ?> заказов</span>
+                <span><?= count($task->author->tasks); ?> заданий</span>
+                <span class="last-"><?= $task->author->date_registration; ?> на сайте</span>
             </p>
             <a href="#" class="link-regular">Смотреть профиль</a>
         </div>

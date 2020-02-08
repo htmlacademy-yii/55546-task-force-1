@@ -2,6 +2,7 @@
 namespace common\models;
 
 use app\models\City;
+use app\models\Task;
 use app\models\UserData;
 use app\models\UserSpecialization;
 use Yii;
@@ -82,6 +83,11 @@ class User extends ActiveRecord implements IdentityInterface
     public function getSpecializations()
     {
         return $this->hasMany(UserSpecialization::class, ['user_id' => 'id']);
+    }
+
+    public function getTasks()
+    {
+        return $this->hasMany(Task::class, ['author_id' => 'id']);
     }
 
     public function getRole()

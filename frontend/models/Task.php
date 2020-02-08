@@ -69,9 +69,9 @@ class Task extends ActiveRecord
         return $this->hasOne(User::class, ['id' => 'author_id']);
     }
 
-    public function getReviewsCount()
+    public function getReviews()
     {
-        return $this->hasOne(Review::class, ['author_id' => 'id']);
+        return $this->hasMany(Review::class, ['author_id' => 'id']);
     }
 
     public function getFiles()

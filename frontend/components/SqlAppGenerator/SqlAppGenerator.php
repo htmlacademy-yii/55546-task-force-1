@@ -50,4 +50,13 @@ class SqlAppGenerator
 
         file_put_contents("$outputDir/all.sql", $sql);
     }
+
+    public static function generateSqlProject($dataDir, $sqlDir)
+    {
+        $csvFiles = array_map(function($fileName) use ($dataDir) {
+            return "$dataDir/$fileName";
+        }, array_diff(scandir($dataDir), ['.', '..']));
+
+        SqlAppGenerator::createSqlCollection($csvFiles, $sqlDir);
+    }
 }

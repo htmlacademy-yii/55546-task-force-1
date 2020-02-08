@@ -42,7 +42,7 @@ class TasksController extends SecuredController
     public function actionView($id)
     {
         $taskUrl = Url::to("/tasks/view/$id");
-        $task = Task::find()->with('category', 'author', 'reviewsCount', 'files', 'responds')
+        $task = Task::find()->with('category', 'author', 'files', 'responds')
             ->where(['id' => (int) $id])->one();
         $user = Yii::$app->user->identity;
 
