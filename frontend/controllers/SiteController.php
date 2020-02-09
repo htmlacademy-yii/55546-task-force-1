@@ -1,7 +1,8 @@
 <?php
 namespace frontend\controllers;
 
-use app\models\{City, SignupForm, Task, MainLoginForm};
+use app\models\{City, SignupForm, Task, MainLoginForm, UserData};
+use common\models\User;
 use frontend\components\DebugHelper\DebugHelper;
 use frontend\components\SqlAppGenerator\SqlAppGenerator;
 use Yii;
@@ -165,8 +166,31 @@ class SiteController extends SecuredController
     {
         $model = new SignupForm();
 
-        if(Yii::$app->request->isPost && $model->load(Yii::$app->request->post()) && $model->signup()) {
-            return $this->goHome();
+        if(Yii::$app->request->isPost && $model->load(Yii::$app->request->post())) {
+            $transaction = Yii::$app->db->beginTransaction();
+            try {
+                $user = $model->signup();
+                $userData = new UserData();
+                $userData->attributes = [
+                    'description' => '',
+                    'age' => '',
+                    'address' => '',
+                    'skype' => '',
+                    'phone' => '',
+                    'other_messenger' => '',
+                    'avatar' => '',
+                    'rating' => '',
+                    'views' => '',
+                    'order_count' => '',
+                    'status' => User::STATUS_ACTIVE,
+                ];
+                $userData->save();
+                $user->link('userData', $userData);
+                $transaction->commit();
+                return $this->goHome();
+            } catch (\Exception $e) {
+                $transaction->rollBack();
+            }
         }
 
         return $this->render('signup', [

@@ -17,12 +17,12 @@ class MainLoginForm extends Model
         ];
     }
 
-    public function loginValidate($data)
+    public function loginValidate(array $data): User
     {
         $user = User::findOne(['email' => $data['email']]);
         if(empty($user)) {
             $this->addError('email', "Пользователь с указанным Email {$this->email} не найден");
-        } else if(!password_verify($data['password'], $user->password)) {
+        } else if(!\Yii::$app->getSecurity()->validatePassword($data['password'], $user->password)) {
             $this->addError('password', "Не верный пароль");
         }
 
