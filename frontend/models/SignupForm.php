@@ -34,6 +34,7 @@ class SignupForm extends Model
             ['password', 'string', 'min' => 6],
 
             ['cityId', 'required'],
+            ['cityId', 'integer'],
         ];
     }
 

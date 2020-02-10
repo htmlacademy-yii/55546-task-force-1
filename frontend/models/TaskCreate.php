@@ -16,10 +16,12 @@ class TaskCreate extends Model
 
     public function rules(): array
     {
+
         return [
             [['title', 'description', 'categoryId'], 'required', 'message' => 'Поле должно быть заполнено'],
             [['categoryId', 'price'], 'integer', 'message' => 'Это поле может быть только целым числом'],
             ['categoryId', 'checkCategory'],
+            [['description'], 'string'],
             ['price', 'number', 'min' => 1, 'message' => 'Цена должна быть больше нуля'],
             ['dateEnd', 'match', 'pattern' => '/^\d{4}-\d{2}-\d{2}$/', 'message' => 'Не корректный формат даты']
         ];

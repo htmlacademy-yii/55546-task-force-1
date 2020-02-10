@@ -24,6 +24,7 @@ class Review extends ActiveRecord
     public function rules()
     {
         return [
+            [['task_id', 'author_id', 'executor_id', 'text'], 'required'],
             [['task_id', 'author_id', 'executor_id'], 'integer'],
             [['text'], 'string'],
         ];

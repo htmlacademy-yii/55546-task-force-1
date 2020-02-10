@@ -65,7 +65,7 @@ class SiteController extends SecuredController
     public function actionIndex()
     {
         if (!Yii::$app->user->isGuest) {
-            return $this->redirect(Url::to('/tasks'));
+            return $this->redirect(Task::getBaseTasksUrl());
         }
         $this->layout = 'landing';
 
@@ -76,7 +76,7 @@ class SiteController extends SecuredController
 
             if(empty($model->getErrors())) {
                 Yii::$app->user->login($user);
-                return $this->redirect(Url::to('/tasks'));
+                return $this->redirect(Task::getBaseTasksUrl());
             }
 
             return $model->getErrors();

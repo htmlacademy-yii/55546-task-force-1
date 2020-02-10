@@ -16,6 +16,7 @@ class TaskCompletionForm extends Model
     public function rules()
     {
         return [
+            ['rating', 'required'],
             ['rating', 'integer'],
             [['isCompletion', 'text', 'rating'], 'safe'],
         ];

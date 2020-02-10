@@ -12,6 +12,7 @@ class RespondForm extends Model
     public function rules()
     {
         return [
+            ['price', 'required'],
             ['price', 'integer', 'min' => 1],
             ['text', 'string'],
         ];

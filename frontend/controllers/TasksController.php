@@ -41,9 +41,9 @@ class TasksController extends SecuredController
 
     public function actionView($id)
     {
-        $taskUrl = Url::to("/tasks/view/$id");
         $task = Task::find()->with('category', 'author', 'files', 'responds')
             ->where(['id' => (int) $id])->one();
+        $taskUrl = $task->getCurrentTaskUrl();
         $user = Yii::$app->user->identity;
 
         $respondModel = new RespondForm();
@@ -86,10 +86,11 @@ class TasksController extends SecuredController
     public function actionDecision(string $status, int $id, int $taskId)
     {
         $task = Task::findOne($taskId);
+        $taskUrl = $task->getCurrentTaskUrl();
         $taskRespond = TaskRespond::findOne($id);
 
         if(Yii::$app->user->identity->id !== $task->author_id) {
-            $this->redirect(Url::to("/tasks/view/$taskId"));
+            $this->redirect($taskUrl);
         }
 
         if($status === TaskRespond::STATUS_ACCEPTED) {
@@ -101,13 +102,13 @@ class TasksController extends SecuredController
         }
 
         $taskRespond->save();
-        $this->redirect(Url::to("/tasks/view/$taskId"));
+        $this->redirect($taskUrl);
     }
 
     public function actionCreate()
     {
         if(Yii::$app->user->identity->getRole() === User::ROLE_EXECUTOR) {
-            $this->redirect(Url::to('/tasks'));
+            $this->redirect(Task::getBaseTasksUrl());
         }
 
         $model = new TaskCreate();
@@ -115,7 +116,7 @@ class TasksController extends SecuredController
         if(Yii::$app->request->post()) {
             $model->load(Yii::$app->request->post());
             if($model->validate() && $model->create(new Task(), Task::STATUS_NEW)) {
-                $this->redirect(Url::to('/tasks'));
+                $this->redirect(Task::getBaseTasksUrl());
             }
         }
 
