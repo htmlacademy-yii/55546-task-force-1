@@ -5,6 +5,8 @@ use frontend\components\DebugHelper\DebugHelper;
 use Yii;
 use yii\base\Model;
 use common\models\User;
+use yii\db\Exception;
+
 /**
  * Signup form
  */
@@ -26,12 +28,13 @@ class SignupForm extends Model
             ['email', 'required'],
             ['email', 'email'],
             ['email', 'string', 'max' => 255],
-            ['email', 'unique', 'targetClass' => '\app\models\User', 'message' => 'This email address has already been taken.'],
+            ['email', 'unique', 'targetClass' => '\common\models\User', 'message' => 'This email address has already been taken.'],
 
             ['password', 'required'],
             ['password', 'string', 'min' => 6],
 
             ['cityId', 'required'],
+            ['cityId', 'integer'],
         ];
     }
 
@@ -50,18 +53,22 @@ class SignupForm extends Model
      *
      * @return bool whether the creating new account was successful and email was sent
      */
-    public function signup()
+    public function signup(): User
     {
         if (!$this->validate()) {
-            return null;
+            throw new \Exception();
         }
 
         $user = new User();
         $user->login = $this->login;
         $user->email = $this->email;
         $user->city_id = $this->cityId;
-        $user->password = $this->password;
+        $user->password = Yii::$app->getSecurity()->generatePasswordHash($this->password);
 
-        return $user->save();
+        if (!$user->save()) {
+            throw new \Exception();
+        }
+
+        return $user;
     }
 }

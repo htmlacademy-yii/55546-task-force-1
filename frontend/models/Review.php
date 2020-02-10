@@ -16,28 +16,20 @@ use yii\db\ActiveRecord;
  */
 class Review extends ActiveRecord
 {
-    /**
-     * {@inheritdoc}
-     */
     public static function tableName()
     {
         return 'review';
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function rules()
     {
         return [
+            [['task_id', 'author_id', 'executor_id', 'text'], 'required'],
             [['task_id', 'author_id', 'executor_id'], 'integer'],
             [['text'], 'string'],
         ];
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function attributeLabels()
     {
         return [
@@ -46,6 +38,7 @@ class Review extends ActiveRecord
             'author_id' => 'Author ID',
             'executor_id' => 'Executor ID',
             'text' => 'Text',
+            'rating' => 'Rating',
         ];
     }
 }

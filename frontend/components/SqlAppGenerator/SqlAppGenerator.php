@@ -44,10 +44,19 @@ class SqlAppGenerator
 
         foreach ($csvFiles as $path) {
             $data = self::create($path);
-            file_put_contents("$outputDir/{$data['table']}.sql", $data);
+            file_put_contents("$outputDir/{$data['table']}.sql", $data['sql']);
             $sql .= ($data['sql']."\r\n");
         }
 
         file_put_contents("$outputDir/all.sql", $sql);
+    }
+
+    public static function generateSqlProject($dataDir, $sqlDir)
+    {
+        $csvFiles = array_map(function($fileName) use ($dataDir) {
+            return "$dataDir/$fileName";
+        }, array_diff(scandir($dataDir), ['.', '..']));
+
+        SqlAppGenerator::createSqlCollection($csvFiles, $sqlDir);
     }
 }

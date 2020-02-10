@@ -2,6 +2,7 @@
 
 namespace app\models;
 
+use frontend\components\DebugHelper\DebugHelper;
 use Yii;
 use yii\db\ActiveRecord;
 use common\models\User;
@@ -15,29 +16,23 @@ use common\models\User;
  */
 class TaskRespond extends ActiveRecord
 {
-    /**
-     * {@inheritdoc}
-     */
+    const STATUS_NEW = 'new';
+    const STATUS_ACCEPTED = 'accepted';
+    const STATUS_DENIED = 'denied';
+
     public static function tableName()
     {
         return 'task_respond';
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function rules()
     {
         return [
-            [['task_id', 'user_id'], 'integer'],
+            [['task_id', 'user_id', 'price'], 'integer'],
             [['text'], 'string'],
-            [['public_date'], 'safe'],
         ];
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function attributeLabels()
     {
         return [

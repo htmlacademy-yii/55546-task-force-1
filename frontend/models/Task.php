@@ -6,6 +6,7 @@ use Yii;
 use yii\db\ActiveRecord;
 use app\models\{Category, UserData, Review, TaskFile, TaskRespond};
 use common\models\User;
+use yii\helpers\Url;
 
 class Task extends ActiveRecord
 {
@@ -24,6 +25,7 @@ class Task extends ActiveRecord
     public function rules()
     {
         return [
+            [['title', 'description', 'category_id'], 'required'],
             [['author_id', 'category_id', 'price', 'executor_id'], 'integer'],
             [['description'], 'string'],
             [['date_start', 'date_end'], 'safe'],
@@ -59,6 +61,11 @@ class Task extends ActiveRecord
         ];
     }
 
+    public function getCurrentTaskUrl(): string
+    {
+        return Url::to("/tasks/view/$this->id");
+    }
+
     public function getCategory()
     {
         return $this->hasOne(Category::class, ['id' => 'category_id']);
@@ -69,9 +76,9 @@ class Task extends ActiveRecord
         return $this->hasOne(User::class, ['id' => 'author_id']);
     }
 
-    public function getReviewsCount()
+    public function getReviews()
     {
-        return $this->hasOne(Review::class, ['author_id' => 'id']);
+        return $this->hasMany(Review::class, ['author_id' => 'id']);
     }
 
     public function getFiles()
@@ -87,5 +94,10 @@ class Task extends ActiveRecord
     public function getStatus(): string
     {
         return $this->status;
+    }
+
+    public static function getBaseTasksUrl(): string
+    {
+        return Url::to("/tasks");
     }
 }

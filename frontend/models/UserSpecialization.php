@@ -27,6 +27,7 @@ class UserSpecialization extends ActiveRecord
     public function rules()
     {
         return [
+            [['user_id', 'category_id'], 'required'],
             [['user_id', 'category_id'], 'integer'],
         ];
     }

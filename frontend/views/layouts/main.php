@@ -5,7 +5,8 @@ use yii\helpers\Html;
 
 AppAsset::register($this);
 
-$user = !Yii::$app->user->isGuest ? Yii::$app->user->identity : null;
+$isGuest = Yii::$app->user->isGuest;
+$user = $isGuest ? null : Yii::$app->user->identity;
 
 ?>
 <?php $this->beginPage() ?>
@@ -96,28 +97,26 @@ $user = !Yii::$app->user->isGuest ? Yii::$app->user->identity : null;
                 </p>
             </div>
             <div class="header__account">
-                <a class="header__account-photo">
-                    <img src="/img/user-photo.png"
-                         width="43" height="44"
-                         alt="Аватар пользователя">
-                </a>
-                <span class="header__account-name">
-                 <?= $user->login; ?>
-             </span>
+                <?php if(!$isGuest): ?>
+                    <a class="header__account-photo">
+                        <img src="/img/user-photo.png"
+                             width="43" height="44"
+                             alt="Аватар пользователя">
+                    </a>
+                    <span class="header__account-name">
+                         <?= $user->login; ?>
+                     </span>
+                <?php endif; ?>
             </div>
-            <div class="account__pop-up">
-                <ul class="account__pop-up-list">
-                    <li>
-                        <?= Html::a('Мои задания', '#') ?>
-                    </li>
-                    <li>
-                        <?= Html::a('Настройки', '#') ?>
-                    </li>
-                    <li>
-                        <?= Html::a('Выход', '/site/logout') ?>
-                    </li>
-                </ul>
-            </div>
+            <?php if(!$isGuest): ?>
+                <div class="account__pop-up">
+                    <ul class="account__pop-up-list">
+                        <li><?= Html::a('Мои задания', '#') ?></li>
+                        <li><?= Html::a('Настройки', '#') ?></li>
+                        <li><?= Html::a('Выход', '/site/logout') ?></li>
+                    </ul>
+                </div>
+            <?php endif; ?>
         </div>
     </header>
     <main class="page-main">

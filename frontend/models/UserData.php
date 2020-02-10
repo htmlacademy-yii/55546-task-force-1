@@ -38,9 +38,10 @@ class UserData extends ActiveRecord
     public function rules()
     {
         return [
-            [['user_id', 'age', 'rating', 'views', 'order_count'], 'integer'],
+            [['description', 'age', 'address', 'skype', 'phone', 'other_messenger', 'avatar', 'rating', 'views', 'order_count', 'status'], 'safe'],
+            [['user_id', 'age', 'rating', 'views', 'order_count', 'status'], 'integer'],
             [['description', 'address'], 'string'],
-            [['name', 'skype', 'phone', 'other_messenger', 'avatar', 'status'], 'string', 'max' => 255],
+            [['skype', 'phone', 'other_messenger', 'avatar'], 'string', 'max' => 255],
         ];
     }
 
@@ -64,5 +65,13 @@ class UserData extends ActiveRecord
             'order_count' => 'Order Count',
             'status' => 'Status',
         ];
+    }
+
+    public function save($runValidation = true, $attributeNames = null): bool
+    {
+        if(!($result = parent::save($runValidation, $attributeNames))) {
+            throw new \Exception();
+        }
+        return $result;
     }
 }

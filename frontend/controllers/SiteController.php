@@ -1,8 +1,10 @@
 <?php
 namespace frontend\controllers;
 
-use app\models\{City, SignupForm, Task, MainLoginForm};
+use app\models\{City, SignupForm, Task, MainLoginForm, UserData};
+use common\models\User;
 use frontend\components\DebugHelper\DebugHelper;
+use frontend\components\SqlAppGenerator\SqlAppGenerator;
 use Yii;
 use yii\base\InvalidArgumentException;
 use yii\widgets\ActiveForm;
@@ -63,7 +65,7 @@ class SiteController extends SecuredController
     public function actionIndex()
     {
         if (!Yii::$app->user->isGuest) {
-            return $this->redirect(Url::to('/tasks'));
+            return $this->redirect(Task::getBaseTasksUrl());
         }
         $this->layout = 'landing';
 
@@ -74,7 +76,7 @@ class SiteController extends SecuredController
 
             if(empty($model->getErrors())) {
                 Yii::$app->user->login($user);
-                return $this->redirect(Url::to('/tasks'));
+                return $this->redirect(Task::getBaseTasksUrl());
             }
 
             return $model->getErrors();
@@ -164,8 +166,31 @@ class SiteController extends SecuredController
     {
         $model = new SignupForm();
 
-        if(Yii::$app->request->isPost && $model->load(Yii::$app->request->post()) && $model->signup()) {
-            return $this->goHome();
+        if(Yii::$app->request->isPost && $model->load(Yii::$app->request->post())) {
+            $transaction = Yii::$app->db->beginTransaction();
+            try {
+                $user = $model->signup();
+                $userData = new UserData();
+                $userData->attributes = [
+                    'description' => '',
+                    'age' => '',
+                    'address' => '',
+                    'skype' => '',
+                    'phone' => '',
+                    'other_messenger' => '',
+                    'avatar' => '',
+                    'rating' => '',
+                    'views' => '',
+                    'order_count' => '',
+                    'status' => User::STATUS_ACTIVE,
+                ];
+                $userData->save();
+                $user->link('userData', $userData);
+                $transaction->commit();
+                return $this->goHome();
+            } catch (\Exception $e) {
+                $transaction->rollBack();
+            }
         }
 
         return $this->render('signup', [
