@@ -256,8 +256,6 @@ $respondsCount = count($task->responds);
 
 <div class="overlay"></div>
 <script src="/js/main.js"></script>
-
-
 <script src="https://api-maps.yandex.ru/2.1/?apikey=<?= $yandexMapApikey; ?>&lang=ru_RU" type="text/javascript"></script>
 <script type="text/javascript">
     // Функция ymaps.ready() будет вызвана, когда
@@ -281,13 +279,4 @@ $respondsCount = count($task->responds);
             });
         }
     }
-</script>
-
-<script>
-    (async () => {
-        let res = await fetch('/ajax/data-map?geocode=Горно-Алтайск каве').then(res => res.json());
-        res = JSON.parse(res);
-
-        console.log(res, res.response.GeoObjectCollection.featureMember[0].GeoObject.Point.pos);
-    }) ()
 </script>
