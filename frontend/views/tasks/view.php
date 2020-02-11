@@ -44,7 +44,7 @@ $respondsCount = count($task->responds);
                 <h3 class="content-view__h3">Расположение</h3>
                 <div class="content-view__location-wrapper">
                     <div class="content-view__map" id="map" style="width: 361px; height: 292px;">
-                        <?php if($task->location->position): ?>
+                        <?php if($task->location): ?>
                             <?= Html::hiddenInput('location-position', $task->location->position); ?>
                         <?php else: ?>
                             <a href="#"><img src="/img/map.jpg" width="361" height="292"

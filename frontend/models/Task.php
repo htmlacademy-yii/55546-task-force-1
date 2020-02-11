@@ -64,6 +64,10 @@ class Task extends ActiveRecord
 
     public function initLocation()
     {
+        if(empty($this->location)) {
+            return;
+        }
+
         $position = $this->location;
         $this->location = YandexMap::getAddressByPositions($this->location);
         $this->location->position = $position;
