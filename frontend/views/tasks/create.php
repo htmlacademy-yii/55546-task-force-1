@@ -7,6 +7,7 @@ $labels = $model->attributeLabels();
 ?>
 
 <section class="create__task">
+    <?= Html::hiddenInput('yandex-api-key', $yandexMapApikey); ?>
     <h1>Публикация нового задания</h1>
     <div class="create__task-main">
         <?php $form = ActiveForm::begin([
@@ -45,8 +46,12 @@ $labels = $model->attributeLabels();
             <?= $form->field($model, 'location', $fieldConfig)
                 ->input( 'search',[
                     'class' => 'input-navigation input-middle input',
+                    'list' => 'cities-list',
                     'placeholder' => 'Санкт-Петербург, Калининский район',
+                    'id' => 'autoComplete'
                 ])->hint('<span>Укажите адрес исполнения, если задание требует присутствия</span>')?>
+            <datalist id="cities-list"></datalist>
+
             <div class="create__price-time">
                 <div class="create__price-time--wrapper">
                     <?= $form->field($model, 'price', $fieldConfig)
@@ -98,3 +103,18 @@ $labels = $model->attributeLabels();
 <script>
     var dropzone = new Dropzone("div.create__file", {url: "/tasks/create", paramName: "Attach"});
 </script>
+<script>
+    (async () => {
+        const inputAutoComplete = document.querySelector(`#autoComplete`);
+        const citiesList = document.querySelector(`#cities-list`);
+        inputAutoComplete.addEventListener(`input`, async ({ target }) => {
+            const apiKey = document.querySelector(`[name="yandex-api-key"]`);
+            const data = await fetch(`https://geocode-maps.yandex.ru/1.x?apikey=${apiKey.value}&format=json&geocode=${target.value}`,
+                { Method: `GET`, 'Content-Type': `json/application` })
+                .then(res => res.json());
+            citiesList.innerHTML = data.response.GeoObjectCollection.featureMember.map(({GeoObject}) => `<option value="${GeoObject.name}">`);
+        });
+    }) ()
+</script>
+
+

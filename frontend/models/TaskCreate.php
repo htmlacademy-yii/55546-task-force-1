@@ -1,6 +1,7 @@
 <?php
 namespace app\models;
 
+use frontend\components\YandexMap\YandexMap;
 use Yii;
 use yii\base\Model;
 
@@ -16,12 +17,11 @@ class TaskCreate extends Model
 
     public function rules(): array
     {
-
         return [
             [['title', 'description', 'categoryId'], 'required', 'message' => 'Поле должно быть заполнено'],
             [['categoryId', 'price'], 'integer', 'message' => 'Это поле может быть только целым числом'],
             ['categoryId', 'checkCategory'],
-            [['description'], 'string'],
+            [['description', 'location'], 'string'],
             ['price', 'number', 'min' => 1, 'message' => 'Цена должна быть больше нуля'],
             ['dateEnd', 'match', 'pattern' => '/^\d{4}-\d{2}-\d{2}$/', 'message' => 'Не корректный формат даты']
         ];
@@ -54,7 +54,16 @@ class TaskCreate extends Model
         $task->description = $this->description;
         $task->category_id = $this->categoryId;
         $task->price = $this->price;
-        $task->location = $this->location;
+
+        if(!empty($this->location)) {
+            $geocode = YandexMap::getPosition($this->location);
+
+            if(!$geocode) {
+                $this->addError('location', 'Указанная локация не определена');
+                return false;
+            }
+            $task->location = $geocode;
+        }
 
         if(isset($this->date_end)) {
             $task->date_end = strtotime($this->date_end);

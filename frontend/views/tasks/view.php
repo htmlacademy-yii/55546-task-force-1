@@ -43,13 +43,26 @@ $respondsCount = count($task->responds);
             <div class="content-view__location">
                 <h3 class="content-view__h3">Расположение</h3>
                 <div class="content-view__location-wrapper">
-                    <div class="content-view__map">
-                        <a href="#"><img src="/img/map.jpg" width="361" height="292"
-                                         alt="Москва, Новый арбат, 23 к. 1"></a>
+                    <div class="content-view__map" id="map" style="width: 361px; height: 292px;">
+                        <?php if($task->location->position): ?>
+                            <?= Html::hiddenInput('location-position', $task->location->position); ?>
+                        <?php else: ?>
+                            <a href="#"><img src="/img/map.jpg" width="361" height="292"
+                                             alt="Москва, Новый арбат, 23 к. 1"></a>
+                        <?php endif; ?>
                     </div>
                     <div class="content-view__address">
-                        <?php if($task->author->city): ?>
-                            <span class="address__town"><?= $task->author->city->name; ?></span><br>
+                        <?php if($task->location): ?>
+                            <?php $locality = $task->location->AdministrativeArea->SubAdministrativeArea->Locality; ?>
+                            <span class="address__town">
+                                <?= $locality->LocalityName; ?>
+                            </span>
+                            <br>
+                            <?php if($locality->Thoroughfare): ?>
+                                <span>
+                                    <?= $locality->Thoroughfare->ThoroughfareName; ?>
+                                </span>
+                            <?php endif; ?>
                         <?php endif; ?>
                         <?php if($task->author->userData->address): ?>
                             <span><?= $task->author->userData->address; ?></span>
@@ -243,3 +256,38 @@ $respondsCount = count($task->responds);
 
 <div class="overlay"></div>
 <script src="/js/main.js"></script>
+
+
+<script src="https://api-maps.yandex.ru/2.1/?apikey=<?= $yandexMapApikey; ?>&lang=ru_RU" type="text/javascript"></script>
+<script type="text/javascript">
+    // Функция ymaps.ready() будет вызвана, когда
+    // загрузятся все компоненты API, а также когда будет готово DOM-дерево.
+    ymaps.ready(init);
+    function init(){
+        // Создание карты.
+
+        const locationPosition = document.querySelector('[name="location-position"]');
+        if(locationPosition) {
+            const map = new ymaps.Map("map", {
+                // Координаты центра карты.
+                // Порядок по умолчанию: «широта, долгота».
+                // Чтобы не определять координаты центра карты вручную,
+                // воспользуйтесь инструментом Определение координат.
+                // center: [55.007139, 37.23209],
+                center: locationPosition.value.split(` `),
+                // Уровень масштабирования. Допустимые значения:
+                // от 0 (весь мир) до 19.
+                zoom: 7
+            });
+        }
+    }
+</script>
+
+<script>
+    (async () => {
+        let res = await fetch('/ajax/data-map?geocode=Горно-Алтайск каве').then(res => res.json());
+        res = JSON.parse(res);
+
+        console.log(res, res.response.GeoObjectCollection.featureMember[0].GeoObject.Point.pos);
+    }) ()
+</script>

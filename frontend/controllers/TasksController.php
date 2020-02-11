@@ -7,8 +7,10 @@ use app\models\TaskCompletionForm;
 use app\models\TaskCreate;
 use app\models\TaskRespond;
 use common\models\User;
+
 use frontend\components\DebugHelper\DebugHelper;
 use frontend\components\SqlAppGenerator\SqlAppGenerator;
+use frontend\components\YandexMap\YandexMap;
 use Yii;
 use yii\filters\AccessControl;
 use yii\helpers\ArrayHelper;
@@ -21,6 +23,26 @@ use app\models\TasksFilter;
 
 class TasksController extends SecuredController
 {
+    public function behaviors()
+    {
+        $rules = parent::behaviors();
+        $rule = [
+            'allow' => false,
+            'actions' => [
+                'create'
+            ],
+            'matchCallback' => function($rule, $action) {
+                return Yii::$app->user->identity->getRole() === User::ROLE_EXECUTOR;
+            },
+            'denyCallback' => function($rule, $action) {
+                return $action->controller->redirect(Task::getBaseTasksUrl());
+            },
+        ];
+
+        array_unshift($rules['access']['rules'], $rule);
+        return $rules;
+    }
+
     public function actionIndex()
     {
         $tasks = Task::find()->where(['status' => Task::STATUS_NEW]);
@@ -56,6 +78,8 @@ class TasksController extends SecuredController
             throw new NotFoundHttpException("Страница не найдена!");
         }
 
+        $task->initLocation();
+
         if(Yii::$app->request->post('RespondForm') && !$isRespond) {
             if($respondModel->load(Yii::$app->request->post()) && $respondModel->validate()) {
                 $respondModel->createRespond($user->id, $task->id);
@@ -80,6 +104,7 @@ class TasksController extends SecuredController
             'isRespond' => $isRespond,
             'respondModel' => $respondModel,
             'taskCompletionModel' => $taskCompletionModel,
+            'yandexMapApikey' => YandexMap::API_KEY
         ]);
     }
 
@@ -107,10 +132,6 @@ class TasksController extends SecuredController
 
     public function actionCreate()
     {
-        if(Yii::$app->user->identity->getRole() === User::ROLE_EXECUTOR) {
-            $this->redirect(Task::getBaseTasksUrl());
-        }
-
         $model = new TaskCreate();
 
         if(Yii::$app->request->post()) {
@@ -123,6 +144,7 @@ class TasksController extends SecuredController
         return $this->render('create', [
             'model' => $model,
             'categories' => ArrayHelper::map(Category::find()->all(), 'id', 'title'),
+            'yandexMapApikey' => YandexMap::API_KEY
         ]);
     }
 }

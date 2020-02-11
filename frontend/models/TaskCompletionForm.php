@@ -1,7 +1,7 @@
 <?php
 namespace app\models;
 
-use frontend\components\DebugHelper\DebugHelper;
+use frontend\components\DebugHelper;
 use yii\base\Model;
 
 class TaskCompletionForm extends Model
