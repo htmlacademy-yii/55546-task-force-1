@@ -7,16 +7,24 @@
 
     const locationPosition = document.querySelector('[name="location-position"]');
     if(locationPosition) {
+      const center = locationPosition.value.split(` `);
       const map = new ymaps.Map("map", {
         // Координаты центра карты.
         // Порядок по умолчанию: «широта, долгота».
         // Чтобы не определять координаты центра карты вручную,
         // воспользуйтесь инструментом Определение координат.
-        center: locationPosition.value.split(` `),
+        center,
         // Уровень масштабирования. Допустимые значения:
         // от 0 (весь мир) до 19.
         zoom: 13
       });
+
+      map.geoObjects.add(new ymaps.Placemark(center, {
+        balloonContent: '<strong>Метка цели</strong>'
+      }, {
+        preset: 'islands#redIcon',
+      }));
+
     }
   }
 }) ();
