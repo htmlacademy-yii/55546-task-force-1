@@ -22,8 +22,10 @@ class TaskCreate extends Model
             [['categoryId', 'price'], 'integer', 'message' => 'Это поле может быть только целым числом'],
             ['categoryId', 'checkCategory'],
             [['description', 'location'], 'string'],
+            ['location', 'checkLocation'],
             ['price', 'number', 'min' => 1, 'message' => 'Цена должна быть больше нуля'],
-            ['dateEnd', 'match', 'pattern' => '/^\d{4}-\d{2}-\d{2}$/', 'message' => 'Не корректный формат даты']
+            ['dateEnd', 'match', 'pattern' => '/^\d{4}-\d{2}-\d{2}$/', 'message' => 'Не корректный формат даты'],
+            ['dateEnd', 'checkDate']
         ];
     }
 
@@ -47,6 +49,27 @@ class TaskCreate extends Model
         }
     }
 
+    public function checkDate(): void
+    {
+        if(time() > strtotime($this->dateEnd)) {
+            $this->addError('dateEnd', 'Дата завершение задачи должна быть после текущей');
+        }
+    }
+
+    public function checkLocation(): void
+    {
+        $geocode = '';
+        if(!empty($this->location)) {
+            $geocode = YandexMap::getPosition($this->location);
+
+            if(!$geocode) {
+                $this->addError('location', 'Указанная локация не определена');
+            }
+        }
+
+        $this->location = $geocode;
+    }
+
     public function create(Task $task, string $status): bool
     {
         $task->author_id = Yii::$app->user->getId();
@@ -54,21 +77,8 @@ class TaskCreate extends Model
         $task->description = $this->description;
         $task->category_id = $this->categoryId;
         $task->price = $this->price;
-
-        if(!empty($this->location)) {
-            $geocode = YandexMap::getPosition($this->location);
-
-            if(!$geocode) {
-                $this->addError('location', 'Указанная локация не определена');
-                return false;
-            }
-            $task->location = $geocode;
-        }
-
-        if(isset($this->date_end)) {
-            $task->date_end = strtotime($this->date_end);
-        }
-
+        $task->location = $this->location;
+        $task->date_end = $this->dateEnd;
         $task->status = $status;
 
         return $task->save();

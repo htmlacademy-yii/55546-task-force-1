@@ -12,6 +12,7 @@ use frontend\components\DebugHelper\DebugHelper;
 use frontend\components\SqlAppGenerator\SqlAppGenerator;
 use frontend\components\YandexMap\YandexMap;
 use Yii;
+use yii\bootstrap\ActiveForm;
 use yii\filters\AccessControl;
 use yii\helpers\ArrayHelper;
 use yii\helpers\Url;
@@ -81,6 +82,10 @@ class TasksController extends SecuredController
         $task->initLocation();
 
         if(Yii::$app->request->post('RespondForm') && !$isRespond) {
+//            $respondModel->load(Yii::$app->request->post());
+//            $respondModel->validate();
+//            $respondModel->createRespond($user->id, $task->id);
+//            return ActiveForm::validate($respondModel);
             if($respondModel->load(Yii::$app->request->post()) && $respondModel->validate()) {
                 $respondModel->createRespond($user->id, $task->id);
                 $this->redirect($taskUrl);

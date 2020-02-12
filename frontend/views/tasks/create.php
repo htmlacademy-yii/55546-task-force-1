@@ -4,6 +4,8 @@ use yii\helpers\Html;
 
 $fieldConfig = ['template' => '{label}{input}{hint}{error}', 'options' => ['tag' => false]];
 $labels = $model->attributeLabels();
+
+\frontend\assets\TaskCreateAsset::register($this);
 ?>
 
 <section class="create__task">
@@ -98,23 +100,3 @@ $labels = $model->attributeLabels();
     </div>
     <?= Html::submitButton('Опубликовать', ['form' => 'task-form', 'class' => 'button']); ?>
 </section>
-<script src="/js/dropzone.js"></script>
-
-<script>
-    var dropzone = new Dropzone("div.create__file", {url: "/tasks/create", paramName: "Attach"});
-</script>
-<script>
-    (async () => {
-        const inputAutoComplete = document.querySelector(`#autoComplete`);
-        const citiesList = document.querySelector(`#cities-list`);
-        inputAutoComplete.addEventListener(`input`, async ({ target }) => {
-            const apiKey = document.querySelector(`[name="yandex-api-key"]`);
-            const data = await fetch(`https://geocode-maps.yandex.ru/1.x?apikey=${apiKey.value}&format=json&geocode=${target.value}`,
-                { Method: `GET`, 'Content-Type': `json/application` })
-                .then(res => res.json());
-            citiesList.innerHTML = data.response.GeoObjectCollection.featureMember.map(({GeoObject}) => `<option value="${GeoObject.name}">`);
-        });
-    }) ()
-</script>
-
-

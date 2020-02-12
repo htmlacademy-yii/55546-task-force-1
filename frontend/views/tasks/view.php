@@ -8,6 +8,8 @@ use yii\helpers\Url;
 $this->title = "Задание: $task->title";
 $fieldConfig = ['template' => '{label}{input}{error}', 'options' => ['tag' => false]];
 $respondsCount = count($task->responds);
+
+\frontend\assets\TaskViewAsset::register($this);
 ?>
 
 <section class="content-view">
@@ -53,21 +55,10 @@ $respondsCount = count($task->responds);
                     </div>
                     <div class="content-view__address">
                         <?php if($task->location): ?>
-                            <?php $locality = $task->location->AdministrativeArea->SubAdministrativeArea->Locality; ?>
                             <span class="address__town">
-                                <?= $locality->LocalityName; ?>
+                                <?= $task->location->AddressLine; ?>
                             </span>
                             <br>
-                            <?php if($locality->Thoroughfare): ?>
-                                <span>
-                                    <?= $locality->Thoroughfare->ThoroughfareName; ?>
-                                </span>
-                            <?php endif; ?>
-                        <?php endif; ?>
-                        <?php if($task->author->userData->address): ?>
-                            <span><?= $task->author->userData->address; ?></span>
-                            <span>Новый арбат, 23 к. 1</span>
-                            <p>Вход под арку, код домофона 1122</p>
                         <?php endif; ?>
                     </div>
                 </div>
@@ -183,7 +174,7 @@ $respondsCount = count($task->responds);
 </section>
 <section class="modal response-form form-modal" id="response-form">
     <h2>Отклик на задание</h2>
-    <?php $form = ActiveForm::begin(['enableClientValidation' => false]); ?>
+    <?php $form = ActiveForm::begin(['enableClientValidation' => false, 'enableAjaxValidation' => true]); ?>
         <p>
             <?= $form->field($respondModel, 'price', $fieldConfig)
                 ->textInput(['class' => 'response-form-payment input input-middle input-money'])
@@ -255,28 +246,3 @@ $respondsCount = count($task->responds);
 </section>
 
 <div class="overlay"></div>
-<script src="/js/main.js"></script>
-<script src="https://api-maps.yandex.ru/2.1/?apikey=<?= $yandexMapApikey; ?>&lang=ru_RU" type="text/javascript"></script>
-<script type="text/javascript">
-    // Функция ymaps.ready() будет вызвана, когда
-    // загрузятся все компоненты API, а также когда будет готово DOM-дерево.
-    ymaps.ready(init);
-    function init(){
-        // Создание карты.
-
-        const locationPosition = document.querySelector('[name="location-position"]');
-        if(locationPosition) {
-            const map = new ymaps.Map("map", {
-                // Координаты центра карты.
-                // Порядок по умолчанию: «широта, долгота».
-                // Чтобы не определять координаты центра карты вручную,
-                // воспользуйтесь инструментом Определение координат.
-                // center: [55.007139, 37.23209],
-                center: locationPosition.value.split(` `),
-                // Уровень масштабирования. Допустимые значения:
-                // от 0 (весь мир) до 19.
-                zoom: 7
-            });
-        }
-    }
-</script>
