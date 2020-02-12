@@ -69,6 +69,8 @@ class TasksController extends SecuredController
         $taskUrl = $task->getCurrentTaskUrl();
         $user = Yii::$app->user->identity;
 
+
+
         $respondModel = new RespondForm();
         $userRespond = TaskRespond::find()->where("task_id = $task->id AND user_id = $user->id")->one();
         $isRespond = $userRespond ? true : false;
@@ -78,8 +80,6 @@ class TasksController extends SecuredController
         if(!$task) {
             throw new NotFoundHttpException("Страница не найдена!");
         }
-
-        $task->initLocation();
 
         if(Yii::$app->request->post('RespondForm') && !$isRespond) {
 //            $respondModel->load(Yii::$app->request->post());
@@ -104,6 +104,7 @@ class TasksController extends SecuredController
 
         return $this->render('view', [
             'task' => $task,
+            'taskLocation' => $task->getLocation(),
             'isAuthor' => $user->id === $task->author_id,
             'isExecutor' => $user->getRole() === User::ROLE_EXECUTOR,
             'isRespond' => $isRespond,

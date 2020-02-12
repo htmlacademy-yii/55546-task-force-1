@@ -46,15 +46,15 @@ $respondsCount = count($task->responds);
                 <h3 class="content-view__h3">Расположение</h3>
                 <div class="content-view__location-wrapper">
                     <div class="content-view__map" id="map" style="width: 361px; height: 292px;">
-                        <?php if($task->location): ?>
-                            <?= Html::hiddenInput('location-position', $task->location->position); ?>
+                        <?php if($task->latitude && $task->longitude): ?>
+                            <?= Html::hiddenInput('location-position', "$task->latitude $task->longitude"); ?>
                         <?php else: ?>
                             <a href="#"><img src="/img/map.jpg" width="361" height="292"
                                              alt="Москва, Новый арбат, 23 к. 1"></a>
                         <?php endif; ?>
                     </div>
                     <div class="content-view__address">
-                        <?php if($task->location): ?>
+                        <?php if($taskLocation): ?>
                             <span class="address__town">
                                 <?= $task->location->AddressLine; ?>
                             </span>

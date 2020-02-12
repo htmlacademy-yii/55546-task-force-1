@@ -62,15 +62,9 @@ class Task extends ActiveRecord
         ];
     }
 
-    public function initLocation()
+    public function getLocation()
     {
-        if(empty($this->location)) {
-            return;
-        }
-
-        $position = $this->location;
-        $this->location = YandexMap::getAddressByPositions($this->location);
-        $this->location->position = $position;
+        return $this->latitude && $this->longitude ? YandexMap::getAddressByPositions($this->latitude, $this->longitude) : null;
     }
 
     public function getCurrentTaskUrl(): string

@@ -1,5 +1,5 @@
-id,author_id,title,description,category_id,price,location,date_start,date_end,executor_id,is_telework,status
+id,author_id,title,description,category_id,price,latitude,longitude,date_start,date_end,executor_id,is_telework,status
 
-1,1,Task title 1,Suspendisse potenti 1.,1,500,,2019-11-13,2020-03-14,3,0,new
-2,2,Task title 2,Suspendisse potenti 2.,2,1000,,2019-11-13,2020-03-14,3,0,new
-3,3,Task title 3,Suspendisse potenti 3.,3,1750,,2019-11-13,2020-03-14,3,0,new
+1,1,Task title 1,Suspendisse potenti 1.,1,500,55.009316,82.670662,2019-11-13,2020-03-14,3,0,new
+2,2,Task title 2,Suspendisse potenti 2.,2,1000,55.009316,82.670662,2019-11-13,2020-03-14,3,0,new
+3,3,Task title 3,Suspendisse potenti 3.,3,1750,55.009316,82.670662,2019-11-13,2020-03-14,3,0,new

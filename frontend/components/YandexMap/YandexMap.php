@@ -35,9 +35,9 @@ class YandexMap
         return $content->featureMember[0]->GeoObject->Point->pos;
     }
 
-    public static function getAddressByPositions($pos)
+    public static function getAddressByPositions($lat, $long)
     {
-        $content = json_decode(self::getDataMap($pos)->getBody()->getContents())
+        $content = json_decode(self::getDataMap("$long $lat")->getBody()->getContents())
             ->response->GeoObjectCollection;
         if((int) $content->metaDataProperty->GeocoderResponseMetaData->found === 0) {
             return false;

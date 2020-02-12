@@ -51,7 +51,7 @@ class SqlAppGenerator
         file_put_contents("$outputDir/all.sql", $sql);
     }
 
-    public static function generateSqlProject($dataDir, $sqlDir)
+    public static function generateSqlProject(string $dataDir = '../../data', string $sqlDir = '../../sql'): void
     {
         $csvFiles = array_map(function($fileName) use ($dataDir) {
             return "$dataDir/$fileName";

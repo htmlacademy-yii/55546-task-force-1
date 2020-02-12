@@ -1,6 +1,7 @@
 <?php
 namespace app\models;
 
+use frontend\components\DebugHelper\DebugHelper;
 use frontend\components\YandexMap\YandexMap;
 use Yii;
 use yii\base\Model;
@@ -14,6 +15,8 @@ class TaskCreate extends Model
     public $location;
     public $price;
     public $dateEnd;
+    public $latitude;
+    public $longitude;
 
     public function rules(): array
     {
@@ -58,16 +61,17 @@ class TaskCreate extends Model
 
     public function checkLocation(): void
     {
-        $geocode = '';
         if(!empty($this->location)) {
             $geocode = YandexMap::getPosition($this->location);
 
             if(!$geocode) {
                 $this->addError('location', 'Указанная локация не определена');
+            } else {
+                $geocode = explode(' ', $geocode);
+                $this->longitude = $geocode[0];
+                $this->latitude = $geocode[1];
             }
         }
-
-        $this->location = $geocode;
     }
 
     public function create(Task $task, string $status): bool
@@ -77,8 +81,10 @@ class TaskCreate extends Model
         $task->description = $this->description;
         $task->category_id = $this->categoryId;
         $task->price = $this->price;
-        $task->location = $this->location;
+        $task->latitude = $this->latitude;
+        $task->longitude = $this->longitude;
         $task->date_end = $this->dateEnd;
+        $task->date_start = date("Y-m-d h:i:s");
         $task->status = $status;
 
         return $task->save();

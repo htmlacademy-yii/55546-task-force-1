@@ -9,6 +9,6 @@
       { Method: `GET`, 'Content-Type': `json/application` })
       .then(res => res.json());
 
-    citiesList.innerHTML = data.response.GeoObjectCollection.featureMember.map(({GeoObject}) => `<option value="${GeoObject.name}">`);
+    citiesList.innerHTML = data.response.GeoObjectCollection.featureMember.map(({GeoObject}) => `<option value="${GeoObject.name}">`).join(``);
   });
 }) ();
