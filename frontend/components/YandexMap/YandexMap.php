@@ -10,9 +10,6 @@ class YandexMap
 {
     /** @var string адрес запроса */
     const URL = 'https://geocode-maps.yandex.ru/1.x/';
-//    const API_KEY = 'e666f398-c983-4bde-8f14-e3fec900592a';
-//    const FORMAT = Response::FORMAT_JSON;
-//    const LANG = 'ru_RU';
 
     /** @var string ключ пользователя */
     public $apiKey;
