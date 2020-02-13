@@ -64,7 +64,8 @@ class Task extends ActiveRecord
 
     public function getLocation()
     {
-        return $this->latitude && $this->longitude ? YandexMap::getAddressByPositions($this->latitude, $this->longitude) : null;
+        return $this->latitude && $this->longitude ? Yii::$container->get('yandexMap')
+            ->getAddressByPositions($this->latitude, $this->longitude) : null;
     }
 
     public function getCurrentTaskUrl(): string

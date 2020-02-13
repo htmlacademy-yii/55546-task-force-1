@@ -9,7 +9,7 @@ $labels = $model->attributeLabels();
 ?>
 
 <section class="create__task">
-    <?= Html::hiddenInput('yandex-api-key', $yandexMapApikey); ?>
+    <?= Html::hiddenInput('yandex-api-key', $yandexMapApiKey); ?>
     <h1>Публикация нового задания</h1>
     <div class="create__task-main">
         <?php $form = ActiveForm::begin([

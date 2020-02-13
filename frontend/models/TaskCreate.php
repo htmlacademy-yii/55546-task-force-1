@@ -62,7 +62,7 @@ class TaskCreate extends Model
     public function checkLocation(): void
     {
         if(!empty($this->location)) {
-            $geocode = YandexMap::getPosition($this->location);
+            $geocode = Yii::$container->get('yandexMap')->getPosition($this->location);
 
             if(!$geocode) {
                 $this->addError('location', 'Указанная локация не определена');

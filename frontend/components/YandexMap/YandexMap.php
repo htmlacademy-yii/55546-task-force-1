@@ -3,30 +3,49 @@ namespace frontend\components\YandexMap;
 
 use frontend\components\DebugHelper\DebugHelper;
 use GuzzleHttp\Client;
+use GuzzleHttp\Psr7\Response as GuzzleResponse;
 use yii\web\Response;
 
 class YandexMap
 {
+    /** @var string адрес запроса */
     const URL = 'https://geocode-maps.yandex.ru/1.x/';
-    const API_KEY = 'e666f398-c983-4bde-8f14-e3fec900592a';
-    const FORMAT = Response::FORMAT_JSON;
-    const LANG = 'ru_RU';
+//    const API_KEY = 'e666f398-c983-4bde-8f14-e3fec900592a';
+//    const FORMAT = Response::FORMAT_JSON;
+//    const LANG = 'ru_RU';
 
-    private static function getDataMap($geocode)
+    /** @var string ключ пользователя */
+    public $apiKey;
+
+    /** @var string язык ответа */
+    public $lang = 'ru_RU';
+
+    /** @var string формат ответа */
+    public $format = Response::FORMAT_JSON;
+
+    /**
+     * @param string $geocode
+     * @return GuzzleResponse
+     **/
+    private function getDataMap(string $geocode): GuzzleResponse
     {
         return (new Client(['base_uri' => self::URL]))->request('GET', '', [
             'query' => [
                 'geocode' => $geocode,
-                'apikey' => self::API_KEY,
-                'format' => self::FORMAT,
-                'lang' => self::LANG,
+                'apikey' => $this->apiKey,
+                'format' => $this->format,
+                'lang' => $this->lang,
             ]
         ]);
     }
 
-    public static function getPosition($geocode)
+    /**
+     * @param string $geocode
+     * @return string
+     **/
+    public function getPosition(string $geocode): string
     {
-        $content = json_decode(self::getDataMap($geocode)->getBody()->getContents())
+        $content = json_decode($this->getDataMap($geocode)->getBody()->getContents())
             ->response->GeoObjectCollection;
         if((int) $content->metaDataProperty->GeocoderResponseMetaData->found === 0) {
             return false;
@@ -35,9 +54,14 @@ class YandexMap
         return $content->featureMember[0]->GeoObject->Point->pos;
     }
 
-    public static function getAddressByPositions($lat, $long)
+    /**
+     * @param float $lat
+     * @param float $long
+     * @return \stdClass
+     **/
+    public function getAddressByPositions(float $lat, float $long): \stdClass
     {
-        $content = json_decode(self::getDataMap("$long $lat")->getBody()->getContents())
+        $content = json_decode($this->getDataMap("$long $lat")->getBody()->getContents())
             ->response->GeoObjectCollection;
         if((int) $content->metaDataProperty->GeocoderResponseMetaData->found === 0) {
             return false;

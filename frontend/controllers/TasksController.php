@@ -104,8 +104,7 @@ class TasksController extends SecuredController
             'isExecutor' => $user->getRole() === User::ROLE_EXECUTOR,
             'isRespond' => $isRespond,
             'respondModel' => $respondModel,
-            'taskCompletionModel' => $taskCompletionModel,
-            'yandexMapApikey' => YandexMap::API_KEY
+            'taskCompletionModel' => $taskCompletionModel
         ]);
     }
 
@@ -155,7 +154,7 @@ class TasksController extends SecuredController
         return $this->render('create', [
             'model' => $model,
             'categories' => ArrayHelper::map(Category::find()->all(), 'id', 'title'),
-            'yandexMapApikey' => YandexMap::API_KEY
+            'yandexMapApiKey' => Yii::$container->get('yandexMap')->apiKey,
         ]);
     }
 }
