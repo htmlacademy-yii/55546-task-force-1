@@ -21,6 +21,7 @@ use app\models\Task;
 use app\models\Category;
 use yii\web\NotFoundHttpException;
 use app\models\TasksFilter;
+use yii\web\Response;
 
 class TasksController extends SecuredController
 {
@@ -69,8 +70,6 @@ class TasksController extends SecuredController
         $taskUrl = $task->getCurrentTaskUrl();
         $user = Yii::$app->user->identity;
 
-
-
         $respondModel = new RespondForm();
         $userRespond = TaskRespond::find()->where("task_id = $task->id AND user_id = $user->id")->one();
         $isRespond = $userRespond ? true : false;
@@ -82,10 +81,6 @@ class TasksController extends SecuredController
         }
 
         if(Yii::$app->request->post('RespondForm') && !$isRespond) {
-//            $respondModel->load(Yii::$app->request->post());
-//            $respondModel->validate();
-//            $respondModel->createRespond($user->id, $task->id);
-//            return ActiveForm::validate($respondModel);
             if($respondModel->load(Yii::$app->request->post()) && $respondModel->validate()) {
                 $respondModel->createRespond($user->id, $task->id);
                 $this->redirect($taskUrl);
@@ -112,6 +107,16 @@ class TasksController extends SecuredController
             'taskCompletionModel' => $taskCompletionModel,
             'yandexMapApikey' => YandexMap::API_KEY
         ]);
+    }
+
+    public function actionRespondAjaxValidation()
+    {
+        if(Yii::$app->request->isAjax) {
+            Yii::$app->response->format = Response::FORMAT_JSON;
+            $respondModel = new RespondForm();
+            $respondModel->setAttributes(Yii::$app->request->post('RespondForm'));
+            return ActiveForm::validate($respondModel);
+        }
     }
 
     public function actionDecision(string $status, int $id, int $taskId)

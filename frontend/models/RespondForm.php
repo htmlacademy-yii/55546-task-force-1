@@ -12,8 +12,8 @@ class RespondForm extends Model
     public function rules()
     {
         return [
-            ['price', 'required'],
-            ['price', 'integer', 'min' => 1],
+            ['price', 'required', 'message' => 'Поле должно быть заполнено'],
+            ['price', 'integer', 'min' => 1, 'message' => 'Цена должна быть больше нуля'],
             ['text', 'string'],
         ];
     }

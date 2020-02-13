@@ -6,7 +6,8 @@ use app\models\Task;
 use yii\helpers\Url;
 
 $this->title = "Задание: $task->title";
-$fieldConfig = ['template' => '{label}{input}{error}', 'options' => ['tag' => false]];
+
+$fieldConfig = ['template' => '<p>{label}{input}{error}</p>'];
 $respondsCount = count($task->responds);
 
 \frontend\assets\TaskViewAsset::register($this);
@@ -174,17 +175,17 @@ $respondsCount = count($task->responds);
 </section>
 <section class="modal response-form form-modal" id="response-form">
     <h2>Отклик на задание</h2>
-    <?php $form = ActiveForm::begin(['enableClientValidation' => false, 'enableAjaxValidation' => true]); ?>
-        <p>
-            <?= $form->field($respondModel, 'price', $fieldConfig)
-                ->textInput(['class' => 'response-form-payment input input-middle input-money'])
-                ->label(null, ['class' => 'form-modal-description']); ?>
-        </p>
-        <p>
-            <?= $form->field($respondModel, 'text', $fieldConfig)
-                ->textarea(['class' => 'input textarea', 'rows' => 4, 'placeholder' => 'Place your text'])
-                ->label(null, ['class' => 'form-modal-description']); ?>
-        </p>
+    <?php $form = ActiveForm::begin([
+        'enableClientValidation' => false,
+        'enableAjaxValidation' => true,
+        'validationUrl' => Url::to('/tasks/respond-ajax-validation')
+    ]); ?>
+        <?= $form->field($respondModel, 'price', $fieldConfig)
+            ->textInput(['class' => 'response-form-payment input input-middle input-money'])
+            ->label(null, ['class' => 'form-modal-description']); ?>
+        <?= $form->field($respondModel, 'text', $fieldConfig)
+            ->textarea(['class' => 'input textarea', 'rows' => 4, 'placeholder' => 'Place your text'])
+            ->label(null, ['class' => 'form-modal-description']); ?>
         <?= Html::submitButton('Отправить', ['class' => 'button modal-button']); ?>
     <?php ActiveForm::end(); ?>
     <?= Html::button('Закрыть', ['class' => 'form-modal-close']); ?>
@@ -203,10 +204,8 @@ $respondsCount = count($task->responds);
             }
         ])->label(false);
     ?>
-        <p>
-            <?= $form->field($taskCompletionModel, 'text', $fieldConfig)
-                ->textarea(['class' => 'input textarea', 'rows' => 4, 'placeholder' => 'Place your text']); ?>
-        </p>
+        <?= $form->field($taskCompletionModel, 'text', $fieldConfig)
+            ->textarea(['class' => 'input textarea', 'rows' => 4, 'placeholder' => 'Place your text']); ?>
         <p class="form-modal-description">
             Оценка
         <div class="feedback-card__top--name completion-form-star">
