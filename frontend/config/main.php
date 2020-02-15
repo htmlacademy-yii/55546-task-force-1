@@ -45,5 +45,13 @@ return [
             ],
         ],
     ],
+    'container' => [
+        'singletons' => [
+            'yandexMap' => [
+                'class' => 'frontend\components\YandexMap\YandexMap',
+                'apiKey' => 'e666f398-c983-4bde-8f14-e3fec900592a',
+            ]
+        ]
+    ],
     'params' => $params,
 ];

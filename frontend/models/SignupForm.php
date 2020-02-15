@@ -1,7 +1,7 @@
 <?php
 namespace app\models;
 
-use frontend\components\DebugHelper\DebugHelper;
+use frontend\components\DebugHelper;
 use Yii;
 use yii\base\Model;
 use common\models\User;

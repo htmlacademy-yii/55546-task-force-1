@@ -7,9 +7,12 @@ use app\models\TaskCompletionForm;
 use app\models\TaskCreate;
 use app\models\TaskRespond;
 use common\models\User;
+
 use frontend\components\DebugHelper\DebugHelper;
 use frontend\components\SqlAppGenerator\SqlAppGenerator;
+use frontend\components\YandexMap\YandexMap;
 use Yii;
+use yii\bootstrap\ActiveForm;
 use yii\filters\AccessControl;
 use yii\helpers\ArrayHelper;
 use yii\helpers\Url;
@@ -18,9 +21,30 @@ use app\models\Task;
 use app\models\Category;
 use yii\web\NotFoundHttpException;
 use app\models\TasksFilter;
+use yii\web\Response;
 
 class TasksController extends SecuredController
 {
+    public function behaviors()
+    {
+        $rules = parent::behaviors();
+        $rule = [
+            'allow' => false,
+            'actions' => [
+                'create'
+            ],
+            'matchCallback' => function($rule, $action) {
+                return Yii::$app->user->identity->getRole() === User::ROLE_EXECUTOR;
+            },
+            'denyCallback' => function($rule, $action) {
+                return $action->controller->redirect(Task::getBaseTasksUrl());
+            },
+        ];
+
+        array_unshift($rules['access']['rules'], $rule);
+        return $rules;
+    }
+
     public function actionIndex()
     {
         $tasks = Task::find()->where(['status' => Task::STATUS_NEW]);
@@ -75,12 +99,23 @@ class TasksController extends SecuredController
 
         return $this->render('view', [
             'task' => $task,
+            'taskLocation' => $task->getLocation(),
             'isAuthor' => $user->id === $task->author_id,
             'isExecutor' => $user->getRole() === User::ROLE_EXECUTOR,
             'isRespond' => $isRespond,
             'respondModel' => $respondModel,
-            'taskCompletionModel' => $taskCompletionModel,
+            'taskCompletionModel' => $taskCompletionModel
         ]);
+    }
+
+    public function actionRespondAjaxValidation()
+    {
+        if(Yii::$app->request->isAjax) {
+            Yii::$app->response->format = Response::FORMAT_JSON;
+            $respondModel = new RespondForm();
+            $respondModel->setAttributes(Yii::$app->request->post('RespondForm'));
+            return ActiveForm::validate($respondModel);
+        }
     }
 
     public function actionDecision(string $status, int $id, int $taskId)
@@ -107,10 +142,6 @@ class TasksController extends SecuredController
 
     public function actionCreate()
     {
-        if(Yii::$app->user->identity->getRole() === User::ROLE_EXECUTOR) {
-            $this->redirect(Task::getBaseTasksUrl());
-        }
-
         $model = new TaskCreate();
 
         if(Yii::$app->request->post()) {
@@ -123,6 +154,7 @@ class TasksController extends SecuredController
         return $this->render('create', [
             'model' => $model,
             'categories' => ArrayHelper::map(Category::find()->all(), 'id', 'title'),
+            'yandexMapApiKey' => Yii::$container->get('yandexMap')->apiKey,
         ]);
     }
 }

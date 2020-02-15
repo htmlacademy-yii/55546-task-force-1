@@ -2,7 +2,7 @@
 
 namespace app\models;
 
-use frontend\components\DebugHelper\DebugHelper;
+use frontend\components\DebugHelper;
 use Yii;
 use yii\db\ActiveRecord;
 use common\models\User;

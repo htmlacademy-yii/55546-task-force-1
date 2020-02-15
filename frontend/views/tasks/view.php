@@ -6,8 +6,11 @@ use app\models\Task;
 use yii\helpers\Url;
 
 $this->title = "Задание: $task->title";
-$fieldConfig = ['template' => '{label}{input}{error}', 'options' => ['tag' => false]];
+
+$fieldConfig = ['template' => '<p>{label}{input}{error}</p>'];
 $respondsCount = count($task->responds);
+
+\frontend\assets\TaskViewAsset::register($this);
 ?>
 
 <section class="content-view">
@@ -43,18 +46,20 @@ $respondsCount = count($task->responds);
             <div class="content-view__location">
                 <h3 class="content-view__h3">Расположение</h3>
                 <div class="content-view__location-wrapper">
-                    <div class="content-view__map">
-                        <a href="#"><img src="/img/map.jpg" width="361" height="292"
-                                         alt="Москва, Новый арбат, 23 к. 1"></a>
+                    <div class="content-view__map" id="map" style="width: 361px; height: 292px;">
+                        <?php if($task->latitude && $task->longitude): ?>
+                            <?= Html::hiddenInput('location-position', "$task->latitude $task->longitude"); ?>
+                        <?php else: ?>
+                            <a href="#"><img src="/img/map.jpg" width="361" height="292"
+                                             alt="Москва, Новый арбат, 23 к. 1"></a>
+                        <?php endif; ?>
                     </div>
                     <div class="content-view__address">
-                        <?php if($task->author->city): ?>
-                            <span class="address__town"><?= $task->author->city->name; ?></span><br>
-                        <?php endif; ?>
-                        <?php if($task->author->userData->address): ?>
-                            <span><?= $task->author->userData->address; ?></span>
-                            <span>Новый арбат, 23 к. 1</span>
-                            <p>Вход под арку, код домофона 1122</p>
+                        <?php if($taskLocation): ?>
+                            <span class="address__town">
+                                <?= $task->location->AddressLine; ?>
+                            </span>
+                            <br>
                         <?php endif; ?>
                     </div>
                 </div>
@@ -170,17 +175,17 @@ $respondsCount = count($task->responds);
 </section>
 <section class="modal response-form form-modal" id="response-form">
     <h2>Отклик на задание</h2>
-    <?php $form = ActiveForm::begin(['enableClientValidation' => false]); ?>
-        <p>
-            <?= $form->field($respondModel, 'price', $fieldConfig)
-                ->textInput(['class' => 'response-form-payment input input-middle input-money'])
-                ->label(null, ['class' => 'form-modal-description']); ?>
-        </p>
-        <p>
-            <?= $form->field($respondModel, 'text', $fieldConfig)
-                ->textarea(['class' => 'input textarea', 'rows' => 4, 'placeholder' => 'Place your text'])
-                ->label(null, ['class' => 'form-modal-description']); ?>
-        </p>
+    <?php $form = ActiveForm::begin([
+        'enableClientValidation' => false,
+        'enableAjaxValidation' => true,
+        'validationUrl' => Url::to('/tasks/respond-ajax-validation')
+    ]); ?>
+        <?= $form->field($respondModel, 'price', $fieldConfig)
+            ->textInput(['class' => 'response-form-payment input input-middle input-money'])
+            ->label(null, ['class' => 'form-modal-description']); ?>
+        <?= $form->field($respondModel, 'text', $fieldConfig)
+            ->textarea(['class' => 'input textarea', 'rows' => 4, 'placeholder' => 'Place your text'])
+            ->label(null, ['class' => 'form-modal-description']); ?>
         <?= Html::submitButton('Отправить', ['class' => 'button modal-button']); ?>
     <?php ActiveForm::end(); ?>
     <?= Html::button('Закрыть', ['class' => 'form-modal-close']); ?>
@@ -199,10 +204,8 @@ $respondsCount = count($task->responds);
             }
         ])->label(false);
     ?>
-        <p>
-            <?= $form->field($taskCompletionModel, 'text', $fieldConfig)
-                ->textarea(['class' => 'input textarea', 'rows' => 4, 'placeholder' => 'Place your text']); ?>
-        </p>
+        <?= $form->field($taskCompletionModel, 'text', $fieldConfig)
+            ->textarea(['class' => 'input textarea', 'rows' => 4, 'placeholder' => 'Place your text']); ?>
         <p class="form-modal-description">
             Оценка
         <div class="feedback-card__top--name completion-form-star">
@@ -242,4 +245,3 @@ $respondsCount = count($task->responds);
 </section>
 
 <div class="overlay"></div>
-<script src="/js/main.js"></script>
