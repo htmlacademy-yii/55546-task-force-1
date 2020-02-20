@@ -17,6 +17,8 @@ $respondsCount = count($task->responds);
 <script>
     // временный скрипт для проверки ajax запроса
     (async () => console.log(await fetch(`/api/messages/${1}`).then(res => res.text()))) ();
+    // альтернативный URL
+    (async () => console.log(await fetch(`/index.php?r=api/messages/${1}`).then(res => res.text()))) ();
 </script>
 
 <section class="content-view">
