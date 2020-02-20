@@ -45,6 +45,7 @@ return [
             'errorAction' => 'site/error',
         ],
         'urlManager' => [
+            'class' => 'frontend\components\TaskforceUrlManager\TaskforceUrlManager',
             'enablePrettyUrl' => true,
             'showScriptName' => false,
             'rules' => [
