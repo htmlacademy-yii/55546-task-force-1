@@ -19,6 +19,8 @@ $respondsCount = count($task->responds);
     (async () => console.log(await fetch(`/api/messages/${1}`).then(res => res.text()))) ();
     // альтернативный URL
     (async () => console.log(await fetch(`/index.php?r=api/messages/${1}`).then(res => res.text()))) ();
+    // список сообщений для задания
+    (async () => console.log(await fetch(`/index.php?r=api/messages&filter[task_id]=1`).then(res => res.text()))) ();
 </script>
 
 <section class="content-view">
