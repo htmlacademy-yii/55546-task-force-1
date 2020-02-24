@@ -1,4 +1,6 @@
 <?php
+use frontend\modules\api\components\RestMessagesUrlRule;
+
 $params = array_merge(
     require __DIR__ . '/../../common/config/params.php',
     require __DIR__ . '/../../common/config/params-local.php',
@@ -51,6 +53,14 @@ return [
             'rules' => [
                 'tasks/view/<id>' => 'tasks/view',
                 'tasks/decision/<status>/<id>/<taskId>' => 'tasks/decision',
+                [
+                    'class' => RestMessagesUrlRule::class,
+                    'pattern' => '/api\/messages\/(?P<task_id>\d+)$/',
+                    'routes' => [
+                        'GET' => 'api/message',
+                        'POST' => 'api/message/create',
+                    ]
+                ],
                 ['class' => 'yii\rest\UrlRule', 'controller' => 'api/message'],
             ],
         ],

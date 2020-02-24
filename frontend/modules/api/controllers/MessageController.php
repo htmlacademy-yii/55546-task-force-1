@@ -5,6 +5,7 @@ use app\models\Message;
 use yii\rest\ActiveController;
 use yii\base\DynamicModel;
 use yii\data\ActiveDataFilter;
+use yii\rest\CreateAction;
 
 class MessageController extends ActiveController
 {
