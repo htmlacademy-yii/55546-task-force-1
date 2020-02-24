@@ -82,7 +82,7 @@ class RestMessagesUrlRule extends BaseObject implements UrlRuleInterface
             }
         }
         $rawBody = json_decode($request->getRawBody(), true);
-        if((json_last_error() == JSON_ERROR_NONE) && in_array($rawBody)) {
+        if((json_last_error() == JSON_ERROR_NONE) && is_array($rawBody)) {
             $bodyParams = array_merge($bodyParams, $rawBody);
         }
         $request->setBodyParams($bodyParams);
