@@ -17,6 +17,7 @@ class TaskViewAsset extends AssetBundle
             "https://api-maps.yandex.ru/2.1/?apikey=".Yii::$container->get('yandexMap')->apiKey."&lang=ru_RU",
             'js/main.js',
             'js/yandex-map.js',
+            'js/messenger.js',
         ];
 
         parent::__construct($config);

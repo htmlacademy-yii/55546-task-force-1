@@ -23,7 +23,7 @@ class m200213_063536_add_task_location_two_column extends Migration
     {
         $this->addColumn('task', 'location', $this->char(255));
         $this->db->createCommand()->update('task', [
-            'location' => new Expression('concat(`longitude`, "", `latitude`)'),
+            'location' => new Expression('concat(`longitude`, " ", `latitude`)'),
         ])->execute();
         $this->dropColumn('task', 'latitude');
         $this->dropColumn('task', 'longitude');

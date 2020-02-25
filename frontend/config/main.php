@@ -1,4 +1,6 @@
 <?php
+use frontend\modules\api\components\RestMessagesUrlRule;
+
 $params = array_merge(
     require __DIR__ . '/../../common/config/params.php',
     require __DIR__ . '/../../common/config/params-local.php',
@@ -11,9 +13,17 @@ return [
     'basePath' => dirname(__DIR__),
     'bootstrap' => ['log'],
     'controllerNamespace' => 'frontend\controllers',
+    'modules' => [
+        'api' => [
+            'class' => 'frontend\modules\api\Module'
+        ]
+    ],
     'components' => [
         'request' => [
             'csrfParam' => '_csrf-frontend',
+            'parsers' => [
+                'application/json' => 'yii\web\JsonParser',
+            ]
         ],
         'user' => [
             'identityClass' => 'common\models\User',
@@ -37,11 +47,21 @@ return [
             'errorAction' => 'site/error',
         ],
         'urlManager' => [
+            'class' => 'frontend\components\TaskforceUrlManager\TaskforceUrlManager',
             'enablePrettyUrl' => true,
             'showScriptName' => false,
             'rules' => [
                 'tasks/view/<id>' => 'tasks/view',
-                'tasks/decision/<status>/<id>/<taskId>' => 'tasks/decision'
+                'tasks/decision/<status>/<id>/<taskId>' => 'tasks/decision',
+                [
+                    'class' => RestMessagesUrlRule::class,
+                    'pattern' => '/api\/messages\/(?P<task_id>\d+)$/',
+                    'routes' => [
+                        'GET' => 'api/message',
+                        'POST' => 'api/message/create',
+                    ]
+                ],
+                ['class' => 'yii\rest\UrlRule', 'controller' => 'api/message'],
             ],
         ],
     ],
