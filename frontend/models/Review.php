@@ -2,6 +2,7 @@
 
 namespace app\models;
 
+use common\models\User;
 use Yii;
 use yii\db\ActiveRecord;
 
@@ -40,5 +41,10 @@ class Review extends ActiveRecord
             'text' => 'Text',
             'rating' => 'Rating',
         ];
+    }
+
+    public function getExecutor()
+    {
+        return User::findOne($this->executor_id);
     }
 }
