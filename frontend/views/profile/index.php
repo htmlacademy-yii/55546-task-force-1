@@ -39,35 +39,22 @@ $fieldConfig = ['template' => '{label}{input}{error}', 'options' => ['tag' => fa
             </div>
             <h3 class="div-line">Выберите свои специализации</h3>
             <div class="account__redaction-section-wrapper">
-                <div class="search-task__categories account_checkbox--bottom">
-                    <?= $form->field($model, 'specializations', ['options' => ['tag' => false]])
-                        ->checkboxList(yii\helpers\ArrayHelper::map($categories, 'id', 'title'), [
-                            'item' => function ($_index, $label, $name, $checked, $id) {
-                                $checked = $checked ? "checked" : "";
-                                return "<input
-                                    class='visually-hidden checkbox__input'
-                                    type='checkbox'
-                                    name='$name'
-                                    id='specializations-$id'
-                                    value='$id'
-                                    $checked>
-                                    <label for='specializations-$id'>$label</label>";
-                            }
-                        ])->label(false); ?>
-
-                   <!-- <input class='visually-hidden checkbox__input' id='205' type='checkbox' name='' value='' checked>
-                    <label for='205'>Курьерские услуги</label>
-                    <input class="visually-hidden checkbox__input" id="206" type="checkbox" name="" value="" checked>
-                    <label  for="206">Грузоперевозки</label>
-                    <input class="visually-hidden checkbox__input" id="207" type="checkbox" name="" value="">
-                    <label for="207">Перевод текстов</label>
-                    <input class="visually-hidden checkbox__input" id="208" type="checkbox" name="" value="" checked>
-                    <label for="208">Ремонт транспорта</label>
-                    <input class="visually-hidden checkbox__input" id="209" type="checkbox" name="" value="">
-                    <label  for="209">Удалённая помощь</label>
-                    <input class="visually-hidden checkbox__input" id="210" type="checkbox" name="" value="">
-                    <label  for="210">Выезд на стрелку</label> -->
-                </div>
+                <?= $form->field($model, 'specializations')
+                    ->checkboxList(yii\helpers\ArrayHelper::map($categories, 'id', 'title'), [
+                        'item' => function ($_index, $label, $name, $checked, $id) {
+                            $checked = $checked ? "checked" : "";
+                            return "<input
+                                class='visually-hidden checkbox__input'
+                                type='checkbox'
+                                name='$name'
+                                id='specializations-$id'
+                                value='$id'
+                                $checked>
+                                <label for='specializations-$id'>$label</label>";
+                        },
+                        'tag' => 'div',
+                        'class' => 'search-task__categories account_checkbox--bottom'
+                    ])->label(false); ?>
             </div>
             <h3 class="div-line">Безопасность</h3>
             <div class="account__redaction-section-wrapper account__redaction">
