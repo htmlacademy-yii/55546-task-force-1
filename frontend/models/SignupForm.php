@@ -69,6 +69,23 @@ class SignupForm extends Model
             throw new \Exception();
         }
 
+        $userNotifications = new UserNotifications();
+        $userNotifications->attributes = [
+            'user_id' => $user->id,
+            'is_new_message' => 0,
+            'is_task_actions' => 0,
+            'is_new_review' => 0,
+        ];
+        $userNotifications->save();
+
+        $userSettings = new UserSettings();
+        $userSettings->attributes = [
+            'user_id' => $user->id,
+            'is_hidden_contacts' => 0,
+            'is_hidden_profile' => 0
+        ];
+        $userSettings->save();
+
         return $user;
     }
 }

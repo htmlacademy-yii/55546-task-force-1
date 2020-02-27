@@ -7,3 +7,6 @@
 *.sublime*
 Thumbs.db
 vendor
+
+frontend/web/users-files/avatars/**/*
+frontend/web/users-files/works/**/*
