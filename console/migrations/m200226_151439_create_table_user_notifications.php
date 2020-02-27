@@ -8,9 +8,6 @@ use common\models\User;
  */
 class m200226_151439_create_table_user_notifications extends Migration
 {
-
-    public $tableOptions = 'CHARACTER SET utf8 COLLATE utf8_unicode_ci ENGINE=InnoDB';
-
     /**
      * {@inheritdoc}
      */
