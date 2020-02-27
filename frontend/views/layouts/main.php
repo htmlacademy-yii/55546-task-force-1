@@ -99,7 +99,7 @@ $user = $isGuest ? null : Yii::$app->user->identity;
             <div class="header__account">
                 <?php if(!$isGuest): ?>
                     <a class="header__account-photo">
-                        <img src="/img/user-photo.png"
+                        <img src="/<?= $user->userData->avatar ?? 'img/user-photo.png'; ?>"
                              width="43" height="44"
                              alt="Аватар пользователя">
                     </a>

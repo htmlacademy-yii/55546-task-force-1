@@ -39,7 +39,7 @@ class ProfileController extends SecuredController
             if($model->avatar) {
                 $filePath = "{$this->avatarsPath}/{$model->avatar->baseName}.{$model->avatar->extension}";
 
-                if($userData->avatar) {
+                if($userData->avatar && file_exists($userData->avatar)) {
                     unlink($userData->avatar);
                 }
 
