@@ -66,6 +66,15 @@ return [
         ],
     ],
     'container' => [
+
+
+        'definitions' => [
+            'frontend\controllers\ProfileController' => [
+                'avatarsPath' => 'users-files/avatars'
+            ]
+        ],
+
+
         'singletons' => [
             'yandexMap' => [
                 'class' => 'frontend\components\YandexMap\YandexMap',

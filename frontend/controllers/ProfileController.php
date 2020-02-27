@@ -15,6 +15,9 @@ use yii\web\UploadedFile;
 
 class ProfileController extends SecuredController
 {
+    /** @var string  */
+    public $avatarsPath = '';
+
     public function actionIndex()
     {
         $user = Yii::$app->user->identity;
@@ -34,7 +37,7 @@ class ProfileController extends SecuredController
             // обновление картинки
             $model->avatar = UploadedFile::getInstance($model, 'avatar');
             if($model->avatar) {
-                $filePath = "users-files/avatars/{$model->avatar->baseName}.{$model->avatar->extension}";
+                $filePath = "{$this->avatarsPath}/{$model->avatar->baseName}.{$model->avatar->extension}";
                 $model->avatar->saveAs($filePath);
 
                 if($userData->avatar) {
@@ -69,7 +72,7 @@ class ProfileController extends SecuredController
             UserSpecialization::deleteAll(['user_id' => $user->id]);
             Yii::$app->db->createCommand()->batchInsert('user_specialization', ['user_id', 'category_id'], array_map(function($id) use ($user) {
                 return [$user->id, $id];
-            }, $model->specializations))->execute();
+            }, is_array($model->specializations) ? $model->specializations : []))->execute();
         }
 
         return $this->render('index', [
