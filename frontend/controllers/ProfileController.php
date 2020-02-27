@@ -38,12 +38,12 @@ class ProfileController extends SecuredController
             $model->avatar = UploadedFile::getInstance($model, 'avatar');
             if($model->avatar) {
                 $filePath = "{$this->avatarsPath}/{$model->avatar->baseName}.{$model->avatar->extension}";
-                $model->avatar->saveAs($filePath);
 
                 if($userData->avatar) {
                     unlink($userData->avatar);
                 }
 
+                $model->avatar->saveAs($filePath);
                 $userData->avatar = $filePath;
             }
 
