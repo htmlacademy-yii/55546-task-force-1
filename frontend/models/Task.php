@@ -50,7 +50,7 @@ class Task extends ActiveRecord
         ];
     }
 
-    public function getStatusList(): array
+    public static function getStatusList(): array
     {
         return [
             self::STATUS_NEW,
@@ -86,6 +86,11 @@ class Task extends ActiveRecord
     public function getReviews()
     {
         return $this->hasMany(Review::class, ['author_id' => 'id']);
+    }
+
+    public function getReview()
+    {
+        return $this->hasOne(Review::class, ['task_id' => 'id']);
     }
 
     public function getFiles()

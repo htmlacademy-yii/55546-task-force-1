@@ -1,9 +1,12 @@
 <?php
 namespace common\models;
 
+use app\models\Category;
 use app\models\City;
 use app\models\Task;
 use app\models\UserData;
+use app\models\UserNotifications;
+use app\models\UserSettings;
 use app\models\UserSpecialization;
 use Yii;
 use yii\base\NotSupportedException;
@@ -75,9 +78,25 @@ class User extends ActiveRecord implements IdentityInterface
         return $this->hasOne(UserData::class, ['user_id' => 'id']);
     }
 
+    public function getUserNotifications()
+    {
+        return $this->hasOne(UserNotifications::class, ['user_id' => 'id']);
+    }
+
+    public function getUserSettings()
+    {
+        return $this->hasOne(UserSettings::class, ['user_id' => 'id']);
+    }
+
     public function getCity()
     {
         return $this->hasOne(City::class, ['id' => 'city_id']);
+    }
+
+    public function getSpecializationsId()
+    {
+        return UserSpecialization::find()->select('category_id')
+            ->where(['user_id' => $this->id])->asArray()->column();
     }
 
     public function getSpecializations()

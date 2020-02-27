@@ -45,7 +45,6 @@ $fieldConfig = ['template' => "{label}\n{input}", 'options' => ['tag' => false]]
                 <?= $form->field($taskModel, 'category')
                     ->checkboxList(yii\helpers\ArrayHelper::map($categories, 'id', 'title'), [
                     'item' => function ($_index, $label, $name, $checked, $id) {
-                        //@todo refactoring
                         $checked = $checked ? "checked" : "";
                         return "<input
                             class='visually-hidden checkbox__input'

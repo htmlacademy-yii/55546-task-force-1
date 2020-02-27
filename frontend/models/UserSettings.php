@@ -14,6 +14,11 @@ use yii\db\ActiveRecord;
  */
 class UserSettings extends ActiveRecord
 {
+    public static function primaryKey()
+    {
+        return ['user_id'];
+    }
+
     /**
      * {@inheritdoc}
      */
@@ -28,7 +33,8 @@ class UserSettings extends ActiveRecord
     public function rules()
     {
         return [
-            [['user_id', 'is_hidden_contacts', 'is_hidden_profile'], 'integer'],
+            ['user_id', 'integer'],
+            [['is_hidden_contacts', 'is_hidden_profile'], 'boolean'],
         ];
     }
 

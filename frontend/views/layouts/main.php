@@ -67,7 +67,7 @@ $user = $isGuest ? null : Yii::$app->user->identity;
                         <?= Html::a('Создать задание', '/tasks/create'); ?>
                     </li>
                     <li class="site-list__item">
-                        <a>Мой профиль</a>
+                        <?= Html::a('Мой профиль', '/profile'); ?>
                     </li>
                 </ul>
             </div>
@@ -99,7 +99,7 @@ $user = $isGuest ? null : Yii::$app->user->identity;
             <div class="header__account">
                 <?php if(!$isGuest): ?>
                     <a class="header__account-photo">
-                        <img src="/img/user-photo.png"
+                        <img src="/<?= $user->userData->avatar ?? 'img/user-photo.png'; ?>"
                              width="43" height="44"
                              alt="Аватар пользователя">
                     </a>
@@ -111,7 +111,7 @@ $user = $isGuest ? null : Yii::$app->user->identity;
             <?php if(!$isGuest): ?>
                 <div class="account__pop-up">
                     <ul class="account__pop-up-list">
-                        <li><?= Html::a('Мои задания', '#') ?></li>
+                        <li><?= Html::a('Мои задания', '/my-list') ?></li>
                         <li><?= Html::a('Настройки', '#') ?></li>
                         <li><?= Html::a('Выход', '/site/logout') ?></li>
                     </ul>
