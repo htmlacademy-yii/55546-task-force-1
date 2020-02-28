@@ -118,6 +118,7 @@ $fieldConfig = ['template' => "{label}{input}{error}", 'options' => ['tag' => fa
                 ->label(null, ['class' => 'form-modal-description'])
                 ->error(['id' => 'error-password']); ?>
         </p>
+        <?= Html::a('Войти через VK', '#', ['class' => 'link-regular']); ?>
         <?= Html::submitButton('Войти', ['id' => 'btn-login', 'class' => 'button']); ?>
     <?php ActiveForm::end(); ?>
     <?= Html::button('Закрыть', ['id' => 'close-modal', 'class' => 'form-modal-close']); ?>
