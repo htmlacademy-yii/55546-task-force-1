@@ -67,6 +67,11 @@ class UserData extends ActiveRecord
         ];
     }
 
+    public function getCorrectAvatar()
+    {
+        return preg_match('/^http/', $this->avatar) ? $this->avatar : "/$this->avatar";
+    }
+
     public function save($runValidation = true, $attributeNames = null): bool
     {
         if(!($result = parent::save($runValidation, $attributeNames))) {

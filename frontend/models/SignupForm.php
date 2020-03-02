@@ -23,6 +23,7 @@ class SignupForm extends Model
             ['login', 'trim'],
             ['login', 'required'],
             ['login', 'string', 'min' => 2, 'max' => 255],
+            ['login', 'unique', 'targetClass' => '\common\models\User', 'message' => 'This login has already been taken.'],
 
             ['email', 'trim'],
             ['email', 'required'],
@@ -46,46 +47,5 @@ class SignupForm extends Model
             'cityId' => 'Город проживания',
             'password' => 'Пароль',
         ];
-    }
-
-    /**
-     * Signs user up.
-     *
-     * @return bool whether the creating new account was successful and email was sent
-     */
-    public function signup(): User
-    {
-        if (!$this->validate()) {
-            throw new \Exception();
-        }
-
-        $user = new User();
-        $user->login = $this->login;
-        $user->email = $this->email;
-        $user->city_id = $this->cityId;
-        $user->password = Yii::$app->getSecurity()->generatePasswordHash($this->password);
-
-        if (!$user->save()) {
-            throw new \Exception();
-        }
-
-        $userNotifications = new UserNotifications();
-        $userNotifications->attributes = [
-            'user_id' => $user->id,
-            'is_new_message' => 0,
-            'is_task_actions' => 0,
-            'is_new_review' => 0,
-        ];
-        $userNotifications->save();
-
-        $userSettings = new UserSettings();
-        $userSettings->attributes = [
-            'user_id' => $user->id,
-            'is_hidden_contacts' => 0,
-            'is_hidden_profile' => 0
-        ];
-        $userSettings->save();
-
-        return $user;
     }
 }
