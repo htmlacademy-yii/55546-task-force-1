@@ -1,11 +1,12 @@
 <?php
 namespace frontend\controllers;
 
-use app\models\{City, SignupForm, Task, MainLoginForm, UserData};
+use app\models\{Auth, City, SignupForm, Task, MainLoginForm, UserData};
 use common\models\User;
 use frontend\components\DebugHelper\DebugHelper;
 use frontend\components\SqlAppGenerator\SqlAppGenerator;
 use Yii;
+use yii\authclient\AuthAction;
 use yii\base\InvalidArgumentException;
 use yii\widgets\ActiveForm;
 use yii\helpers\Url;
@@ -16,7 +17,6 @@ use common\models\LoginForm;
 use frontend\models\{PasswordResetRequestForm, ResetPasswordForm, ContactForm, ResendVerificationEmailForm, VerifyEmailForm};
 use yii\helpers\ArrayHelper;
 use yii\web\Response;
-
 
 /**
  * Site controller
@@ -54,6 +54,10 @@ class SiteController extends SecuredController
                 'class' => 'yii\captcha\CaptchaAction',
                 'fixedVerifyCode' => YII_ENV_TEST ? 'testme' : null,
             ],
+            'auth' => [
+                'class' => 'yii\authclient\AuthAction',
+                'successCallback' => [$this, 'onAuthSuccess'],
+            ]
         ];
     }
 
@@ -292,5 +296,78 @@ class SiteController extends SecuredController
         return $this->render('resendVerificationEmail', [
             'model' => $model
         ]);
+    }
+
+    public function onAuthSuccess($client)
+    {
+        $attributes = $client->getUserAttributes();
+
+        /* @var $auth Auth */
+        $auth = Auth::find()->where([
+            'source' =>$client->getId(),
+            'source_id' =>$attributes['id'],
+        ])->one();
+
+        if (Yii::$app->user->isGuest) {
+            if ($auth) { // авторизация
+                $user = $auth->user;
+                Yii::$app->user->login($user);
+            } else { // регистрация
+                if(isset($attributes['email']) && User::find()->where(['email' => $attributes['email']])->exists()) {
+                    Yii::$app->getSession()->setFlash('error', [
+                        Yii::t('app', 'Пользователь с такой электронной почтой как в {client} уже существует.'),
+                    ]);
+                } else {
+                    $password = Yii::$app->security->generateRandomString(6);
+                    $user = new User([
+                        'login' => $user['login'] ?? $client->getId(),
+                        'email' => $attributes['email'],
+                        'password' => $password,
+                    ]);
+                    $user->generateAuthKey();
+
+                    try {
+                        $transaction = $user->getDb()->beginTransaction();
+                        $user->save();
+                        $userData = new UserData();
+                        $userData->attributes = [
+                            'description' => '',
+                            'age' => '',
+                            'address' => '',
+                            'skype' => '',
+                            'phone' => '',
+                            'other_messenger' => '',
+                            'avatar' => '',
+                            'rating' => '',
+                            'views' => '',
+                            'order_count' => '',
+                            'status' => User::STATUS_ACTIVE,
+                        ];
+                        $userData->save();
+                        $user->link('userData', $userData);
+                        $auth = new Auth([
+                            'source' => $client->getId(),
+                            'source_id' => (string)$attributes['id'],
+                        ]);
+                        $auth->save();
+                        $auth->link('user', $user);
+                        Yii::$app->user->login($user);
+                        $transaction->commit();
+                    } catch (\Exception $err) {
+                        $transaction->rollBack();
+                    }
+                }
+            }
+        } else { // Пользователь уже зарегистрирован
+            if (!$auth) {
+                $auth = new Auth([
+                    'user_id' => Yii::$app->user->id,
+                    'source' => $client->getId(),
+                    'source_id' => $attributes['id'],
+                ]);
+                $auth->save();
+            }
+        }
+        return $this->redirect(Task::getBaseTasksUrl());
     }
 }

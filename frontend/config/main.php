@@ -32,6 +32,7 @@ return [
                     'class' => 'yii\authclient\clients\VKontakte',
                     'clientId' => '7338231',
                     'clientSecret' => 'a19mVwHIMAC2frErrefh',
+                    'scope' => 'email',
                 ],
             ],
         ],
