@@ -13,7 +13,7 @@ $fieldConfig = ['template' => '{label}{input}{error}', 'options' => ['tag' => fa
             <h3 class="div-line">Настройки аккаунта</h3>
             <div class="account__redaction-section-wrapper">
                 <div class="account__redaction-avatar">
-                    <img src="/<?= $user->userData->avatar ? $user->userData->avatar : 'img/man-glasses.jpg' ?>" width="156" height="156">
+                    <img src="<?= $user->userData->getCorrectAvatar() ?? '/img/user-photo.png'; ?>" width="156" height="156">
                     <?= $form->field($model, 'avatar', ['template' => '{input}{label}{error}', 'options' => ['tag' => false]])
                         ->fileInput(['id' => 'upload-avatar'])->label(null, ['class' => 'link-regular']); ?>
                 </div>

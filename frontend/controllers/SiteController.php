@@ -1,11 +1,20 @@
 <?php
 namespace frontend\controllers;
 
-use app\models\{City, SignupForm, Task, MainLoginForm, UserData};
+use app\models\{Auth,
+    City,
+    SignupForm,
+    Task,
+    MainLoginForm,
+    UserData,
+    UserNotifications,
+    UserSettings};
 use common\models\User;
 use frontend\components\DebugHelper\DebugHelper;
 use frontend\components\SqlAppGenerator\SqlAppGenerator;
+use frontend\components\UserInitHelper\UserInitHelper;
 use Yii;
+use yii\authclient\AuthAction;
 use yii\base\InvalidArgumentException;
 use yii\widgets\ActiveForm;
 use yii\helpers\Url;
@@ -16,7 +25,6 @@ use common\models\LoginForm;
 use frontend\models\{PasswordResetRequestForm, ResetPasswordForm, ContactForm, ResendVerificationEmailForm, VerifyEmailForm};
 use yii\helpers\ArrayHelper;
 use yii\web\Response;
-
 
 /**
  * Site controller
@@ -30,7 +38,7 @@ class SiteController extends SecuredController
     {
         return ArrayHelper::merge([
             'access' => [
-                'except' => ['index', 'signup', 'login'],
+                'except' => ['index', 'signup', 'login', 'auth'],
             ],
 //            'verbs' => [
 //                'class' => VerbFilter::class,
@@ -54,6 +62,10 @@ class SiteController extends SecuredController
                 'class' => 'yii\captcha\CaptchaAction',
                 'fixedVerifyCode' => YII_ENV_TEST ? 'testme' : null,
             ],
+            'auth' => [
+                'class' => 'yii\authclient\AuthAction',
+                'successCallback' => [$this, 'onAuthSuccess'],
+            ]
         ];
     }
 
@@ -165,27 +177,17 @@ class SiteController extends SecuredController
     public function actionSignup()
     {
         $model = new SignupForm();
-
-        if(Yii::$app->request->isPost && $model->load(Yii::$app->request->post())) {
+        if(Yii::$app->request->isPost && $model->load(Yii::$app->request->post()) && $model->validate()) {
             $transaction = Yii::$app->db->beginTransaction();
             try {
-                $user = $model->signup();
-                $userData = new UserData();
-                $userData->attributes = [
-                    'description' => '',
-                    'age' => '',
-                    'address' => '',
-                    'skype' => '',
-                    'phone' => '',
-                    'other_messenger' => '',
-                    'avatar' => '',
-                    'rating' => '',
-                    'views' => '',
-                    'order_count' => '',
-                    'status' => User::STATUS_ACTIVE,
-                ];
-                $userData->save();
-                $user->link('userData', $userData);
+                (new UserInitHelper(new User(), [
+                    'login' => $model->login,
+                    'email' => $model->email,
+                    'password' => $model->password,
+                    'city_id' => $model->cityId,
+                ]))->initNotifications(new UserNotifications())
+                    ->initSetting(new UserSettings())
+                    ->initUserData(new UserData(), User::STATUS_ACTIVE);
                 $transaction->commit();
                 return $this->goHome();
             } catch (\Exception $e) {
@@ -292,5 +294,50 @@ class SiteController extends SecuredController
         return $this->render('resendVerificationEmail', [
             'model' => $model
         ]);
+    }
+
+    public function onAuthSuccess($client)
+    {
+        // если пользователь зарегистрирован, то и новая регистрация ему не нужна
+        if(!Yii::$app->user->isGuest) {
+            return $this->redirect(Task::getBaseTasksUrl());
+        }
+
+        $clientId = $client->getId();
+        $attributes = $client->getUserAttributes();
+
+        $auth = Auth::findOne(['source' => $clientId, 'source_id' => $attributes['id']]);
+        $user = null;
+        if($auth) { // Пользователь гость, но уже имеет аккаунт через VK
+            $user = $auth->user;
+        } else { // Пользователь гость, и ещё не имеет аккаунта VK
+            $transaction = Yii::$app->db->beginTransaction();
+            try {
+                $user = (new UserInitHelper(new User(), [
+                    'login' => $attributes['first_name'] . ' ' . $attributes['last_name'],
+                    'email' => $attributes['email'],
+                    'password' => Yii::$app->security->generateRandomString(6),
+                    'city_id' => null,
+                ]))->initNotifications(new UserNotifications())
+                    ->initSetting(new UserSettings())
+                    ->initUserData(new UserData(['avatar' => $attributes['photo']]), User::STATUS_ACTIVE)
+                    ->user;
+
+                (new Auth([
+                    'user_id' => $user->id,
+                    'source' => $clientId,
+                    'source_id' => $attributes['id'],
+                ]))->save();
+                $transaction->commit();
+            } catch (\Exception $err) {
+                $transaction->rollBack();
+            }
+        }
+
+        if($user) {
+            Yii::$app->user->login($user);
+        }
+
+        return $this->redirect(Task::getBaseTasksUrl());
     }
 }
