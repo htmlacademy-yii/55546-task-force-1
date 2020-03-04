@@ -161,6 +161,10 @@ class TasksController extends SecuredController
     public function actionAjaxGetYandexPlace(string $place = '')
     {
         Yii::$app->response->format = Response::FORMAT_JSON;
+        if(empty($place)) {
+            return [];
+        }
+
         $cache = Yii::$app->cache;
 
         // если кэш redis не доступен, то просто возвращаем список с результатами напрямую от яндекса
