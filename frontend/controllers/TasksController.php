@@ -63,7 +63,7 @@ class TasksController extends SecuredController
         ]);
     }
 
-    public function actionView($id)
+    public function actionView(int $id)
     {
         $task = Task::find()->with('category', 'author', 'files', 'responds')
             ->where(['id' => (int) $id])->one();
@@ -156,5 +156,25 @@ class TasksController extends SecuredController
             'categories' => ArrayHelper::map(Category::find()->all(), 'id', 'title'),
             'yandexMapApiKey' => Yii::$container->get('yandexMap')->apiKey,
         ]);
+    }
+
+    public function actionAjaxGetYandexPlace(string $place = '')
+    {
+        Yii::$app->response->format = Response::FORMAT_JSON;
+        $cache = Yii::$app->cache->redis;
+
+        // если кэш redis не доступен, то просто возвращаем список с результатами напрямую от яндекса
+        if(!$cache) {
+            return Yii::$container->get('yandexMap')->getResultList($place);
+        }
+
+        $place_key = md5($place);
+        // проверяем кэш redis по ключу, если не находим, делаем запрос к яндексу, результат записываем в кэш
+        if(!$cache->get($place_key)) {
+            $cache->set(json_encode(Yii::$container->get('yandexMap')->getResultList($place)), $place_key, 86400);
+        }
+
+        // возвращаем кэш
+        return json_decode($cache->get($place_key));
     }
 }

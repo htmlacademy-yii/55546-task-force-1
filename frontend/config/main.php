@@ -19,6 +19,14 @@ return [
         ]
     ],
     'components' => [
+        'cache' => [
+            'class' => 'yii\redis\Cache',
+            'redis' => [
+                'hostname' => 'localhost',
+                'port' => 6379,
+                'database' => 1,
+            ],
+        ],
         'request' => [
             'csrfParam' => '_csrf-frontend',
             'parsers' => [

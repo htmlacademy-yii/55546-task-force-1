@@ -11,4 +11,15 @@
 
     citiesList.innerHTML = data.response.GeoObjectCollection.featureMember.map(({GeoObject}) => `<option value="${GeoObject.name}">`).join(``);
   });
+
+  // test
+  inputAutoComplete.addEventListener(`input`, async ({ target }) => {
+    // const apiKey = document.querySelector(`[name="yandex-api-key"]`);
+    const data = await fetch(`/tasks/ajax-get-yandex-place?place=${target.value}`,
+      { Method: `GET`, 'Content-Type': `json/application` })
+      .then(res => res.json());
+
+    console.log(data);
+  });
+
 }) ();

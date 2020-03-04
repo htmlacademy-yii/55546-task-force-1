@@ -66,4 +66,10 @@ class YandexMap
 
         return $content->featureMember[0]->GeoObject->metaDataProperty->GeocoderMetaData->AddressDetails->Country;
     }
+
+    public function getResultList($geocode)
+    {
+        return json_decode($this->getDataMap($geocode)->getBody()->getContents())
+            ->response->GeoObjectCollection->featureMember;
+    }
 }
