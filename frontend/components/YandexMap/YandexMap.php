@@ -4,6 +4,7 @@ namespace frontend\components\YandexMap;
 use frontend\components\DebugHelper\DebugHelper;
 use GuzzleHttp\Client;
 use GuzzleHttp\Psr7\Response as GuzzleResponse;
+use Yii;
 use yii\web\Response;
 
 class YandexMap
@@ -71,5 +72,29 @@ class YandexMap
     {
         return json_decode($this->getDataMap($geocode)->getBody()->getContents())
             ->response->GeoObjectCollection->featureMember;
+    }
+
+    public function getPlaceFromCache(string $place = '')
+    {
+        Yii::$app->response->format = Response::FORMAT_JSON;
+        if(empty($place)) {
+            return [];
+        }
+
+        $cache = Yii::$app->cache;
+
+        // если кэш redis не доступен, то просто возвращаем список с результатами напрямую от яндекса
+        if(!$cache) {
+            return $this->getResultList($place);
+        }
+
+        $place_key = md5($place);
+        // проверяем кэш redis по ключу, если не находим, делаем запрос к яндексу, результат записываем в кэш
+        if(!$cache->get($place_key)) {
+            $cache->set($place_key, json_encode($this->getResultList($place)), 86400);
+        }
+
+        // возвращаем кэш
+        return json_decode($cache->get($place_key));
     }
 }

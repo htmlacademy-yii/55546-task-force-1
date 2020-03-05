@@ -10,5 +10,4 @@
 
     citiesList.innerHTML = (data || []).map(({GeoObject}) => `<option value="${GeoObject.name}">`).join(``);
   });
-
 }) ();
