@@ -159,6 +159,7 @@ class TasksController extends SecuredController
 
     public function actionAjaxGetYandexPlace(string $place = '')
     {
+        Yii::$app->response->format = Response::FORMAT_JSON;
         return Yii::$container->get('yandexMap')->getPlaceFromCache($place);
     }
 }

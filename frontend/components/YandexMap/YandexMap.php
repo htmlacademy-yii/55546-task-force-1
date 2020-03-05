@@ -76,13 +76,11 @@ class YandexMap
 
     public function getPlaceFromCache(string $place = '')
     {
-        Yii::$app->response->format = Response::FORMAT_JSON;
         if(empty($place)) {
             return [];
         }
 
         $cache = Yii::$app->cache;
-
         // если кэш redis не доступен, то просто возвращаем список с результатами напрямую от яндекса
         if(!$cache) {
             return $this->getResultList($place);
@@ -96,5 +94,24 @@ class YandexMap
 
         // возвращаем кэш
         return json_decode($cache->get($place_key));
+    }
+
+    public function getLocationFromCache(int $lat, int $long)
+    {
+        if(!$lat || !$long) {
+            return null;
+        }
+
+        $cache = Yii::$app->cache;
+        if(!$cache) {
+            return $this->getAddressByPositions($lat, $long);
+        }
+
+        $locationKey = md5("location-$lat-$long");
+        if(!Yii::$app->cache->get($locationKey)) {
+            Yii::$app->cache->set($locationKey, json_encode($this->getAddressByPositions($lat, $long)),86400);
+        }
+
+        return json_decode(Yii::$app->cache->get($locationKey));
     }
 }
