@@ -11,17 +11,7 @@ $fieldConfig = ['template' => '<p>{label}{input}{error}</p>'];
 $respondsCount = count($task->responds);
 
 \frontend\assets\TaskViewAsset::register($this);
-
 ?>
-
-<script>
-    // временный скрипт для проверки ajax запроса
-    (async () => console.log(await fetch(`/api/messages/${1}`).then(res => res.text()))) ();
-    // альтернативный URL
-    (async () => console.log(await fetch(`/index.php?r=api/messages/${1}`).then(res => res.text()))) ();
-    // список сообщений для задания
-    (async () => console.log(await fetch(`/index.php?r=api/messages&filter[task_id]=1`).then(res => res.text()))) ();
-</script>
 
 <section class="content-view">
     <div class="content-view__card">
