@@ -1,8 +1,6 @@
 <?php
 namespace app\models;
 
-use frontend\components\DebugHelper\DebugHelper;
-use frontend\components\YandexMap\YandexMap;
 use Yii;
 use yii\base\Model;
 

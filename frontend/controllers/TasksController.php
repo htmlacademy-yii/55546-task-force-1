@@ -1,5 +1,4 @@
 <?php
-
 namespace frontend\controllers;
 
 use app\models\RespondForm;
@@ -7,16 +6,9 @@ use app\models\TaskCompletionForm;
 use app\models\TaskCreate;
 use app\models\TaskRespond;
 use common\models\User;
-
-use frontend\components\DebugHelper\DebugHelper;
-use frontend\components\SqlAppGenerator\SqlAppGenerator;
-use frontend\components\YandexMap\YandexMap;
 use Yii;
 use yii\bootstrap\ActiveForm;
-use yii\filters\AccessControl;
 use yii\helpers\ArrayHelper;
-use yii\helpers\Url;
-use yii\web\Controller;
 use app\models\Task;
 use app\models\Category;
 use yii\web\NotFoundHttpException;
@@ -143,7 +135,6 @@ class TasksController extends SecuredController
     public function actionCreate()
     {
         $model = new TaskCreate();
-
         if(Yii::$app->request->post()) {
             $model->load(Yii::$app->request->post());
             if($model->validate() && $model->create(new Task(), Task::STATUS_NEW)) {
@@ -160,6 +151,7 @@ class TasksController extends SecuredController
     public function actionAjaxGetYandexPlace(string $place = '')
     {
         Yii::$app->response->format = Response::FORMAT_JSON;
-        return Yii::$container->get('yandexMap')->getPlaceFromCache($place);
+        return json_decode(Yii::$container->get('yandexMap')->getDataMap($place))
+            ->response->GeoObjectCollection->featureMember;
     }
 }
