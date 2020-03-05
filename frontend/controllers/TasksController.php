@@ -63,7 +63,7 @@ class TasksController extends SecuredController
         ]);
     }
 
-    public function actionView($id)
+    public function actionView(int $id)
     {
         $task = Task::find()->with('category', 'author', 'files', 'responds')
             ->where(['id' => (int) $id])->one();
@@ -154,7 +154,12 @@ class TasksController extends SecuredController
         return $this->render('create', [
             'model' => $model,
             'categories' => ArrayHelper::map(Category::find()->all(), 'id', 'title'),
-            'yandexMapApiKey' => Yii::$container->get('yandexMap')->apiKey,
         ]);
+    }
+
+    public function actionAjaxGetYandexPlace(string $place = '')
+    {
+        Yii::$app->response->format = Response::FORMAT_JSON;
+        return Yii::$container->get('yandexMap')->getPlaceFromCache($place);
     }
 }

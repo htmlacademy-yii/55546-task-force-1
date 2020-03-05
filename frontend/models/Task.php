@@ -2,6 +2,7 @@
 
 namespace app\models;
 
+use frontend\components\DebugHelper\DebugHelper;
 use frontend\components\YandexMap\YandexMap;
 use Yii;
 use yii\db\ActiveRecord;
@@ -64,8 +65,8 @@ class Task extends ActiveRecord
 
     public function getLocation()
     {
-        return $this->latitude && $this->longitude ? Yii::$container->get('yandexMap')
-            ->getAddressByPositions($this->latitude, $this->longitude) : null;
+        return Yii::$container->get('yandexMap')
+            ->getLocationFromCache($this->latitude, $this->longitude);
     }
 
     public function getCurrentTaskUrl(): string
