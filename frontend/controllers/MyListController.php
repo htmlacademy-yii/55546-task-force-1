@@ -5,7 +5,6 @@ use app\models\TaskRespond;
 use common\models\User;
 use Yii;
 use app\models\Task;
-use frontend\components\DebugHelper\DebugHelper;
 use yii\base\ErrorException;
 use yii\validators\RangeValidator;
 use yii\web\NotFoundHttpException;
@@ -14,7 +13,6 @@ class MyListController extends SecuredController
 {
     public function actionIndex(string $status = '')
     {
-
         if(!empty($status) && !(new RangeValidator(['range' => Task::getStatusList()]))->validate($status)) {
             throw new NotFoundHttpException("Страница не найдена!");
         }

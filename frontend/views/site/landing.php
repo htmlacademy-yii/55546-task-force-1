@@ -1,10 +1,12 @@
 <?php
+
+use yii\helpers\Url;
 use yii\widgets\ActiveForm;
 use yii\helpers\Html;
 
 $this->title = 'Главная страница сайта TaskForce';
 
-$fieldConfig = ['template' => "{label}{input}{error}", 'options' => ['tag' => false]];
+$fieldConfig = ['template' => "<p>{label}{input}{error}</p>"];
 ?>
 
 <div class="landing-container">
@@ -105,19 +107,17 @@ $fieldConfig = ['template' => "{label}{input}{error}", 'options' => ['tag' => fa
 <section class="modal enter-form form-modal" id="enter-form">
     <h2>Вход на сайт</h2>
 
-    <?php $form = ActiveForm::begin(['enableAjaxValidation' => true, 'enableClientValidation' => true]); ?>
-        <p>
-            <?= $form->field($model, 'email', $fieldConfig)
-                ->input('email', ['class' => 'enter-form-email input input-middle', 'id' => 'enter-email'])
-                ->label(null, ['class' => 'form-modal-description'])
-                ->error(['id' => 'error-email']); ?>
-        </p>
-        <p>
-            <?= $form->field($model, 'password', $fieldConfig)
-                ->passwordInput(['class' => 'enter-form-email input input-middle', 'id' => 'enter-password'])
-                ->label(null, ['class' => 'form-modal-description'])
-                ->error(['id' => 'error-password']); ?>
-        </p>
+    <?php $form = ActiveForm::begin([
+        'enableClientValidation' => false,
+        'enableAjaxValidation' => true,
+        'validationUrl' => Url::to('/site/login-ajax-validation'),
+    ]); ?>
+    <?= $form->field($model, 'email', $fieldConfig)
+        ->input('email', ['class' => 'enter-form-email input input-middle', 'id' => 'enter-email'])
+        ->label(null, ['class' => 'form-modal-description']); ?>
+    <?= $form->field($model, 'password', $fieldConfig)
+        ->passwordInput(['class' => 'enter-form-email input input-middle', 'id' => 'enter-password'])
+        ->label(null, ['class' => 'form-modal-description']); ?>
         <p>
             <?= \yii\authclient\widgets\AuthChoice::widget([
                 'baseAuthUrl' => ['site/auth'],

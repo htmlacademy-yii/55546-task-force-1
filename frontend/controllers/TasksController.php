@@ -6,6 +6,7 @@ use app\models\TaskCompletionForm;
 use app\models\TaskCreate;
 use app\models\TaskRespond;
 use common\models\User;
+use frontend\components\DebugHelper\DebugHelper;
 use Yii;
 use yii\bootstrap\ActiveForm;
 use yii\helpers\ArrayHelper;
@@ -26,7 +27,8 @@ class TasksController extends SecuredController
                 'create'
             ],
             'matchCallback' => function($rule, $action) {
-                return Yii::$app->user->identity->getRole() === User::ROLE_EXECUTOR;
+                $user = Yii::$app->user->identity;
+                return $user && $user->role === User::ROLE_EXECUTOR;
             },
             'denyCallback' => function($rule, $action) {
                 return $action->controller->redirect(Task::getBaseTasksUrl());
@@ -65,7 +67,6 @@ class TasksController extends SecuredController
         $respondModel = new RespondForm();
         $userRespond = TaskRespond::find()->where("task_id = $task->id AND user_id = $user->id")->one();
         $isRespond = $userRespond ? true : false;
-
         $taskCompletionModel = new TaskCompletionForm();
 
         if(!$task) {
@@ -74,7 +75,14 @@ class TasksController extends SecuredController
 
         if(Yii::$app->request->post('RespondForm') && !$isRespond) {
             if($respondModel->load(Yii::$app->request->post()) && $respondModel->validate()) {
-                $respondModel->createRespond($user->id, $task->id);
+                (new TaskRespond([
+                    'user_id' => $user->id,
+                    'task_id' => $task->id,
+                    'text' => $respondModel->text,
+                    'price' => $respondModel->text,
+                    'status' => TaskRespond::STATUS_NEW,
+                ]))->save();
+
                 $this->redirect($taskUrl);
             }
         }
@@ -93,7 +101,7 @@ class TasksController extends SecuredController
             'task' => $task,
             'taskLocation' => $task->getLocation(),
             'isAuthor' => $user->id === $task->author_id,
-            'isExecutor' => $user->getRole() === User::ROLE_EXECUTOR,
+            'isExecutor' => $user->role === User::ROLE_EXECUTOR,
             'isRespond' => $isRespond,
             'respondModel' => $respondModel,
             'taskCompletionModel' => $taskCompletionModel
@@ -135,11 +143,20 @@ class TasksController extends SecuredController
     public function actionCreate()
     {
         $model = new TaskCreate();
-        if(Yii::$app->request->post()) {
-            $model->load(Yii::$app->request->post());
-            if($model->validate() && $model->create(new Task(), Task::STATUS_NEW)) {
-                $this->redirect(Task::getBaseTasksUrl());
-            }
+        if(Yii::$app->request->post() && $model->load(Yii::$app->request->post()) && $model->validate()) {
+            (new Task([
+                'author_id' => Yii::$app->user->getId(),
+                'title' => $model->title,
+                'description' => $model->description,
+                'category_id' => $model->categoryId,
+                'price' => $model->price,
+                'latitude' => $model->latitude,
+                'longitude' => $model->longitude,
+                'date_end' => $model->dateEnd,
+                'date_start' => date("Y-m-d h:i:s"),
+                'status' => Task::STATUS_NEW,
+            ]))->save();
+            $this->redirect(Task::getBaseTasksUrl());
         }
 
         return $this->render('create', [

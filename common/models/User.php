@@ -62,17 +62,6 @@ class User extends ActiveRecord implements IdentityInterface
         ];
     }
 
-    public function attributeLabels()
-    {
-        return [
-            'id' => 'ID',
-            'login' => 'Login',
-            'email' => 'Email',
-            'password' => 'Password',
-            'date_registration' => 'Date Registration',
-        ];
-    }
-
     public function getUserData()
     {
         return $this->hasOne(UserData::class, ['user_id' => 'id']);
@@ -107,11 +96,6 @@ class User extends ActiveRecord implements IdentityInterface
     public function getTasks()
     {
         return $this->hasMany(Task::class, ['author_id' => 'id']);
-    }
-
-    public function getRole()
-    {
-        return empty($this->specializations) ? self::ROLE_CLIENT : self::ROLE_EXECUTOR;
     }
 
     public static function findIdentity($id)

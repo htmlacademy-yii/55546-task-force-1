@@ -12,17 +12,13 @@ class UserInitHelper
 {
     public $user;
 
-    public function __construct(User $user, array $data)
+    public function __construct(User $user)
     {
         $this->user = $user;
-        $this->user->login = $data['login'];
-        $this->user->email = $data['email'];
-        $this->user->city_id = $data['city_id'];
-        $this->user->password = Yii::$app->getSecurity()->generatePasswordHash($data['password']);
         $this->user->save();
     }
 
-    public function initUserData(UserData $uData, $status): UserInitHelper
+    public function initUserData(UserData $uData): UserInitHelper
     {
         $uData->attributes = [
             'user_id' => $this->user->id,
@@ -35,8 +31,7 @@ class UserInitHelper
             'avatar' => $uData->avatar ?? '',
             'rating' => '',
             'views' => '',
-            'order_count' => '',
-            'status' => $status,
+            'order_count' => ''
         ];
         $uData->save();
         return $this;

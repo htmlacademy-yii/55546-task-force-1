@@ -5,7 +5,7 @@ use app\models\{Auth,
     City,
     SignupForm,
     Task,
-    MainLoginForm,
+    LoginForm,
     UserData,
     UserNotifications,
     UserSettings};
@@ -16,6 +16,7 @@ use yii\filters\VerbFilter;
 
 use yii\helpers\ArrayHelper;
 use yii\web\Response;
+use yii\widgets\ActiveForm;
 
 /**
  * Site controller
@@ -29,7 +30,7 @@ class SiteController extends SecuredController
     {
         return ArrayHelper::merge([
             'access' => [
-                'except' => ['index', 'signup', 'login', 'auth'],
+                'except' => ['index', 'signup', 'login', 'auth', 'login-ajax-validation'],
             ],
 //            'verbs' => [
 //                'class' => VerbFilter::class,
@@ -72,24 +73,26 @@ class SiteController extends SecuredController
         }
         $this->layout = 'landing';
 
-        $model = new MainLoginForm();
-        if(Yii::$app->request->isAjax) {
-            $user = $model->loginValidate(Yii::$app->request->post());
-            Yii::$app->response->format = Response::FORMAT_JSON;
-
-            if(empty($model->getErrors())) {
-                Yii::$app->user->login($user);
-                return $this->redirect(Task::getBaseTasksUrl());
-            }
-
-            return $model->getErrors();
-        }
-
         return $this->render('landing', [
-            'model' => $model,
+            'model' => new LoginForm(),
             'tasks' => Task::find()->with(['category'])->where(['status' => Task::STATUS_NEW])
                 ->orderBy('date_start DESC')->limit(4)->all(),
         ]);
+    }
+
+    public function actionLoginAjaxValidation()
+    {
+        if(Yii::$app->request->isAjax) {
+            Yii::$app->response->format = Response::FORMAT_JSON;
+            $model = new LoginForm();
+            $model->setAttributes(Yii::$app->request->post('LoginForm'));
+            if($validate = ActiveForm::validate($model)) {
+                return $validate;
+            }
+
+            Yii::$app->user->login(User::findOne(['email' => $model->email]));
+            return $this->redirect(Task::getBaseTasksUrl());
+        }
     }
 
     /**
@@ -114,14 +117,15 @@ class SiteController extends SecuredController
         if(Yii::$app->request->isPost && $model->load(Yii::$app->request->post()) && $model->validate()) {
             $transaction = Yii::$app->db->beginTransaction();
             try {
-                (new UserInitHelper(new User(), [
+                (new UserInitHelper(new User([
                     'login' => $model->login,
                     'email' => $model->email,
-                    'password' => $model->password,
+                    'password' => Yii::$app->getSecurity()->generatePasswordHash($model->password),
                     'city_id' => $model->cityId,
-                ]))->initNotifications(new UserNotifications())
+                    'role' => User::ROLE_CLIENT,
+                ])))->initNotifications(new UserNotifications())
                     ->initSetting(new UserSettings())
-                    ->initUserData(new UserData(), User::STATUS_ACTIVE);
+                    ->initUserData(new UserData());
                 $transaction->commit();
                 return $this->goHome();
             } catch (\Exception $e) {
@@ -152,16 +156,16 @@ class SiteController extends SecuredController
         } else { // Пользователь гость, и ещё не имеет аккаунта VK
             $transaction = Yii::$app->db->beginTransaction();
             try {
-                $user = (new UserInitHelper(new User(), [
+                $user = (new UserInitHelper(new User([
                     'login' => $attributes['first_name'] . ' ' . $attributes['last_name'],
                     'email' => $attributes['email'],
                     'password' => Yii::$app->security->generateRandomString(6),
                     'city_id' => null,
-                ]))->initNotifications(new UserNotifications())
+                    'role' => User::ROLE_CLIENT,
+                ])))->initNotifications(new UserNotifications())
                     ->initSetting(new UserSettings())
-                    ->initUserData(new UserData(['avatar' => $attributes['photo']]), User::STATUS_ACTIVE)
+                    ->initUserData(new UserData(['avatar' => $attributes['photo']]))
                     ->user;
-
                 (new Auth([
                     'user_id' => $user->id,
                     'source' => $clientId,

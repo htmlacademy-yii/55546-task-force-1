@@ -71,20 +71,4 @@ class TaskCreate extends Model
             }
         }
     }
-
-    public function create(Task $task, string $status): bool
-    {
-        $task->author_id = Yii::$app->user->getId();
-        $task->title = $this->title;
-        $task->description = $this->description;
-        $task->category_id = $this->categoryId;
-        $task->price = $this->price;
-        $task->latitude = $this->latitude;
-        $task->longitude = $this->longitude;
-        $task->date_end = $this->dateEnd;
-        $task->date_start = date("Y-m-d h:i:s");
-        $task->status = $status;
-
-        return $task->save();
-    }
 }

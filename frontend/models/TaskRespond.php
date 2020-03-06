@@ -25,24 +25,6 @@ class TaskRespond extends ActiveRecord
         return 'task_respond';
     }
 
-    public function rules()
-    {
-        return [
-            [['task_id', 'user_id', 'price'], 'integer'],
-            [['text'], 'string'],
-        ];
-    }
-
-    public function attributeLabels()
-    {
-        return [
-            'task_id' => 'Task ID',
-            'user_id' => 'User ID',
-            'text' => 'Text',
-            'public_date' => 'Public Date',
-        ];
-    }
-
     public function getUser()
     {
         return $this->hasOne(User::class, ['id' => 'user_id']);

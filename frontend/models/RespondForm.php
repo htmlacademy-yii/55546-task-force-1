@@ -24,15 +24,4 @@ class RespondForm extends Model
             'text' => 'Комментарий'
         ];
     }
-
-    public function createRespond($userId, $taskId)
-    {
-        $taskRespond = new TaskRespond();
-        $taskRespond->user_id = $userId;
-        $taskRespond->task_id = $taskId;
-        $taskRespond->text = $this->text;
-        $taskRespond->price = $this->price;
-        $taskRespond->status = TaskRespond::STATUS_NEW;
-        $taskRespond->save();
-    }
 }

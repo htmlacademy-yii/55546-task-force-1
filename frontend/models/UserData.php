@@ -1,8 +1,6 @@
 <?php
-
 namespace app\models;
 
-use Yii;
 use yii\db\ActiveRecord;
 
 /**
@@ -38,38 +36,20 @@ class UserData extends ActiveRecord
     public function rules()
     {
         return [
-            [['description', 'age', 'address', 'skype', 'phone', 'other_messenger', 'avatar', 'rating', 'views', 'order_count', 'status'], 'safe'],
-            [['user_id', 'age', 'rating', 'views', 'order_count', 'status'], 'integer'],
+            [['description', 'age', 'address', 'skype', 'phone', 'other_messenger', 'avatar', 'rating', 'views', 'order_count'], 'safe'],
+            [['user_id', 'age', 'rating', 'views', 'order_count'], 'integer'],
             [['description', 'address'], 'string'],
             [['skype', 'phone', 'other_messenger', 'avatar'], 'string', 'max' => 255],
         ];
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function attributeLabels()
+    public function getAvatar()
     {
-        return [
-            'user_id' => 'User ID',
-            'name' => 'Name',
-            'description' => 'Description',
-            'age' => 'Age',
-            'address' => 'Address',
-            'skype' => 'Skype',
-            'phone' => 'Phone',
-            'other_messenger' => 'Other Messenger',
-            'avatar' => 'Avatar',
-            'rating' => 'Rating',
-            'views' => 'Views',
-            'order_count' => 'Order Count',
-            'status' => 'Status',
-        ];
-    }
+        if(!empty($this->avatar)) {
+            return preg_match('/^http/', $this->avatar) ? $this->avatar : "/$this->avatar";
+        }
 
-    public function getCorrectAvatar()
-    {
-        return preg_match('/^http/', $this->avatar) ? $this->avatar : "/$this->avatar";
+        return '/img/user-photo.png';
     }
 
     public function save($runValidation = true, $attributeNames = null): bool

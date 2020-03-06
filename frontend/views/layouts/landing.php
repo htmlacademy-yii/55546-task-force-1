@@ -3,7 +3,10 @@ use frontend\assets\AppAsset;
 use yii\helpers\Html;
 
 AppAsset::register($this);
+\frontend\assets\LandingAsset::register($this);
+
 $this->beginPage();
+$user = null;
 ?>
 <!DOCTYPE html>
 <html lang="<?= Yii::$app->language; ?>">
@@ -15,7 +18,6 @@ $this->beginPage();
 </head>
 <body class="landing">
     <?php $this->beginBody(); ?>
-
     <div class="table-layout">
         <header class=" page-header--index">
             <div class="main-container page-header__container page-header__container--index">
@@ -73,20 +75,20 @@ $this->beginPage();
                 </div>
                 <div class="page-footer__links">
                     <ul class="links__list">
-                        <li class="links__item">
-                            <a href="">Задания</a>
+                        <li class="site-list__item">
+                            <?= Html::a('Задания', '/tasks'); ?>
+                        </li>
+                        <li class="site-list__item">
+                            <?= Html::a('Мой профиль', "/users/view/" . ($user ? $user->id : '')); ?>
+                        </li>
+                        <li class="site-list__item">
+                            <?= Html::a('Исполнители', '/users'); ?>
                         </li>
                         <li class="links__item">
-                            <a href="">Мой профиль</a>
+                            <?= Html::a('Регистрация', '/site/signup'); ?>
                         </li>
-                        <li class="links__item">
-                            <a href="">Исполнители</a>
-                        </li>
-                        <li class="links__item">
-                            <a href="">Регистрация</a>
-                        </li>
-                        <li class="links__item">
-                            <a href="">Создать задание</a>
+                        <li class="site-list__item">
+                            <?= Html::a('Создать задание', '/tasks/create'); ?>
                         </li>
                         <li class="links__item">
                             <a href="">Справка</a>
@@ -94,46 +96,14 @@ $this->beginPage();
                     </ul>
                 </div>
                 <div class="page-footer__copyright">
-                    <a href="https://htmlacademy.ru">
-                        <img class="copyright-logo"
+                    <?= Html::a('<img class="copyright-logo"
                              src="/img/academy-logo.png"
                              width="185" height="63"
-                             alt="Логотип HTML Academy">
-                    </a>
+                             alt="Логотип HTML Academy">', 'https://htmlacademy.ru') ?>
                 </div>
             </div>
         </footer>
     </div>
-
-    <?php
-    $js = <<<JS
-        const emailError = document.querySelector(`#error-email`);
-        const passwordError = document.querySelector(`#error-password`);
-        $(`#btn-login`).click(function(evt) {
-          emailError.textContent = passwordError.textContent = '';
-            $.ajax(`/site/index`, {
-                type: `POST`,
-                data: {
-                  email: document.querySelector(`#enter-email`).value,
-                  password: document.querySelector(`#enter-password`).value,
-                },
-                success: function(data) {
-                  if(data.email) {
-                    emailError.textContent = data.email[0];
-                  } else if(data.password) {
-                    passwordError.textContent = data.password[0];
-                  }
-                }
-            });
-            
-            return false;
-        });
-JS;
-
-    $this->registerJs($js);
-    ?>
-
-    <script src="/js/main.js"></script>
     <?php $this->endBody(); ?>
 </body>
 </html>

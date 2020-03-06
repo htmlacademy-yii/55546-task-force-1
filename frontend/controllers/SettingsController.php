@@ -1,19 +1,19 @@
 <?php
 namespace frontend\controllers;
 
-use app\models\AccountForm;
+use app\models\SettingsForm;
 use app\models\Category;
 use app\models\City;
 use app\models\UserData;
 use app\models\UserNotifications;
 use app\models\UserSettings;
 use app\models\UserSpecialization;
-use frontend\components\DebugHelper\DebugHelper;
+use common\models\User;
 use Yii;
 use yii\helpers\ArrayHelper;
 use yii\web\UploadedFile;
 
-class ProfileController extends SecuredController
+class SettingsController extends SecuredController
 {
     /** @var string  */
     public $avatarsPath = '';
@@ -21,8 +21,7 @@ class ProfileController extends SecuredController
     public function actionIndex()
     {
         $user = Yii::$app->user->identity;
-        $model = new AccountForm();
-
+        $model = new SettingsForm();
         if(Yii::$app->request->isPost && $model->load(Yii::$app->request->post()) && $model->validate()) {
             // обновление основных данных пользователя
             $user->login = $model->name;
@@ -38,7 +37,6 @@ class ProfileController extends SecuredController
             $model->avatar = UploadedFile::getInstance($model, 'avatar');
             if($model->avatar) {
                 $filePath = "{$this->avatarsPath}/{$model->avatar->baseName}.{$model->avatar->extension}";
-
                 if($userData->avatar && file_exists($userData->avatar)) {
                     unlink($userData->avatar);
                 }
@@ -69,10 +67,16 @@ class ProfileController extends SecuredController
             $userSettings->save();
 
             // обновление категорий
+            $specializations = is_array($model->specializations) ? $model->specializations : [];
+
             UserSpecialization::deleteAll(['user_id' => $user->id]);
             Yii::$app->db->createCommand()->batchInsert('user_specialization', ['user_id', 'category_id'], array_map(function($id) use ($user) {
                 return [$user->id, $id];
-            }, is_array($model->specializations) ? $model->specializations : []))->execute();
+            }, $specializations))->execute();
+
+            // обновление роли пользователя
+            $user->role = empty($specializations) ? User::ROLE_CLIENT : User::ROLE_EXECUTOR;
+            $user->save();
         }
 
         return $this->render('index', [

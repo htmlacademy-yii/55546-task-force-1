@@ -1,9 +1,10 @@
 <?php
-
 use yii\widgets\ActiveForm;
 use yii\helpers\Html;
 
 $fieldConfig = ['template' => '{label}{input}{error}', 'options' => ['tag' => false]];
+
+\frontend\assets\ProfileAsset::register($this);
 ?>
 
 <section class="account__redaction-wrapper">
@@ -13,7 +14,7 @@ $fieldConfig = ['template' => '{label}{input}{error}', 'options' => ['tag' => fa
             <h3 class="div-line">Настройки аккаунта</h3>
             <div class="account__redaction-section-wrapper">
                 <div class="account__redaction-avatar">
-                    <img src="<?= $user->userData->getCorrectAvatar() ?? '/img/user-photo.png'; ?>" width="156" height="156">
+                    <img src="<?= $user->userData->getAvatar(); ?>" width="156" height="156">
                     <?= $form->field($model, 'avatar', ['template' => '{input}{label}{error}', 'options' => ['tag' => false]])
                         ->fileInput(['id' => 'upload-avatar'])->label(null, ['class' => 'link-regular']); ?>
                 </div>
@@ -71,6 +72,12 @@ $fieldConfig = ['template' => '{label}{input}{error}', 'options' => ['tag' => fa
                     <?= $form->field($model, 'copyPassword', $fieldConfig)->input('password', ['class' => 'input textarea']); ?>
                 </div>
             </div>
+
+            <h3 class="div-line">Фото работ</h3>
+            <div class="account__redaction-section-wrapper account__redaction">
+                <span class="dropzone">Выбрать фотографии</span>
+            </div>
+
             <h3 class="div-line">Контакты</h3>
             <div class="account__redaction-section-wrapper account__redaction">
                 <div class="account__input">

@@ -61,13 +61,13 @@ $user = $isGuest ? null : Yii::$app->user->identity;
                         <?= Html::a('Задания', '/tasks'); ?>
                     </li>
                     <li class="site-list__item">
-                        <a href="#">Исполнители</a>
+                        <?= Html::a('Исполнители', '/users'); ?>
                     </li>
                     <li class="site-list__item">
                         <?= Html::a('Создать задание', '/tasks/create'); ?>
                     </li>
                     <li class="site-list__item">
-                        <?= Html::a('Мой профиль', '/profile'); ?>
+                        <?= Html::a('Мой профиль', "/users/view/" . ($user ? $user->id : '')); ?>
                     </li>
                 </ul>
             </div>
@@ -99,7 +99,7 @@ $user = $isGuest ? null : Yii::$app->user->identity;
             <div class="header__account">
                 <?php if(!$isGuest): ?>
                     <a class="header__account-photo">
-                        <img src="<?= $user->userData->getCorrectAvatar() ?? '/img/user-photo.png'; ?>"
+                        <img src="<?= $user->userData->getAvatar(); ?>"
                              width="43" height="44"
                              alt="Аватар пользователя">
                     </a>
@@ -112,7 +112,7 @@ $user = $isGuest ? null : Yii::$app->user->identity;
                 <div class="account__pop-up">
                     <ul class="account__pop-up-list">
                         <li><?= Html::a('Мои задания', '/my-list') ?></li>
-                        <li><?= Html::a('Настройки', '#') ?></li>
+                        <li><?= Html::a('Настройки', '/settings') ?></li>
                         <li><?= Html::a('Выход', '/site/logout') ?></li>
                     </ul>
                 </div>
@@ -138,20 +138,20 @@ $user = $isGuest ? null : Yii::$app->user->identity;
             </div>
             <div class="page-footer__links">
                 <ul class="links__list">
-                    <li class="links__item">
-                        <a href="">Задания</a>
+                    <li class="site-list__item">
+                        <?= Html::a('Задания', '/tasks'); ?>
+                    </li>
+                    <li class="site-list__item">
+                        <?= Html::a('Мой профиль', "/users/view/" . ($user ? $user->id : '')); ?>
+                    </li>
+                    <li class="site-list__item">
+                        <?= Html::a('Исполнители', '/users'); ?>
                     </li>
                     <li class="links__item">
-                        <a href="">Мой профиль</a>
+                        <?= Html::a('Регистрация', '/site/signup'); ?>
                     </li>
-                    <li class="links__item">
-                        <a href="">Исполнители</a>
-                    </li>
-                    <li class="links__item">
-                        <a href="">Регистрация</a>
-                    </li>
-                    <li class="links__item">
-                        <a href="">Создать задание</a>
+                    <li class="site-list__item">
+                        <?= Html::a('Создать задание', '/tasks/create'); ?>
                     </li>
                     <li class="links__item">
                         <a href="">Справка</a>
@@ -159,12 +159,10 @@ $user = $isGuest ? null : Yii::$app->user->identity;
                 </ul>
             </div>
             <div class="page-footer__copyright">
-                <a>
-                    <img class="copyright-logo"
+                <?= Html::a('<img class="copyright-logo"
                          src="/img/academy-logo.png"
                          width="185" height="63"
-                         alt="Логотип HTML Academy">
-                </a>
+                         alt="Логотип HTML Academy">', '#') ?>
             </div>
         </div>
     </footer>

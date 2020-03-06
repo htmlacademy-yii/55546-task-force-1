@@ -72,6 +72,7 @@ return [
             'rules' => [
                 'tasks/view/<id>' => 'tasks/view',
                 'tasks/decision/<status>/<id>/<taskId>' => 'tasks/decision',
+                'users/view/<id>' => 'users/view',
                 [
                     'class' => RestMessagesUrlRule::class,
                     'pattern' => '/api\/messages\/(?P<task_id>\d+)$/',
@@ -86,7 +87,7 @@ return [
     ],
     'container' => [
         'definitions' => [
-            'frontend\controllers\ProfileController' => [
+            'frontend\controllers\SettingsController' => [
                 'avatarsPath' => 'users-files/avatars'
             ]
         ],

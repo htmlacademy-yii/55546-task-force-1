@@ -5,7 +5,7 @@ use common\models\User;
 use Yii;
 use yii\base\Model;
 
-class AccountForm extends Model
+class SettingsForm extends Model
 {
     public $avatar;
     public $name;
