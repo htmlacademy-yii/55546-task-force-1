@@ -31,22 +31,6 @@ class Task extends ActiveRecord
         ];
     }
 
-    public function attributeLabels()
-    {
-        return [
-            'id' => 'ID',
-            'author_id' => 'Author ID',
-            'title' => 'Title',
-            'description' => 'Description',
-            'category_id' => 'Category ID',
-            'price' => 'Price',
-            'date_start' => 'Date Start',
-            'date_end' => 'Date End',
-            'executor_id' => 'Executor ID',
-            'status' => 'Status',
-        ];
-    }
-
     public static function getStatusList(): array
     {
         return [
@@ -61,8 +45,8 @@ class Task extends ActiveRecord
 
     public function getLocation()
     {
-        return Yii::$container->get('yandexMap')
-            ->getAddressByPositions($this->latitude, $this->longitude);
+        return ($this->latitude && $this->longitude) ? Yii::$container->get('yandexMap')
+            ->getAddressByPositions($this->latitude, $this->longitude) : null;
     }
 
     public function getCurrentTaskUrl(): string
