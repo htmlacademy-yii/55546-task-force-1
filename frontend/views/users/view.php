@@ -1,13 +1,19 @@
+<?php
+use yii\helpers\Html;
+?>
+
 <section class="content-view">
     <div class="user__card-wrapper">
         <div class="user__card">
-            <img src="./img/man-hat.png" width="120" height="120" alt="Аватар пользователя">
+            <img src="<?= $user->userData->getAvatar(); ?>" width="120" height="120" alt="Аватар пользователя">
             <div class="content-view__headline">
-                <h1>Мамедов Кумар</h1>
+                <h1><?= $user->login; ?></h1>
                 <p>Россия, Санкт-Петербург, 30 лет</p>
                 <div class="profile-mini__name five-stars__rate">
-                    <span></span><span></span><span></span><span></span><span class="star-disabled"></span>
-                    <b>4.25</b>
+                    <?php for ($i = 0; $i < 5; $i++): ?>
+                        <span <?= $user->userData->rating > $i ? '' : 'class="star-disabled"'; ?>></span>
+                    <?php endfor; ?>
+                    <b><?= $user->userData->rating; ?></b>
                 </div>
                 <b class="done-task">Выполнил 5 заказов</b><b class="done-review">Получил 6 отзывов</b>
             </div>
@@ -17,72 +23,56 @@
             </div>
         </div>
         <div class="content-view__description">
-            <p>Внезапно, ключевые особенности структуры проекта неоднозначны и будут подвергнуты целой серии
-                независимых исследований. Следует отметить, что высококачественный прототип будущего проекта, в
-                своём классическом представлении, допускает внедрение своевременного выполнения сверхзадачи.
-                Кстати, некоторые особенности внутренней политики будут функционально разнесены на
-                независимые элементы.</p>
+            <p><?= $user->userData->description; ?></p>
         </div>
         <div class="user__card-general-information">
             <div class="user__card-info">
                 <h3 class="content-view__h3">Специализации</h3>
                 <div class="link-specialization">
-                    <a href="#" class="link-regular">Ремонт</a>
-                    <a href="#" class="link-regular">Курьер</a>
-                    <a href="#" class="link-regular">Оператор ПК</a>
+                    <?php foreach ($user->specializations as $specialization): ?>
+                        <?= Html::a($specialization->title, '#', ['class' => 'link-regular']) ?>
+                    <?php endforeach; ?>
                 </div>
                 <h3 class="content-view__h3">Контакты</h3>
                 <div class="user__card-link">
-                    <a class="user__card-link--tel link-regular" href="#">8 (555) 172 83 69</a>
-                    <a class="user__card-link--email link-regular" href="#">Kumarm@mail.ru</a>
-                    <a class="user__card-link--skype link-regular" href="#">Kumarm</a>
+                    <?= Html::a($user->userData->phone, '#', ['class' => 'user__card-link--tel link-regular']); ?>
+                    <?= Html::a($user->email, '#', ['class' => 'user__card-link--email link-regular']); ?>
+                    <?= Html::a($user->userData->skype, '#', ['class' => 'user__card-link--skype link-regular']); ?>
                 </div>
             </div>
-            <div class="user__card-photo">
-                <h3 class="content-view__h3">Фото работ</h3>
-                <a href="#"><img src="./img/rome-photo.jpg" width="85" height="86" alt="Фото работы"></a>
-                <a href="#"><img src="./img/smartphone-photo.png" width="85" height="86" alt="Фото работы"></a>
-                <a href="#"><img src="./img/dotonbori-photo.png" width="85" height="86" alt="Фото работы"></a>
-            </div>
+
+            <?php if($user->photo): ?>
+                <div class="user__card-photo">
+                    <h3 class="content-view__h3">Фото работ</h3>
+                    <?php foreach ($user->photo as $data): ?>
+                        <?= Html::a("<img src='$data->photo' width='85' height='86' alt='Фото работы'>", '#') ?>
+                    <?php endforeach; ?>
+                </div>
+            <?php endif; ?>
         </div>
     </div>
-    <div class="content-view__feedback">
-        <h2>Отзывы<span>(2)</span></h2>
-        <div class="content-view__feedback-wrapper reviews-wrapper">
-            <div class="feedback-card__reviews">
-                <p class="link-task link">Задание <a href="#" class="link-regular">«Выгулять моего боевого петуха»</a></p>
-                <div class="card__review">
-                    <a href="#"><img src="./img/man-glasses.jpg" width="55" height="54"></a>
-                    <div class="feedback-card__reviews-content">
-                        <p class="link-name link"><a href="#" class="link-regular">Астахов Павел</a></p>
-                        <p class="review-text">
-                            Кумар сделал всё в лучшем виде.  Буду обращаться к нему в будущем, если
-                            возникнет такая необходимость!
-                        </p>
+    <?php if($user->reviews): ?>
+        <div class="content-view__feedback">
+            <h2>Отзывы<span>(<?= count($user->reviews) ?>)</span></h2>
+            <div class="content-view__feedback-wrapper reviews-wrapper">
+                <?php foreach ($user->reviews as $review): ?>
+                    <div class="feedback-card__reviews">
+                        <p class="link-task link">Задание «<?= Html::a($review->task->title, "/tasks/view/{$review->task->id}", ['class' => 'link-regular']); ?>»</p>
+                        <div class="card__review">
+                            <?= Html::a("<img src='{$review->author->userData->getAvatar()}' width='55' height='54'>", "#"); ?>
+                            <div class="feedback-card__reviews-content">
+                                <p class="link-name link"><?= Html::a($review->author->login, "#", ['class' => 'link-regular']); ?></p>
+                                <p class="review-text"><?= $review->text; ?></p>
+                            </div>
+                            <div class="card__review-rate">
+                                <p class="five-rate big-rate"><?= $review->rating; ?><span></span></p>
+                            </div>
+                        </div>
                     </div>
-                    <div class="card__review-rate">
-                        <p class="five-rate big-rate">5<span></span></p>
-                    </div>
-                </div>
-            </div>
-            <div class="feedback-card__reviews">
-                <p class="link-task link">Задание <a href="#" class="link-regular">«Повесить полочку»</a></p>
-                <div class="card__review">
-                    <a href="#"><img src="./img/woman-glasses.jpg" width="55" height="54"></a>
-                    <div class="feedback-card__reviews-content">
-                        <p class="link-name link"><a href="#" class="link-regular">Морозова Евгения</a></p>
-                        <p class="review-text">
-                            Кумар приехал позже, чем общал и не привез с собой всех
-                            инстументов. В итоге пришлось еще ходить в строительный магазин.
-                        </p>
-                    </div>
-                    <div class="card__review-rate">
-                        <p class="three-rate big-rate">3<span></span></p>
-                    </div>
-                </div>
+                <?php endforeach; ?>
             </div>
         </div>
-    </div>
+    <?php endif; ?>
 </section>
 <section class="connect-desk">
     <div class="connect-desk__chat">

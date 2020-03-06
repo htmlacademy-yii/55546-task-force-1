@@ -5,6 +5,7 @@ use app\models\Category;
 use app\models\ExecutorSearchForm;
 use common\models\User;
 use yii\helpers\ArrayHelper;
+use yii\web\NotFoundHttpException;
 
 class UsersController extends SecuredController
 {
@@ -19,8 +20,13 @@ class UsersController extends SecuredController
         ]);
     }
 
-    public function actionView($id)
+    public function actionView(int $id)
     {
-        return $this->render('view');
+        $user = User::findOne($id);
+        if(!$user) {
+            throw new NotFoundHttpException("Страница не найдена!");
+        }
+
+        return $this->render('view', compact('user'));
     }
 }

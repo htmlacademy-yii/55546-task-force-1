@@ -3,9 +3,11 @@ namespace common\models;
 
 use app\models\Category;
 use app\models\City;
+use app\models\Review;
 use app\models\Task;
 use app\models\UserData;
 use app\models\UserNotifications;
+use app\models\UserPhoto;
 use app\models\UserSettings;
 use app\models\UserSpecialization;
 use Yii;
@@ -96,6 +98,16 @@ class User extends ActiveRecord implements IdentityInterface
     public function getTasks()
     {
         return $this->hasMany(Task::class, ['author_id' => 'id']);
+    }
+
+    public function getPhoto()
+    {
+        return $this->hasMany(UserPhoto::class, ['user_id' => 'id']);
+    }
+
+    public function getReviews()
+    {
+        return $this->hasMany(Review::class, ['executor_id' => 'id']);
     }
 
     public static function findIdentity($id)

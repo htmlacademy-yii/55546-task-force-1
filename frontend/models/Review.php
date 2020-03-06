@@ -1,9 +1,7 @@
 <?php
-
 namespace app\models;
 
 use common\models\User;
-use Yii;
 use yii\db\ActiveRecord;
 
 /**
@@ -46,5 +44,15 @@ class Review extends ActiveRecord
     public function getExecutor()
     {
         return User::findOne($this->executor_id);
+    }
+
+    public function getAuthor()
+    {
+        return $this->hasOne(User::class, ['id' => 'author_id']);
+    }
+
+    public function getTask()
+    {
+        return $this->hasOne(Task::class, ['id' => 'task_id']);
     }
 }

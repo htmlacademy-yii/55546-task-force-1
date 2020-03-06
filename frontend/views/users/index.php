@@ -54,7 +54,6 @@ $fieldConfig = ['options' => ['tag' => false]];
         <?php $form = ActiveForm::begin(['options' => ['class' => 'search-task__form']]); ?>
         <fieldset class="search-task__categories">
             <legend>Категории</legend>
-
             <?= $form->field($model, 'categories', $fieldConfig)
                 ->checkboxList($categories, [
                     'item' => function($_index, $label, $name, $checked, $id) {
@@ -90,7 +89,6 @@ $fieldConfig = ['options' => ['tag' => false]];
                     'tag' => false,
                 ])->label(false); ?>
         </fieldset>
-
         <?= $form->field($model, 'name', ['template' => '{label}{input}', 'options' => ['tag' => false]])
             ->input('search', ['class' => 'input-middle input'])
             ->label(null, ['class' => 'search-task__name']); ?>

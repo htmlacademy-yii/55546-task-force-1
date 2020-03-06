@@ -12,7 +12,7 @@ class ExecutorSearchForm extends Model
         'there-are-reviews',
         'in-favorites',
     ];
-    public $name;
+    public $name = '';
 
     public function attributeLabels()
     {
