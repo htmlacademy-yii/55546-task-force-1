@@ -20,8 +20,12 @@ $fieldConfig = ['template' => "{label}\n{input}", 'options' => ['tag' => false]]
                 </div>
                 <div class="new-task__icon new-task__icon--<?= $task->category->code; ?>"></div>
                 <p class="new-task_description"><?= $task->description; ?></p>
-                <b class="new-task__price new-task__price--<?= $task->category->code; ?>"><?= $task->price; ?><b> ₽</b></b>
-                <p class="new-task__place"><?= $task->author->userData->address; ?></p>
+                <?php if($task->price): ?>
+                    <b class="new-task__price new-task__price--<?= $task->category->code; ?>"><?= $task->price; ?><b> ₽</b></b>
+                <?php endif; ?>
+                <?php if($location = $task->getLocation()): ?>
+                    <p class="new-task__place"><?= $location->AddressLine; ?></p>
+                <?php endif; ?>
                 <span class="new-task__time"><?= $task->date_start; ?></span>
             </div>
         <?php endforeach; ?>

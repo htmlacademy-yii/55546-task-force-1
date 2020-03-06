@@ -137,7 +137,7 @@ $respondsCount = count($task->responds);
         <div class="profile-mini__wrapper">
             <h3>Заказчик</h3>
             <div class="profile-mini__top">
-                <img src="/img/man-brune.jpg" width="62" height="62" alt="Аватар заказчика">
+                <img src="<?= $task->author->userData->getAvatar(); ?>" width="62" height="62" alt="Аватар заказчика">
                 <div class="profile-mini__name five-stars__rate">
                     <p><?= $task->author->login; ?></p>
                 </div>
@@ -146,7 +146,7 @@ $respondsCount = count($task->responds);
                 <span><?= count($task->author->tasks); ?> заданий</span>
                 <span class="last-"><?= $task->author->date_registration; ?> на сайте</span>
             </p>
-            <a href="#" class="link-regular">Смотреть профиль</a>
+            <?= Html::a('Смотреть профиль', "/users/view/{$task->author->id}", ['class' => 'link-regular']) ?>
         </div>
     </div>
     <div id="chat-container">

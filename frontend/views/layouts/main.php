@@ -1,7 +1,7 @@
 <?php
-
 use frontend\assets\AppAsset;
 use yii\helpers\Html;
+use yii\helpers\Url;
 
 AppAsset::register($this);
 
@@ -28,7 +28,7 @@ $user = $isGuest ? null : Yii::$app->user->identity;
     <header class="page-header">
         <div class="main-container page-header__container">
             <div class="page-header__logo">
-                <a href="index.html">
+                <a href="<?= Url::to('/tasks') ?>">
                     <svg class="page-header__logo-image" id="Layer_2" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1634 646.35">
                         <title>taskforce_logo2-01</title>
                         <g>
@@ -138,19 +138,19 @@ $user = $isGuest ? null : Yii::$app->user->identity;
             </div>
             <div class="page-footer__links">
                 <ul class="links__list">
-                    <li class="site-list__item">
+                    <li class="links__item">
                         <?= Html::a('Задания', '/tasks'); ?>
                     </li>
-                    <li class="site-list__item">
+                    <li class="links__item">
                         <?= Html::a('Мой профиль', "/users/view/" . ($user ? $user->id : '')); ?>
                     </li>
-                    <li class="site-list__item">
+                    <li class="links__item">
                         <?= Html::a('Исполнители', '/users'); ?>
                     </li>
                     <li class="links__item">
                         <?= Html::a('Регистрация', '/site/signup'); ?>
                     </li>
-                    <li class="site-list__item">
+                    <li class="links__item">
                         <?= Html::a('Создать задание', '/tasks/create'); ?>
                     </li>
                     <li class="links__item">

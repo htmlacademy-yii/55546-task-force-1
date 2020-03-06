@@ -75,19 +75,19 @@ $user = null;
                 </div>
                 <div class="page-footer__links">
                     <ul class="links__list">
-                        <li class="site-list__item">
+                        <li class="links__item">
                             <?= Html::a('Задания', '/tasks'); ?>
                         </li>
-                        <li class="site-list__item">
+                        <li class="links__item">
                             <?= Html::a('Мой профиль', "/users/view/" . ($user ? $user->id : '')); ?>
                         </li>
-                        <li class="site-list__item">
+                        <li class="links__item">
                             <?= Html::a('Исполнители', '/users'); ?>
                         </li>
                         <li class="links__item">
                             <?= Html::a('Регистрация', '/site/signup'); ?>
                         </li>
-                        <li class="site-list__item">
+                        <li class="links__item">
                             <?= Html::a('Создать задание', '/tasks/create'); ?>
                         </li>
                         <li class="links__item">

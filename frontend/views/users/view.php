@@ -8,7 +8,7 @@ use yii\helpers\Html;
             <img src="<?= $user->userData->getAvatar(); ?>" width="120" height="120" alt="Аватар пользователя">
             <div class="content-view__headline">
                 <h1><?= $user->login; ?></h1>
-                <p>Россия, Санкт-Петербург, 30 лет</p>
+                <p><?= $user->city->name; ?></p>
                 <div class="profile-mini__name five-stars__rate">
                     <?php for ($i = 0; $i < 5; $i++): ?>
                         <span <?= $user->userData->rating > $i ? '' : 'class="star-disabled"'; ?>></span>
