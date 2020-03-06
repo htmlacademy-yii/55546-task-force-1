@@ -29,9 +29,9 @@ class UserInitHelper
             'phone' => '',
             'other_messenger' => '',
             'avatar' => $uData->avatar ?? '',
-            'rating' => '',
-            'views' => '',
-            'order_count' => ''
+            'rating' => 0,
+            'views' => 0,
+            'order_count' => 0
         ];
         $uData->save();
         return $this;

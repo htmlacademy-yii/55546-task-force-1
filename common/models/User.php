@@ -90,7 +90,7 @@ class User extends ActiveRecord implements IdentityInterface
 
     public function getSpecializations()
     {
-        return $this->hasMany(UserSpecialization::class, ['user_id' => 'id']);
+        return Category::findAll($this->getSpecializationsId());
     }
 
     public function getTasks()
