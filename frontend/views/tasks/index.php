@@ -26,7 +26,7 @@ $fieldConfig = ['template' => "{label}\n{input}", 'options' => ['tag' => false]]
                 <?php if($location = $task->getLocation()): ?>
                     <p class="new-task__place"><?= $location->AddressLine; ?></p>
                 <?php endif; ?>
-                <span class="new-task__time"><?= $task->date_start; ?></span>
+                <span class="new-task__time"><?= Yii::$app->formatter->asRelativeTime($task->date_start); ?></span>
             </div>
         <?php endforeach; ?>
     </div>

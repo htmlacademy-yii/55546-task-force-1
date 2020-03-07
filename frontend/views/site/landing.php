@@ -91,7 +91,7 @@ $fieldConfig = ['template' => "<p>{label}{input}{error}</p>"];
                     <div class="landing-task-info">
                         <div class="task-info-left">
                             <p><?= Html::a($task->category->title, '#', ['class' => 'link-regular']) ?></p>
-                            <p><?= $task->date_start; ?> назад</p>
+                            <p><?= Yii::$app->formatter->asRelativeTime($task->date_start); ?></p>
                         </div>
                         <span><?= $task->price; ?> <b>₽</b></span>
                     </div>

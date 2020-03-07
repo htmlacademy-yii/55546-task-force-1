@@ -1,5 +1,8 @@
 <?php
+
+use app\models\City;
 use frontend\assets\AppAsset;
+use yii\helpers\ArrayHelper;
 use yii\helpers\Html;
 use yii\helpers\Url;
 
@@ -7,6 +10,13 @@ AppAsset::register($this);
 
 $isGuest = Yii::$app->user->isGuest;
 $user = $isGuest ? null : Yii::$app->user->identity;
+
+$selectedCity = null;
+if (Yii::$app->session->get('city')) {
+    $selectedCity = Yii::$app->session->get('city');
+} elseif($user) {
+    $selectedCity = $user->city_id;
+}
 
 ?>
 <?php $this->beginPage() ?>
@@ -16,7 +26,6 @@ $user = $isGuest ? null : Yii::$app->user->identity;
     <meta charset="<?= Yii::$app->charset ?>">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-
     <?php $this->registerCsrfMetaTags() ?>
     <title><?= $this->title; ?></title>
     <?php $this->head() ?>
@@ -71,14 +80,11 @@ $user = $isGuest ? null : Yii::$app->user->identity;
                     </li>
                 </ul>
             </div>
+
             <div class="header__town">
-                <select class="multiple-select input town-select" size="1" name="town[]">
-                    <option value="Moscow">Москва</option>
-                    <option selected value="SPB">Санкт-Петербург</option>
-                    <option value="Krasnodar">Краснодар</option>
-                    <option value="Irkutsk">Иркутск</option>
-                    <option value="Vladivostok">Владивосток</option>
-                </select>
+                <?= Html::dropDownList('town[]', $selectedCity,
+                    ArrayHelper::map(City::find()->asArray()->all(), 'id', 'name'),
+                    ['class' => 'multiple-select input town-select', 'size' => 1, 'id' => 'city-session']); ?>
             </div>
             <div class="header__lightbulb"></div>
             <div class="lightbulb__pop-up">

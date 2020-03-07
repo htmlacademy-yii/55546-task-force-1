@@ -30,7 +30,7 @@ class SiteController extends SecuredController
     {
         return ArrayHelper::merge([
             'access' => [
-                'except' => ['index', 'signup', 'login', 'auth', 'login-ajax-validation'],
+                'except' => ['index', 'signup', 'login', 'auth', 'login-ajax-validation', 'set-ajax-city'],
             ],
 //            'verbs' => [
 //                'class' => VerbFilter::class,
@@ -59,6 +59,11 @@ class SiteController extends SecuredController
                 'successCallback' => [$this, 'onAuthSuccess'],
             ]
         ];
+    }
+
+    public function actionSetAjaxCity(int $id)
+    {
+        Yii::$app->session->set('city', $id);
     }
 
     /**

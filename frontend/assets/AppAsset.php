@@ -1,5 +1,4 @@
 <?php
-
 namespace frontend\assets;
 
 use yii\web\AssetBundle;
@@ -17,6 +16,7 @@ class AppAsset extends AssetBundle
         'css/style.css',
     ];
     public $js = [
+        'js/city-session.js',
     ];
     public $depends = [
         'yii\web\YiiAsset',

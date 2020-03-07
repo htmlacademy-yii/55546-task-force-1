@@ -2,6 +2,7 @@
 namespace frontend\controllers;
 
 use app\models\RespondForm;
+use app\models\Review;
 use app\models\TaskCompletionForm;
 use app\models\TaskCreate;
 use app\models\TaskRespond;
@@ -41,13 +42,15 @@ class TasksController extends SecuredController
 
     public function actionIndex()
     {
-        $tasks = Task::find()->where(['status' => Task::STATUS_NEW]);
+        $tasks = Task::find()->where([
+            'status' => Task::STATUS_NEW,
+        ]);
         $taskModel = new TasksFilter();
 
         if(Yii::$app->request->isPost) {
             $taskModel->load(Yii::$app->request->post());
-            $taskModel->applyFilters($tasks);
         }
+        $taskModel->applyFilters($tasks);
 
         return $this->render('index', [
             'tasks' => $tasks->with(['category', 'author'])->orderBy('date_start DESC')->all(),
@@ -82,7 +85,6 @@ class TasksController extends SecuredController
                     'price' => $respondModel->text,
                     'status' => TaskRespond::STATUS_NEW,
                 ]))->save();
-
                 $this->redirect($taskUrl);
             }
         }
@@ -92,7 +94,16 @@ class TasksController extends SecuredController
         }
         if(Yii::$app->request->post('TaskCompletionForm')) {
             if($taskCompletionModel->load(Yii::$app->request->post()) && $taskCompletionModel->validate()) {
-                $taskCompletionModel->completionTask($task->id);
+                $task->status = $taskCompletionModel->isCompletion === TaskCompletionForm::STATUS_YES ? Task::STATUS_COMPLETED : Task::STATUS_FAILING;
+                $task->save();
+
+                (new Review([
+                    'text' => $taskCompletionModel->text,
+                    'rating' => $taskCompletionModel->rating,
+                    'task_id' => $task->id,
+                    'author_id' => $task->author_id,
+                    'executor_id' => $task->executor_id,
+                ]))->save();
                 $this->goHome();
             }
         }
@@ -118,21 +129,25 @@ class TasksController extends SecuredController
         }
     }
 
+    // действия автора задания с откликаками на задания
     public function actionDecision(string $status, int $id, int $taskId)
     {
         $task = Task::findOne($taskId);
         $taskUrl = $task->getCurrentTaskUrl();
         $taskRespond = TaskRespond::findOne($id);
 
+        // если действие пытается совершить не автор задания, то происходит редирект
         if(Yii::$app->user->identity->id !== $task->author_id) {
             $this->redirect($taskUrl);
         }
 
+        // принятие отклика задания
         if($status === TaskRespond::STATUS_ACCEPTED) {
             $taskRespond->status = TaskRespond::STATUS_ACCEPTED;
             $task->status = Task::STATUS_EXECUTION;
+            $task->executor_id = $taskRespond->user_id;
             $task->save();
-        } else {
+        } else { // отклонение отклика задания
             $taskRespond->status = TaskRespond::STATUS_DENIED;
         }
 

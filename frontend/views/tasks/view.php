@@ -22,7 +22,7 @@ $respondsCount = count($task->responds);
                     <span>
                         Размещено в категории
                         <a href="#" class="link-regular"><?= $task->category->title; ?></a>
-                        <?= $task->date_start; ?> назад
+                        <?= Yii::$app->formatter->asRelativeTime($task->date_start); ?>
                     </span>
                 </div>
                 <b class="new-task__price new-task__price--<?= $task->category->code; ?> content-view-price">
@@ -96,17 +96,18 @@ $respondsCount = count($task->responds);
             <div class="content-view__feedback-wrapper">
                 <?php foreach ($task->responds as $respond): ?>
                     <?php if($isAuthor || Yii::$app->user->identity->id === $respond->user_id): ?>
+
                         <div class="content-view__feedback-card">
                             <div class="feedback-card__top">
-                                <a href="#"><img src="/img/man-glasses.jpg" width="55" height="55"></a>
+                                <?= Html::a("<img src='{$respond->user->userData->getAvatar()}' width='55' height='55'>", "/users/view/{$respond->user_id}") ?>
                                 <div class="feedback-card__top--name">
-                                    <p><a href="#" class="link-regular"><?= $respond->user->login; ?></a></p>
+                                    <p><?= Html::a($respond->user->login, "/users/view/{$respond->user_id}", ['class' => 'link-regular']); ?></p>
                                     <?php for ($i = 1; $i <= 5; $i++): ?>
                                         <span <?= ($respond->user->userData->rating >= $i) ? '' : 'class="star-disabled"'; ?>></span>
                                     <?php endfor; ?>
                                     <b><?= $respond->user->userData->rating; ?></b>
                                 </div>
-                                <span class="new-task__time"><?= $respond->public_date; ?> назад</span>
+                                <span class="new-task__time"><?= Yii::$app->formatter->asRelativeTime($respond->public_date); ?></span>
                             </div>
                             <div class="feedback-card__content">
                                 <p><?= $respond->text; ?></p>
@@ -144,7 +145,7 @@ $respondsCount = count($task->responds);
             </div>
             <p class="info-customer">
                 <span><?= count($task->author->tasks); ?> заданий</span>
-                <span class="last-"><?= $task->author->date_registration; ?> на сайте</span>
+                <span class="last-"><?= Yii::$app->formatter->asRelativeTime($task->author->date_registration); ?> на сайте</span>
             </p>
             <?= Html::a('Смотреть профиль', "/users/view/{$task->author->id}", ['class' => 'link-regular']) ?>
         </div>
@@ -179,9 +180,9 @@ $respondsCount = count($task->responds);
     echo $form->field($taskCompletionModel, 'isCompletion')->radioList(['yes' => 'Да', 'difficult' => 'Возникли проблемы'],
         [
             'item' => function ($index, $label, $name, $checked, $value) {
-                return "<input class=\"visually-hidden completion-input completion-input--$value\" type=\"radio\" 
-                    id=\"completion-radio--$value\" name=\"$name\" value=\"$value\">
-                <label class=\"completion-label completion-label--$value\" for=\"completion-radio--$value\">$label</label>";
+                return "<input class='visually-hidden completion-input completion-input--$value' type='radio' 
+                    id='completion-radio--$value' name='$name' value='$value'>
+                <label class='completion-label completion-label--$value' for='completion-radio--$value'>$label</label>";
             }
         ])->label(false);
     ?>

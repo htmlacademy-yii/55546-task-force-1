@@ -1,7 +1,6 @@
 <?php
 use yii\helpers\Html;
 ?>
-
 <section class="content-view">
     <div class="user__card-wrapper">
         <div class="user__card">
@@ -17,9 +16,9 @@ use yii\helpers\Html;
                 </div>
                 <b class="done-task">Выполнил 5 заказов</b><b class="done-review">Получил 6 отзывов</b>
             </div>
-            <div class="content-view__headline user__card-bookmark user__card-bookmark--current">
-                <span>Был на сайте 25 минут назад</span>
-                <a href="#"><b></b></a>
+            <div class="content-view__headline user__card-bookmark <?= $isFavorite ? 'user__card-bookmark--current' : ''; ?>">
+                <span>Был на сайте <?= Yii::$app->formatter->asRelativeTime($user->last_activity); ?></span>
+                <?= Html::a('<b></b>', "/users/select-favorite?userId={$user->id}"); ?>
             </div>
         </div>
         <div class="content-view__description">

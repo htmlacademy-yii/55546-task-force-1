@@ -21,7 +21,10 @@ class TaskCreate extends Model
     public function rules(): array
     {
         return [
+            [['title', 'description'], 'trim'],
             [['title', 'description', 'categoryId'], 'required', 'message' => 'Поле должно быть заполнено'],
+            ['title', 'string', 'min' => 10],
+            ['description', 'string', 'min' => 30],
             [['categoryId', 'price'], 'integer', 'message' => 'Это поле может быть только целым числом'],
             ['categoryId', 'checkCategory'],
             [['description', 'location'], 'string'],

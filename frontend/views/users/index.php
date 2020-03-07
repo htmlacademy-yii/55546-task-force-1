@@ -39,7 +39,7 @@ $fieldConfig = ['options' => ['tag' => false]];
                     <b><?= $executor->userData->rating; ?></b>
                     <p class="user__search-content"><?= $executor->userData->description; ?></p>
                 </div>
-                <span class="new-task__time">Был на сайте 25 минут назад</span>
+                <span class="new-task__time"><?= Yii::$app->formatter->asRelativeTime($executor->last_activity); ?></span>
             </div>
             <div class="link-specialization user__search-link--bottom">
                 <?php foreach ($executor->specializations as $specialization): ?>

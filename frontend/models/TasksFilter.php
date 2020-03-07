@@ -2,8 +2,10 @@
 
 namespace app\models;
 
+use Yii;
 use yii\base\Model;
 use yii\db\ActiveQuery;
+use yii\db\Expression;
 
 class TasksFilter extends Model
 {
@@ -11,7 +13,7 @@ class TasksFilter extends Model
     public $isNoExecutor;
     public $isTelework;
     public $title;
-    public $time;
+    public $time = 'day';
 
     const PERIOD_LIST = [
         'day' => 'За день',
@@ -43,15 +45,22 @@ class TasksFilter extends Model
         }
 
         if($this->isNoExecutor) {
-            $taskQuery->andWhere("`executor_id` IS NULL");
+            $taskQuery->andWhere(['executor_id' => null]);
         }
 
-        if($this->isTelework) {
-            $taskQuery->andWhere(['is_telework' => true]);
+        if(!$this->isTelework) {
+            $taskQuery->andWhere([
+                'city_id' => Yii::$app->session->get('city') ?
+                    Yii::$app->session->get('city') : Yii::$app->user->identity->city_id
+            ]);
         }
 
         if(isset($this->title)) {
             $taskQuery->andWhere(['like', 'title', $this->title]);
+        }
+
+        if(isset($this->time) && in_array($this->time, array_keys(self::PERIOD_LIST))) {
+            $taskQuery->andWhere("date_start > CURRENT_TIMESTAMP() - INTERVAL 1 $this->time");
         }
     }
 }
