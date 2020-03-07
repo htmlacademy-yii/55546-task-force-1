@@ -1,6 +1,7 @@
 <?php
 namespace app\models;
 
+use frontend\components\DebugHelper\DebugHelper;
 use Yii;
 use yii\base\Model;
 
@@ -15,6 +16,7 @@ class TaskCreate extends Model
     public $dateEnd;
     public $latitude;
     public $longitude;
+    public $cityId;
 
     public function rules(): array
     {
@@ -23,10 +25,12 @@ class TaskCreate extends Model
             [['categoryId', 'price'], 'integer', 'message' => 'Это поле может быть только целым числом'],
             ['categoryId', 'checkCategory'],
             [['description', 'location'], 'string'],
+            ['location', 'checkCity'],
             ['location', 'checkLocation'],
             ['price', 'number', 'min' => 1, 'message' => 'Цена должна быть больше нуля'],
             ['dateEnd', 'match', 'pattern' => '/^\d{4}-\d{2}-\d{2}$/', 'message' => 'Не корректный формат даты'],
-            ['dateEnd', 'checkDate']
+            ['dateEnd', 'checkDate'],
+            ['cityId', 'checkCity']
         ];
     }
 
@@ -47,6 +51,16 @@ class TaskCreate extends Model
     {
         if(!Category::findOne((int) $this->categoryId)) {
             $this->addError('categoryId', 'Указанной категории не существует');
+        }
+    }
+
+    public function checkCity(): void
+    {
+        $city = City::findOne(['name' => explode(',', $this->location)[0]]);
+        if(!$city) {
+            $this->addError('location', 'Указанный город не найден в нашей базе данных');
+        } else {
+            $this->cityId = $city->id;
         }
     }
 

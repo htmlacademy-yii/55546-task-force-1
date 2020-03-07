@@ -153,6 +153,7 @@ class TasksController extends SecuredController
                 'latitude' => $model->latitude,
                 'longitude' => $model->longitude,
                 'date_end' => $model->dateEnd,
+                'city_id' => $model->cityId,
                 'date_start' => date("Y-m-d h:i:s"),
                 'status' => Task::STATUS_NEW,
             ]))->save();
