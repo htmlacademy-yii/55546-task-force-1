@@ -13,12 +13,18 @@ class TasksFilter extends Model
     public $isNoExecutor;
     public $isTelework;
     public $title;
-    public $time = 'day';
+    public $time;
+
+    const PERIOD_ALL = 'all';
+    const PERIOD_DAY = 'day';
+    const PERIOD_WEEK = 'week';
+    const PERIOD_MONTH = 'month';
 
     const PERIOD_LIST = [
-        'day' => 'За день',
-        'week' => 'За неделю',
-        'month' => 'За месяц'
+        self::PERIOD_ALL => 'За всё время',
+        self::PERIOD_DAY => 'За день',
+        self::PERIOD_WEEK => 'За неделю',
+        self::PERIOD_MONTH => 'За месяц'
     ];
 
     public function rules()
@@ -39,7 +45,8 @@ class TasksFilter extends Model
         ];
     }
 
-    public function applyFilters(ActiveQuery &$taskQuery) {
+    public function applyFilters(ActiveQuery &$taskQuery)
+    {
         if(!empty($this->category)) {
             $taskQuery->andWhere(['category_id' => $this->category]);
         }
@@ -59,7 +66,7 @@ class TasksFilter extends Model
             $taskQuery->andWhere(['like', 'title', $this->title]);
         }
 
-        if(isset($this->time) && in_array($this->time, array_keys(self::PERIOD_LIST))) {
+        if(isset($this->time) && in_array($this->time, [self::PERIOD_DAY, self::PERIOD_WEEK, self::PERIOD_MONTH])) {
             $taskQuery->andWhere("date_start > CURRENT_TIMESTAMP() - INTERVAL 1 $this->time");
         }
     }

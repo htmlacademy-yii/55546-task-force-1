@@ -32,12 +32,14 @@ use yii\helpers\Html;
                         <?= Html::a($specialization->title, '#', ['class' => 'link-regular']) ?>
                     <?php endforeach; ?>
                 </div>
-                <h3 class="content-view__h3">Контакты</h3>
-                <div class="user__card-link">
-                    <?= Html::a($user->userData->phone, '#', ['class' => 'user__card-link--tel link-regular']); ?>
-                    <?= Html::a($user->email, '#', ['class' => 'user__card-link--email link-regular']); ?>
-                    <?= Html::a($user->userData->skype, '#', ['class' => 'user__card-link--skype link-regular']); ?>
-                </div>
+                <?php if (!$user->userSettings->is_hidden_contacts): ?> <!-- ДОБАВИТЬ ПРОВЕРКУ НА ЗАКАЗЧИКА!!! -->
+                    <h3 class="content-view__h3">Контакты</h3>
+                    <div class="user__card-link">
+                        <?= Html::a($user->userData->phone, '#', ['class' => 'user__card-link--tel link-regular']); ?>
+                        <?= Html::a($user->email, '#', ['class' => 'user__card-link--email link-regular']); ?>
+                        <?= Html::a($user->userData->skype, '#', ['class' => 'user__card-link--skype link-regular']); ?>
+                    </div>
+                <?php endif; ?>
             </div>
 
             <?php if($user->photo): ?>

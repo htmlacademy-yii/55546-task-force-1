@@ -37,16 +37,4 @@ class UserSettings extends ActiveRecord
             [['is_hidden_contacts', 'is_hidden_profile'], 'boolean'],
         ];
     }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function attributeLabels()
-    {
-        return [
-            'user_id' => 'User ID',
-            'is_hidden_contacts' => 'Is Hidden Contacts',
-            'is_hidden_profile' => 'Is Hidden Profile',
-        ];
-    }
 }

@@ -1,6 +1,7 @@
 <?php
 use yii\helpers\Html;
 use yii\widgets\ActiveForm;
+use yii\widgets\ListView;
 
 $fieldConfig = ['options' => ['tag' => false]];
 ?>
@@ -20,34 +21,24 @@ $fieldConfig = ['options' => ['tag' => false]];
             </li>
         </ul>
     </div>
-    <?php foreach ($executors as $executor): ?>
-        <div class="content-view__feedback-card user__search-wrapper">
-            <div class="feedback-card__top">
-                <div class="user__search-icon">
-                    <?= Html::a("<img src='{$executor->userData->getAvatar()}' width='65' height='65'>",
-                            "users/view/$executor->id"); ?>
-                    <span>17 заданий</span>
-                    <span>6 отзывов</span>
-                </div>
-                <div class="feedback-card__top--name user__search-card">
-                    <p class="link-name">
-                        <?= Html::a($executor->login, "users/view/$executor->id", ['class' => 'link-regular']); ?>
-                    </p>
-                    <?php for ($i = 0; $i < 5; $i++): ?>
-                        <span <?= $executor->userData->rating > $i ? '' : 'class="star-disabled"'; ?>></span>
-                    <?php endfor; ?>
-                    <b><?= $executor->userData->rating; ?></b>
-                    <p class="user__search-content"><?= $executor->userData->description; ?></p>
-                </div>
-                <span class="new-task__time"><?= Yii::$app->formatter->asRelativeTime($executor->last_activity); ?></span>
-            </div>
-            <div class="link-specialization user__search-link--bottom">
-                <?php foreach ($executor->specializations as $specialization): ?>
-                    <?= Html::a($specialization->title, '#', ['class' => 'link-regular']); ?>
-                <?php endforeach; ?>
-            </div>
-        </div>
-    <?php endforeach; ?>
+    <?= ListView::widget([
+        'dataProvider' => $dataProvider,
+        'itemView' => 'executor-card',
+        'itemOptions' => ['tag' => false],
+        'options' => ['tag' => false],
+        'summary' => '',
+        'pager' => [
+            'options' => [
+                'class' => 'new-task__pagination-list',
+            ],
+            'linkContainerOptions' => [
+                'class' => 'pagination__item',
+            ],
+            'activePageCssClass' => 'pagination__item--current',
+            'nextPageLabel' => '_',
+            'prevPageLabel' => '_',
+        ]
+    ]); ?>
 </section>
 <section class="search-task">
     <div class="search-task__wrapper">

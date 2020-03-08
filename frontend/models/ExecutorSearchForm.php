@@ -1,7 +1,9 @@
 <?php
 namespace app\models;
 
+use frontend\components\DebugHelper\DebugHelper;
 use yii\base\Model;
+use yii\db\ActiveQuery;
 
 class ExecutorSearchForm extends Model
 {
@@ -26,5 +28,14 @@ class ExecutorSearchForm extends Model
         return [
             ['name', 'string']
         ];
+    }
+
+    public function applyFilters(ActiveQuery &$executorQuery)
+    {
+        if ($this->additionally) {
+            if (in_array('now-online', $this->additionally)) {
+                $executorQuery->andWhere("last_activity > CURRENT_TIMESTAMP() - INTERVAL 30 minute");
+            }
+        }
     }
 }

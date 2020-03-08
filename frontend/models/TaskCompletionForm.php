@@ -17,7 +17,7 @@ class TaskCompletionForm extends Model
     {
         return [
             ['rating', 'required'],
-            ['rating', 'integer'],
+            ['rating', 'integer', 'min' => 1, 'max' => 5],
             [['isCompletion', 'text', 'rating'], 'safe'],
         ];
     }

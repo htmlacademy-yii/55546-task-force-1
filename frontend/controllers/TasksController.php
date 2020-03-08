@@ -10,6 +10,7 @@ use common\models\User;
 use frontend\components\DebugHelper\DebugHelper;
 use Yii;
 use yii\bootstrap\ActiveForm;
+use yii\data\ActiveDataProvider;
 use yii\helpers\ArrayHelper;
 use app\models\Task;
 use app\models\Category;
@@ -46,14 +47,28 @@ class TasksController extends SecuredController
             'status' => Task::STATUS_NEW,
         ]);
         $taskModel = new TasksFilter();
-
-        if(Yii::$app->request->isPost) {
-            $taskModel->load(Yii::$app->request->post());
+        if(Yii::$app->request->get('TasksFilter')) {
+            $taskModel->load(Yii::$app->request->get());
+        } else if(!empty(Yii::$app->request->queryParams['filter'])) {
+            $filter = ['TasksFilter' => Yii::$app->request->queryParams['filter']];
+            $taskModel->load($filter);
         }
         $taskModel->applyFilters($tasks);
 
+        $provider = new ActiveDataProvider([
+            'query' => $tasks->with(['category', 'author']),
+            'pagination' => [
+                'pageSize' => 5,
+            ],
+            'sort' => [
+                'defaultOrder' => [
+                    'date_start' => SORT_DESC
+                ]
+            ],
+        ]);
+
         return $this->render('index', [
-            'tasks' => $tasks->with(['category', 'author'])->orderBy('date_start DESC')->all(),
+            'provider' => $provider,
             'taskModel' => $taskModel,
             'categories' => Category::find()->all(),
             'period' => TasksFilter::PERIOD_LIST,

@@ -12,7 +12,6 @@ use app\models\UserSettings;
 use app\models\UserSpecialization;
 use Yii;
 use yii\base\NotSupportedException;
-use yii\behaviors\TimestampBehavior;
 use yii\db\ActiveRecord;
 use yii\web\IdentityInterface;
 
@@ -62,6 +61,20 @@ class User extends ActiveRecord implements IdentityInterface
             ['password', 'required'],
             ['password', 'string', 'min' => 6],
         ];
+    }
+
+    public static function getCorrectAvatar($avatar)
+    {
+        if(!empty($avatar)) {
+            return preg_match('/^http/', $avatar) ? $avatar : "/$avatar";
+        }
+
+        return '/img/user-photo.png';
+    }
+
+    public function getUrlTasksByCategory($categoryId)
+    {
+        return "/tasks?filter[category][]=$categoryId";
     }
 
     public function getUserData()
