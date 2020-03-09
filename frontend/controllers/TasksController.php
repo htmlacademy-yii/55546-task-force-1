@@ -8,6 +8,7 @@ use app\models\TaskCreate;
 use app\models\TaskRespond;
 use common\models\User;
 use frontend\components\DebugHelper\DebugHelper;
+use frontend\components\NotificationHelper\NotificationHelper;
 use Yii;
 use yii\bootstrap\ActiveForm;
 use yii\data\ActiveDataProvider;
@@ -99,12 +100,27 @@ class TasksController extends SecuredController
                     'text' => $respondModel->text,
                     'price' => $respondModel->text,
                     'status' => TaskRespond::STATUS_NEW,
+                    'public_date' => date("Y-m-d h:i:s"),
                 ]))->save();
+
+                $authorTask = User::findOne((int) $task->author_id);
+                // новый отклик к заданию, отправка события заказчику задания
+                if($authorTask->userNotifications->is_task_actions) {
+                    NotificationHelper::taskRespond($authorTask, $task);
+                }
+
                 $this->redirect($taskUrl);
             }
         }
         if(Yii::$app->request->post('refusal-btn')) {
             $userRespond->delete();
+
+            $authorTask = User::findOne((int) $task->author_id);
+            // отказ от задания исполнителем, отправка события заказчику
+            if($authorTask->userNotifications->is_task_actions) {
+                NotificationHelper::taskDenial($authorTask, $task);
+            }
+
             $this->redirect($taskUrl);
         }
         if(Yii::$app->request->post('TaskCompletionForm')) {
@@ -119,6 +135,13 @@ class TasksController extends SecuredController
                     'author_id' => $task->author_id,
                     'executor_id' => $task->executor_id,
                 ]))->save();
+
+                $executorTask = User::findOne((int) $task->executor_id);
+                // завершение задания, отправка события исполнителю
+                if($executorTask->userNotifications->is_task_actions) {
+                    NotificationHelper::taskComplete($executorTask, $task);
+                }
+
                 $this->goHome();
             }
         }
@@ -128,6 +151,8 @@ class TasksController extends SecuredController
             'taskLocation' => $task->getLocation(),
             'isAuthor' => $user->id === $task->author_id,
             'isExecutor' => $user->role === User::ROLE_EXECUTOR,
+            'isSelectedExecutor' => $task->executor_id === $user->id,
+            'executor' => $task->executor,
             'isRespond' => $isRespond,
             'respondModel' => $respondModel,
             'taskCompletionModel' => $taskCompletionModel
@@ -162,6 +187,12 @@ class TasksController extends SecuredController
             $task->status = Task::STATUS_EXECUTION;
             $task->executor_id = $taskRespond->user_id;
             $task->save();
+
+            // отправка уведомления исполнителю о принятии его отклика
+            $executorTask = User::findOne((int) $taskRespond->user_id);
+            if($executorTask->userNotifications->is_task_actions) {
+                NotificationHelper::taskStart($executorTask, $task);
+            }
         } else { // отклонение отклика задания
             $taskRespond->status = TaskRespond::STATUS_DENIED;
         }

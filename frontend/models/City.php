@@ -33,17 +33,4 @@ class City extends ActiveRecord
             [['name'], 'string', 'max' => 255],
         ];
     }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function attributeLabels()
-    {
-        return [
-            'id' => 'ID',
-            'name' => 'Name',
-            'lat' => 'Lat',
-            'long' => 'Long',
-        ];
-    }
 }

@@ -1,5 +1,7 @@
 <?php
 use yii\helpers\Html;
+use app\models\Task;
+
 ?>
 <section class="content-view">
     <div class="user__card-wrapper">
@@ -7,7 +9,9 @@ use yii\helpers\Html;
             <img src="<?= $user->userData->getAvatar(); ?>" width="120" height="120" alt="Аватар пользователя">
             <div class="content-view__headline">
                 <h1><?= $user->login; ?></h1>
-                <p><?= $user->city->name; ?></p>
+                <?php if($user->city): ?>
+                    <p><?= $user->city->name; ?></p>
+                <?php endif; ?>
                 <div class="profile-mini__name five-stars__rate">
                     <?php for ($i = 0; $i < 5; $i++): ?>
                         <span <?= $user->userData->rating > $i ? '' : 'class="star-disabled"'; ?>></span>
@@ -29,7 +33,7 @@ use yii\helpers\Html;
                 <h3 class="content-view__h3">Специализации</h3>
                 <div class="link-specialization">
                     <?php foreach ($user->specializations as $specialization): ?>
-                        <?= Html::a($specialization->title, '#', ['class' => 'link-regular']) ?>
+                        <?= Html::a($specialization->title, Task::getUrlTasksByCategory($specialization->id), ['class' => 'link-regular']) ?>
                     <?php endforeach; ?>
                 </div>
                 <?php if (!$user->userSettings->is_hidden_contacts): ?> <!-- ДОБАВИТЬ ПРОВЕРКУ НА ЗАКАЗЧИКА!!! -->
@@ -66,7 +70,7 @@ use yii\helpers\Html;
                                 <p class="review-text"><?= $review->text; ?></p>
                             </div>
                             <div class="card__review-rate">
-                                <p class="five-rate big-rate"><?= $review->rating; ?><span></span></p>
+                                <p class="<?= $review->rating > 3 ? 'five-rate' : 'three-rate'; ?> big-rate"><?= $review->rating; ?><span></span></p>
                             </div>
                         </div>
                     </div>

@@ -54,6 +54,11 @@ class Task extends ActiveRecord
         return Url::to("/tasks/view/$this->id");
     }
 
+    public function getExecutor()
+    {
+        return $this->hasOne(User::class, ['id' => 'executor_id']);
+    }
+
     public function getCategory()
     {
         return $this->hasOne(Category::class, ['id' => 'category_id']);
@@ -92,5 +97,10 @@ class Task extends ActiveRecord
     public static function getBaseTasksUrl(): string
     {
         return Url::to("/tasks");
+    }
+
+    public static function getUrlTasksByCategory($categoryId)
+    {
+        return "/tasks?filter[category][]=$categoryId";
     }
 }

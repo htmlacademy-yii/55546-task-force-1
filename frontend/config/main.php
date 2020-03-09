@@ -20,6 +20,18 @@ return [
         ]
     ],
     'components' => [
+
+        'mailer' => [
+            'class' => 'yii\swiftmailer\Mailer',
+            'useFileTransport' => false,
+            'transport' => [
+                'class' => 'Swift_SmtpTransport',
+                'host' => 'smtp.mail.ru',
+                'port'     => 465,
+                'encryption' => 'ssl',
+            ],
+        ],
+
         'formatter' => [
             'class' => 'yii\i18n\Formatter',
             'language' => 'ru-RU',

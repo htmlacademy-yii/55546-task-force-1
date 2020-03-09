@@ -1,5 +1,6 @@
 <?php
 use yii\helpers\Html;
+use app\models\Task;
 use common\models\User;
 
 $executor = $model;
@@ -27,10 +28,8 @@ $executor = $model;
         <span class="new-task__time"><?= Yii::$app->formatter->asRelativeTime($executor['last_activity']); ?></span>
     </div>
     <div class="link-specialization user__search-link--bottom">
-        <!--
-        <?php //foreach ($executor->specializations as $specialization): ?>
-            <?//= Html::a($specialization->title, $executor->getUrlTasksByCategory($specialization->id), ['class' => 'link-regular']); ?>
-        <?php //endforeach; ?>
-        -->
+        <?php foreach (json_decode($executor['specializations']) as $specialization): ?>
+            <?= Html::a($specialization->title, Task::getUrlTasksByCategory($specialization->id), ['class' => 'link-regular']); ?>
+        <?php endforeach; ?>
     </div>
 </div>

@@ -21,7 +21,7 @@ $respondsCount = count($task->responds);
                     <h1><?= $task->title; ?></h1>
                     <span>
                         Размещено в категории
-                        <a href="#" class="link-regular"><?= $task->category->title; ?></a>
+                        <?= Html::a($task->category->title, Task::getUrlTasksByCategory($task->category->id), ['class' => 'link-regular']) ?>
                         <?= Yii::$app->formatter->asRelativeTime($task->date_start); ?>
                     </span>
                 </div>
@@ -50,8 +50,8 @@ $respondsCount = count($task->responds);
                         <?php if($task->latitude && $task->longitude): ?>
                             <?= Html::hiddenInput('location-position', "$task->latitude $task->longitude"); ?>
                         <?php else: ?>
-                            <a href="#"><img src="/img/map.jpg" width="361" height="292"
-                                             alt="Москва, Новый арбат, 23 к. 1"></a>
+                            <?= Html::a('<img src="/img/map.jpg" width="361" height="292"
+                                             alt="Москва, Новый арбат, 23 к. 1">', "#") ?>
                         <?php endif; ?>
                     </div>
                     <div class="content-view__address">
@@ -96,7 +96,6 @@ $respondsCount = count($task->responds);
             <div class="content-view__feedback-wrapper">
                 <?php foreach ($task->responds as $respond): ?>
                     <?php if($isAuthor || Yii::$app->user->identity->id === $respond->user_id): ?>
-
                         <div class="content-view__feedback-card">
                             <div class="feedback-card__top">
                                 <?= Html::a("<img src='{$respond->user->userData->getAvatar()}' width='55' height='55'>", "/users/view/{$respond->user_id}") ?>
@@ -134,25 +133,54 @@ $respondsCount = count($task->responds);
 </section>
 
 <section class="connect-desk">
-    <div class="connect-desk__profile-mini">
-        <div class="profile-mini__wrapper">
-            <h3>Заказчик</h3>
-            <div class="profile-mini__top">
-                <img src="<?= $task->author->userData->getAvatar(); ?>" width="62" height="62" alt="Аватар заказчика">
-                <div class="profile-mini__name five-stars__rate">
-                    <p><?= $task->author->login; ?></p>
+    <!-- Если для задания выбран исполнитель и страницу просматривает автор этого задания, то карточка показывает исполнителя. -->
+    <?php if($executor && $isAuthor): ?>
+        <div class="connect-desk__profile-mini">
+            <div class="profile-mini__wrapper">
+                <h3>Исполнитель</h3>
+                <div class="profile-mini__top">
+                    <img src="<?= $executor->userData->getAvatar(); ?>" width="62" height="62" alt="Аватар заказчика">
+                    <div class="profile-mini__name five-stars__rate">
+                        <p><?= $executor->login; ?></p>
+                        <?php for ($i = 0; $i < 5; $i++): ?>
+                            <span <?= $executor->userData->rating > $i ? '' : 'class="star-disabled"'; ?>></span>
+                        <?php endfor; ?>
+                        <b><?= $executor->userData->rating; ?></b>
+                    </div>
                 </div>
+
+                <p class="info-customer">
+                    <span>15 отзывов</span>
+                    <span class="last-">28 заказов</span>
+                </p>
+                <?= Html::a('Смотреть профиль', "/users/view/{$executor->id}", ['class' => 'link-regular']) ?>
             </div>
-            <p class="info-customer">
-                <span><?= count($task->author->tasks); ?> заданий</span>
-                <span class="last-"><?= Yii::$app->formatter->asRelativeTime($task->author->date_registration); ?> на сайте</span>
-            </p>
-            <?= Html::a('Смотреть профиль', "/users/view/{$task->author->id}", ['class' => 'link-regular']) ?>
         </div>
-    </div>
-    <div id="chat-container">
-        <chat class="connect-desk__chat" task="<?= $task->id; ?>"></chat>
-    </div>
+    <?php else: ?>
+        <!-- В остальных случаях карточка показывает заказчика. -->
+        <div class="connect-desk__profile-mini">
+            <div class="profile-mini__wrapper">
+                <h3>Заказчик</h3>
+                <div class="profile-mini__top">
+                    <img src="<?= $task->author->userData->getAvatar(); ?>" width="62" height="62" alt="Аватар заказчика">
+                    <div class="profile-mini__name five-stars__rate">
+                        <p><?= $task->author->login; ?></p>
+                    </div>
+                </div>
+                <p class="info-customer">
+                    <span><?= count($task->author->tasks); ?> заданий</span>
+                    <span class="last-"><?= Yii::$app->formatter->asRelativeTime($task->author->date_registration); ?> на сайте</span>
+                </p>
+                <?= Html::a('Смотреть профиль', "/users/view/{$task->author->id}", ['class' => 'link-regular']) ?>
+            </div>
+        </div>
+    <?php endif; ?>
+
+    <?php if($task->executor_id && ($isAuthor || $isSelectedExecutor)): ?>
+        <div id="chat-container">
+            <chat class="connect-desk__chat" task="<?= $task->id; ?>"></chat>
+        </div>
+    <?php endif; ?>
 </section>
 
 <section class="modal response-form form-modal" id="response-form">

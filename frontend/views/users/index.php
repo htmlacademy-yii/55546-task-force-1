@@ -4,6 +4,7 @@ use yii\widgets\ActiveForm;
 use yii\widgets\ListView;
 
 $fieldConfig = ['options' => ['tag' => false]];
+
 ?>
 
 <section class="user__search">

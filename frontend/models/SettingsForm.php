@@ -47,7 +47,11 @@ class SettingsForm extends Model
             ['password', 'compare', 'compareAttribute' => 'copyPassword'],
             ['cityId', 'integer'],
             ['cityId', 'validateCity'],
-            [['description', 'phone', 'skype', 'otherMessenger'], 'string'],
+            ['description', 'string'],
+            ['phone', 'string', 'length' => [11, 11]],
+            ['otherMessenger', 'trim'],
+            ['otherMessenger', 'string', 'min' => 1],
+            ['skype', 'match', 'pattern' => '/^[0-9a-zA-Z]{3,}$/'],
         ];
     }
 

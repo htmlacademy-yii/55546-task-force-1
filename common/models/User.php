@@ -72,11 +72,6 @@ class User extends ActiveRecord implements IdentityInterface
         return '/img/user-photo.png';
     }
 
-    public function getUrlTasksByCategory($categoryId)
-    {
-        return "/tasks?filter[category][]=$categoryId";
-    }
-
     public function getUserData()
     {
         return $this->hasOne(UserData::class, ['user_id' => 'id']);

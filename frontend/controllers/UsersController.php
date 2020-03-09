@@ -17,86 +17,47 @@ class UsersController extends SecuredController
     public function actionIndex()
     {
         $model = new ExecutorSearchForm();
-//        $query = (new Query())
-//            ->select("
-//                user.*,
-//                user.id as uid,
-//                user_data.*,
-//                category.*,
-//                (JSON_OBJECT('title', category.title, 'code', category.code)) as res")
-//            ->from('user')
-//            ->where(['user.role' => User::ROLE_EXECUTOR])
-//            ->leftJoin('user_data', 'user.id = user_data.user_id')
-//            ->leftJoin('user_specialization', 'user.id = user_specialization.user_id')
-//            ->leftJoin('category', 'user_specialization.category_id = category.id')
-//            ->groupBy('uid');
-
-        $query = (new Query())
-            ->select('
-                user.id,
-                user.login,
-                user.last_activity,
-                user_data.avatar,
-                user_data.rating,
-                user_data.description,
-                category.title,
-                category.code
-                ')
+        $query = (new Query())->select([
+            'user.id',
+            'user.login',
+            'user.last_activity',
+            'user_data.avatar',
+            'user_data.rating',
+            'user_data.description',
+            'CONCAT("[",GROUP_CONCAT(JSON_OBJECT("title", category.title, "id", category.id) SEPARATOR ","),"]") as specializations'
+        ])
             ->from('user')
-            ->where(['user.role' => User::ROLE_EXECUTOR])
+            ->where(['user.role' => User::ROLE_EXECUTOR, 'user_settings.is_hidden_profile' => false])
             ->leftJoin('user_data', 'user.id = user_data.user_id')
             ->leftJoin('user_specialization', 'user.id = user_specialization.user_id')
-            ->leftJoin('category', 'user_specialization.category_id = category.id');
-//            ->groupBy('user.id');
+            ->leftJoin('category', 'user_specialization.category_id = category.id')
+            ->leftJoin('user_settings', 'user.id = user_settings.user_id')
+            ->groupBy([
+                'user.id',
+                'user_data.rating',
+                'user_data.avatar',
+                'user_data.description',
+            ]);
+
         $provider = new ActiveDataProvider([
             'query' => $query,
             'pagination' => [
                 'pageSize' => 5,
             ],
-//            'sort' => [
-//                'attributes' => [
-//                    'rating' => [
-//                        'asc' => ['rating' => SORT_ASC],
-//                        'desc' => ['rating' => SORT_DESC],
-//                        'default' => SORT_ASC,
-//                        'label' => 'Рейтинг',
-//                    ]
-//                ],
-//                'defaultOrder' => [
-//                    'rating' => SORT_DESC
-//                ]
-//            ],
+            'sort' => [
+                'attributes' => [
+                    'rating' => [
+                        'asc' => ['rating' => SORT_ASC],
+                        'desc' => ['rating' => SORT_DESC],
+                        'default' => SORT_ASC,
+                        'label' => 'Рейтинг',
+                    ]
+                ],
+                'defaultOrder' => [
+                    'rating' => SORT_DESC
+                ]
+            ],
         ]);
-
-
-
-//        $executors = User::find()->joinWith(['userData'])->where(['role' => User::ROLE_EXECUTOR]);
-//        $model = new ExecutorSearchForm();
-//        if(Yii::$app->request->isPost) {
-////            DebugHelper::debug(Yii::$app->request->post());
-//            $model->load(Yii::$app->request->post());
-//            $model->applyFilters($executors);
-//        }
-//
-//        $provider = new ActiveDataProvider([
-//            'query' => $executors,
-//            'pagination' => [
-//                'pageSize' => 5,
-//            ],
-//            'sort' => [
-//                'attributes' => [
-//                    'rating' => [
-//                        'asc' => ['userData.rating' => SORT_ASC],
-//                        'desc' => ['userData.rating' => SORT_DESC],
-//                        'default' => SORT_DESC,
-//                        'label' => 'Рейтинг',
-//                    ]
-//                ],
-//                'defaultOrder' => [
-//                    'userData.rating' => SORT_DESC
-//                ]
-//            ],
-//        ]);
 
         return $this->render('index', [
             'model' => $model,
@@ -108,8 +69,8 @@ class UsersController extends SecuredController
     public function actionView(int $id)
     {
         $user = User::findOne($id);
-        if(!$user) {
-            throw new NotFoundHttpException("Страница не найдена!");
+        if(!$user || $user->role !== User::ROLE_EXECUTOR) {
+            throw new NotFoundHttpException("Исполнитель не найден!");
         }
 
         return $this->render('view', [
@@ -136,5 +97,11 @@ class UsersController extends SecuredController
         }
 
         return $this->redirect("/users/view/{$userId}");
+    }
+
+
+    public function actionTest()
+    {
+        return $this->render('_test');
     }
 }

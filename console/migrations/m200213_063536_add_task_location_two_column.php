@@ -13,8 +13,8 @@ class m200213_063536_add_task_location_two_column extends Migration
         $this->addColumn('task', 'latitude', $this->decimal(10, 7));
         $this->addColumn('task', 'longitude', $this->decimal(10, 7));
         $this->db->createCommand()->update('task', [
-            'latitude' => new Expression('TRIM(REGEXP_SUBSRT(`location`, " .*$"))'),
-            'longitude' => new Expression('TRIM(REGEXP_SUBSRT(`location`, "^.* "))'),
+            'latitude' => new Expression("TRIM(SUBSTR(location, LOCATE(' ', location), LENGTH(location)))"),
+            'longitude' => new Expression("TRIM(SUBSTR(location, 1, LOCATE(' ', location)))"),
         ])->execute();
         $this->dropColumn('task', 'location');
     }
