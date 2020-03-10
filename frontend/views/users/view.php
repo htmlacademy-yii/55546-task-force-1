@@ -36,7 +36,7 @@ use app\models\Task;
                         <?= Html::a($specialization->title, Task::getUrlTasksByCategory($specialization->id), ['class' => 'link-regular']) ?>
                     <?php endforeach; ?>
                 </div>
-                <?php if (!$user->userSettings->is_hidden_contacts): ?> <!-- ДОБАВИТЬ ПРОВЕРКУ НА ЗАКАЗЧИКА!!! -->
+                <?php if (!$user->userSettings->is_hidden_contacts || $isCustomer): ?>
                     <h3 class="content-view__h3">Контакты</h3>
                     <div class="user__card-link">
                         <?= Html::a($user->userData->phone, '#', ['class' => 'user__card-link--tel link-regular']); ?>

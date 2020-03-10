@@ -4,6 +4,7 @@ namespace frontend\controllers;
 use app\models\Category;
 use app\models\ExecutorSearchForm;
 use app\models\FavoriteExecutor;
+use app\models\Task;
 use common\models\User;
 use frontend\components\DebugHelper\DebugHelper;
 use Yii;
@@ -90,6 +91,11 @@ class UsersController extends SecuredController
 
         return $this->render('view', [
             'user' => $user,
+            'isCustomer' => Task::find()->where([
+                'status' => Task::STATUS_EXECUTION,
+                'executor_id' => $user->id,
+                'author_id' => Yii::$app->user->identity->id,
+            ])->exists(),
             'isFavorite' => FavoriteExecutor::find()->where([
                 'client_id' => Yii::$app->user->identity->id,
                 'executor_id' => $user->id
@@ -113,7 +119,6 @@ class UsersController extends SecuredController
 
         return $this->redirect("/users/view/{$userId}");
     }
-
 
     public function actionTest()
     {
