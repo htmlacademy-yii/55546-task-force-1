@@ -2,6 +2,7 @@
 use yii\helpers\Html;
 use yii\widgets\ActiveForm;
 use yii\widgets\ListView;
+use common\models\User;
 
 $fieldConfig = ['options' => ['tag' => false]];
 
@@ -12,13 +13,13 @@ $fieldConfig = ['options' => ['tag' => false]];
         <p>Сортировать по:</p>
         <ul class="user__search-list">
             <li class="user__search-item user__search-item--current">
-                <?= Html::a('Рейтингу', '#', ['class' => 'link-regular']); ?>
+                <?= Html::a('Рейтингу', "?sort=" . User::SORT_TYPE_RATING, ['class' => 'link-regular']); ?>
             </li>
             <li class="user__search-item">
-                <?= Html::a('Числу заказов', '#', ['class' => 'link-regular']); ?>
+                <?= Html::a('Числу заказов', "?sort=" . User::SORT_TYPE_ORDERS, ['class' => 'link-regular']); ?>
             </li>
             <li class="user__search-item">
-                <?= Html::a('Популярности', '#', ['class' => 'link-regular']); ?>
+                <?= Html::a('Популярности', "?sort=" . User::SORT_TYPE_POPULARITY, ['class' => 'link-regular']); ?>
             </li>
         </ul>
     </div>
@@ -43,18 +44,20 @@ $fieldConfig = ['options' => ['tag' => false]];
 </section>
 <section class="search-task">
     <div class="search-task__wrapper">
-        <?php $form = ActiveForm::begin(['options' => ['class' => 'search-task__form']]); ?>
+        <?php $form = ActiveForm::begin(['method' => 'GET', 'options' => ['class' => 'search-task__form']]); ?>
         <fieldset class="search-task__categories">
             <legend>Категории</legend>
             <?= $form->field($model, 'categories', $fieldConfig)
                 ->checkboxList($categories, [
                     'item' => function($_index, $label, $name, $checked, $id) {
+                        $checked = $checked ? "checked" : "";
                         return "<input
                                     class='visually-hidden checkbox__input'
                                     type='checkbox'
                                     id='categories-$id'
                                     name='$name'
-                                    value='$id'>
+                                    value='$id'
+                                    $checked>
                                 <label for='categories-$id'>$label </label>";
                     },
                     'tag' => false,
@@ -70,12 +73,14 @@ $fieldConfig = ['options' => ['tag' => false]];
                     'in-favorites' => 'В избранном',
                 ], [
                     'item' => function($_index, $label, $name, $checked, $id) {
+                        $checked = $checked ? 'checked' : '';
                         return "<input
                                     class='visually-hidden checkbox__input'
                                     type='checkbox'
                                     id='categories-$id'
                                     name='$name'
-                                    value='$id'>
+                                    value='$id'
+                                    $checked>
                                 <label for='categories-$id'>$label </label>";
                     },
                     'tag' => false,

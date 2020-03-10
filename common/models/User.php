@@ -3,6 +3,7 @@ namespace common\models;
 
 use app\models\Category;
 use app\models\City;
+use app\models\FavoriteExecutor;
 use app\models\Review;
 use app\models\Task;
 use app\models\UserData;
@@ -40,6 +41,10 @@ class User extends ActiveRecord implements IdentityInterface
     const ROLE_CLIENT = 'client';
     const ROLE_EXECUTOR = 'executor';
 
+    const SORT_TYPE_RATING = 'rating';
+    const SORT_TYPE_ORDERS = 'orders';
+    const SORT_TYPE_POPULARITY = 'popularity';
+
     public static function tableName()
     {
         return 'user';
@@ -70,6 +75,11 @@ class User extends ActiveRecord implements IdentityInterface
         }
 
         return '/img/user-photo.png';
+    }
+
+    public function getFavoriteExecutorsId()
+    {
+        return FavoriteExecutor::find()->select('executor_id')->where(['client_id' => $this->id])->column();
     }
 
     public function getUserData()

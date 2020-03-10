@@ -14,7 +14,7 @@ use yii\data\ActiveDataProvider;
 
 class UsersController extends SecuredController
 {
-    public function actionIndex()
+    public function actionIndex($sort = null)
     {
         $model = new ExecutorSearchForm();
         $query = (new Query())->select([
@@ -24,39 +24,54 @@ class UsersController extends SecuredController
             'user_data.avatar',
             'user_data.rating',
             'user_data.description',
-            'CONCAT("[",GROUP_CONCAT(JSON_OBJECT("title", category.title, "id", category.id) SEPARATOR ","),"]") as specializations'
+            'CONCAT("[",GROUP_CONCAT(JSON_OBJECT("title", category.title, "id", category.id) SEPARATOR ","),"]") as specializations',
+            '(SELECT COUNT(*) FROM review WHERE review.executor_id = user.id) as reviews_count'
         ])
             ->from('user')
             ->where(['user.role' => User::ROLE_EXECUTOR, 'user_settings.is_hidden_profile' => false])
             ->leftJoin('user_data', 'user.id = user_data.user_id')
             ->leftJoin('user_specialization', 'user.id = user_specialization.user_id')
             ->leftJoin('category', 'user_specialization.category_id = category.id')
-            ->leftJoin('user_settings', 'user.id = user_settings.user_id')
-            ->groupBy([
+            ->leftJoin('user_settings', 'user.id = user_settings.user_id');
+
+        if(Yii::$app->request->get('ExecutorSearchForm') && $model->load(Yii::$app->request->get())) {
+            $model->applyFilters($query);
+        }
+
+        if(!$sort) {
+            $query->orderBy('user.date_registration DESC');
+        } elseif ($sort === User::SORT_TYPE_RATING) {
+            $query->orderBy('user_data.rating DESC');
+        } elseif ($sort === User::SORT_TYPE_ORDERS) {
+            $query->orderBy('(SELECT COUNT(*) FROM task WHERE task.executor_id = user.id) DESC');
+        } elseif ($sort === User::SORT_TYPE_POPULARITY) {
+            $query->orderBy('user_data.views DESC');
+        }
+
+        $provider = new ActiveDataProvider([
+            'query' => $query->groupBy([
                 'user.id',
                 'user_data.rating',
                 'user_data.avatar',
                 'user_data.description',
-            ]);
-
-        $provider = new ActiveDataProvider([
-            'query' => $query,
+                'user_data.views',
+            ]),
             'pagination' => [
                 'pageSize' => 5,
             ],
-            'sort' => [
-                'attributes' => [
-                    'rating' => [
-                        'asc' => ['rating' => SORT_ASC],
-                        'desc' => ['rating' => SORT_DESC],
-                        'default' => SORT_ASC,
-                        'label' => 'Рейтинг',
-                    ]
-                ],
-                'defaultOrder' => [
-                    'rating' => SORT_DESC
-                ]
-            ],
+//            'sort' => [
+//                'attributes' => [
+//                    'rating' => [
+//                        'asc' => ['rating' => SORT_ASC],
+//                        'desc' => ['rating' => SORT_DESC],
+//                        'default' => SORT_ASC,
+//                        'label' => 'Рейтинг',
+//                    ]
+//                ],
+//                'defaultOrder' => [
+//                    'rating' => SORT_DESC
+//                ]
+//            ],
         ]);
 
         return $this->render('index', [

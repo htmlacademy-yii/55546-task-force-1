@@ -84,7 +84,7 @@ class TasksController extends SecuredController
         $user = Yii::$app->user->identity;
 
         $respondModel = new RespondForm();
-        $userRespond = TaskRespond::find()->where("task_id = $task->id AND user_id = $user->id")->one();
+        $userRespond = TaskRespond::findOne(['task_id' => $task->id, 'user_id' => $user->id]);
         $isRespond = $userRespond ? true : false;
         $taskCompletionModel = new TaskCompletionForm();
 
@@ -113,33 +113,59 @@ class TasksController extends SecuredController
             }
         }
         if(Yii::$app->request->post('refusal-btn')) {
-            $userRespond->delete();
+            $transaction = Yii::$app->db->beginTransaction();
+            try {
+                $userRespond->delete();
 
-            $authorTask = User::findOne((int) $task->author_id);
-            // отказ от задания исполнителем, отправка события заказчику
-            if($authorTask->userNotifications->is_task_actions) {
-                NotificationHelper::taskDenial($authorTask, $task);
+                $task->status = Task::STATUS_FAILING;
+                $task->save();
+                $user->userData->failing_counter = (int) $user->userData->failing_counter + 1;
+                $user->userData->save();
+
+                $authorTask = User::findOne((int) $task->author_id);
+                // отказ от задания исполнителем, отправка события заказчику
+                if($authorTask->userNotifications->is_task_actions) {
+                    NotificationHelper::taskDenial($authorTask, $task);
+                }
+                $transaction->commit();
+            } catch (\Exception $err) {
+                $transaction->rollBack();
             }
 
             $this->redirect($taskUrl);
         }
         if(Yii::$app->request->post('TaskCompletionForm')) {
             if($taskCompletionModel->load(Yii::$app->request->post()) && $taskCompletionModel->validate()) {
-                $task->status = $taskCompletionModel->isCompletion === TaskCompletionForm::STATUS_YES ? Task::STATUS_COMPLETED : Task::STATUS_FAILING;
-                $task->save();
+                $transaction = Yii::$app->db->beginTransaction();
 
-                (new Review([
-                    'text' => $taskCompletionModel->text,
-                    'rating' => $taskCompletionModel->rating,
-                    'task_id' => $task->id,
-                    'author_id' => $task->author_id,
-                    'executor_id' => $task->executor_id,
-                ]))->save();
+                try {
+                    $executor = User::findOne((int) $task->executor_id);
+                    if($taskCompletionModel->isCompletion === TaskCompletionForm::STATUS_YES) {
+                        $task->status = Task::STATUS_COMPLETED;
+                        $executor->userData->success_counter = (int) $user->userData->success_counter + 1;
+                    } else {
+                        $task->status = Task::STATUS_FAILING;
+                        $executor->userData->failing_counter = (int) $user->userData->failing_counter + 1;
+                    }
 
-                $executorTask = User::findOne((int) $task->executor_id);
-                // завершение задания, отправка события исполнителю
-                if($executorTask->userNotifications->is_task_actions) {
-                    NotificationHelper::taskComplete($executorTask, $task);
+                    $task->save();
+                    $executor->userData->save();
+
+                    (new Review([
+                        'text' => $taskCompletionModel->text,
+                        'rating' => $taskCompletionModel->rating,
+                        'task_id' => $task->id,
+                        'author_id' => $task->author_id,
+                        'executor_id' => $task->executor_id,
+                    ]))->save();
+
+                    // завершение задания, отправка события исполнителю
+                    if($executor->userNotifications->is_task_actions) {
+                        NotificationHelper::taskComplete($executor, $task);
+                    }
+                    $transaction->commit();
+                } catch (\Exception $err) {
+                    $transaction->rollBack();
                 }
 
                 $this->goHome();

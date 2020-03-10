@@ -67,24 +67,26 @@ $respondsCount = count($task->responds);
         </div>
         <div class="content-view__action-buttons">
             <?php
-                if($isAuthor) {
-                    if($task->status === Task::STATUS_EXECUTION) {
-                        echo Html::button('Завершить', [
-                            'class' => 'button button__big-color request-button open-modal',
-                            'data-for' => 'complete-form'
-                        ]);
-                    }
-                } else if($isExecutor) {
-                    if($isRespond) {
-                        echo Html::button('Отказаться', [
-                            'class' => 'button button__big-color refusal-button open-modal',
-                            'data-for' => 'refuse-form'
-                        ]);
-                    } else {
-                        echo Html::button('Откликнуться', [
-                            'class' => 'button button__big-color response-button open-modal',
-                            'data-for' => 'response-form'
-                        ]);
+                if($task->status === Task::STATUS_NEW || $task->status === Task::STATUS_EXECUTION) {
+                    if($isAuthor) {
+                        if($task->status === Task::STATUS_EXECUTION) {
+                            echo Html::button('Завершить', [
+                                'class' => 'button button__big-color request-button open-modal',
+                                'data-for' => 'complete-form'
+                            ]);
+                        }
+                    } else if($isExecutor) {
+                        if($isRespond && $isSelectedExecutor) {
+                            echo Html::button('Отказаться', [
+                                'class' => 'button button__big-color refusal-button open-modal',
+                                'data-for' => 'refuse-form'
+                            ]);
+                        } elseif(!$isRespond) {
+                            echo Html::button('Откликнуться', [
+                                'class' => 'button button__big-color response-button open-modal',
+                                'data-for' => 'response-form'
+                            ]);
+                        }
                     }
                 }
             ?>

@@ -36,8 +36,8 @@ class UserData extends ActiveRecord
     public function rules()
     {
         return [
-            [['description', 'skype', 'phone', 'other_messenger', 'avatar', 'rating', 'views', 'order_count'], 'safe'],
-            [['user_id', 'rating', 'views', 'order_count'], 'integer'],
+            [['description', 'skype', 'phone', 'other_messenger', 'avatar', 'rating', 'views', 'success_counter', 'failing_counter'], 'safe'],
+            [['user_id', 'rating', 'views', 'success_counter', 'failing_counter'], 'integer'],
             ['description', 'string'],
             [['skype', 'phone', 'other_messenger', 'avatar'], 'string', 'max' => 255],
         ];

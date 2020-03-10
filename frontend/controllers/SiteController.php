@@ -73,11 +73,7 @@ class SiteController extends SecuredController
      */
     public function actionIndex()
     {
-        if (!Yii::$app->user->isGuest) {
-            return $this->redirect(Task::getBaseTasksUrl());
-        }
         $this->layout = 'landing';
-
         return $this->render('landing', [
             'model' => new LoginForm(),
             'tasks' => Task::find()->with(['category'])->where(['status' => Task::STATUS_NEW])

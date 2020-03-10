@@ -3,6 +3,7 @@
 use yii\helpers\Url;
 use yii\widgets\ActiveForm;
 use yii\helpers\Html;
+use app\models\Task;
 
 $this->title = 'Главная страница сайта TaskForce';
 
@@ -85,12 +86,12 @@ $fieldConfig = ['template' => "<p>{label}{input}{error}</p>"];
                 <div class="landing-task">
                     <div class="landing-task-top task-<?= $task->category->code === 'translation' ? 'courier' : $task->category->code; ?>"></div>
                     <div class="landing-task-description">
-                        <h3><?= Html::a($task->title, '#', ['class' => 'link-regular']) ?></h3>
+                        <h3><?= Html::a($task->title, "tasks/view/$task->id", ['class' => 'link-regular']) ?></h3>
                         <p><?= $task->description; ?></p>
                     </div>
                     <div class="landing-task-info">
                         <div class="task-info-left">
-                            <p><?= Html::a($task->category->title, '#', ['class' => 'link-regular']) ?></p>
+                            <p><?= Html::a($task->category->title, Task::getUrlTasksByCategory($task->category->id), ['class' => 'link-regular']) ?></p>
                             <p><?= Yii::$app->formatter->asRelativeTime($task->date_start); ?></p>
                         </div>
                         <span><?= $task->price; ?> <b>₽</b></span>
@@ -99,7 +100,7 @@ $fieldConfig = ['template' => "<p>{label}{input}{error}</p>"];
             <?php endforeach; ?>
         </div>
         <div class="landing-bottom-container">
-            <?= Html::button('смотреть все задания', ['class' => 'button red-button']); ?>
+            <?= Html::a('смотреть все задания', "/tasks", ['class' => 'button red-button']); ?>
         </div>
     </div>
 </div>
