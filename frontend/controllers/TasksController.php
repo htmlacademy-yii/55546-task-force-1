@@ -12,6 +12,7 @@ use frontend\components\NotificationHelper\NotificationHelper;
 use Yii;
 use yii\bootstrap\ActiveForm;
 use yii\data\ActiveDataProvider;
+use yii\data\Pagination;
 use yii\helpers\ArrayHelper;
 use app\models\Task;
 use app\models\Category;
@@ -44,9 +45,7 @@ class TasksController extends SecuredController
 
     public function actionIndex()
     {
-        $tasks = Task::find()->where([
-            'status' => Task::STATUS_NEW,
-        ]);
+        $tasks = Task::find()->where(['status' => Task::STATUS_NEW]);
         $taskModel = new TasksFilter();
         if(Yii::$app->request->get('TasksFilter')) {
             $taskModel->load(Yii::$app->request->get());
@@ -56,22 +55,29 @@ class TasksController extends SecuredController
         }
         $taskModel->applyFilters($tasks);
 
-        $provider = new ActiveDataProvider([
-            'query' => $tasks->with(['category', 'author']),
-            'pagination' => [
-                'pageSize' => 5,
-            ],
-            'sort' => [
-                'defaultOrder' => [
-                    'date_start' => SORT_DESC
-                ]
-            ],
-        ]);
+//        $provider = new ActiveDataProvider([
+//            'query' => $tasks->with(['category', 'author']),
+//            'pagination' => [
+//                'pageSize' => 5,
+//            ],
+//            'sort' => [
+//                'defaultOrder' => [
+//                    'date_start' => SORT_DESC
+//                ]
+//            ],
+//        ]);
+//        $provider->pagination = false;
 
+        $pages = new Pagination(['totalCount' => $tasks->count(), 'pageSize' => 5]);
         return $this->render('index', [
-            'provider' => $provider,
+            'pages' => $pages,
+            'tasks' => $tasks->offset($pages->offset)
+                ->limit($pages->limit)
+                ->orderBy('date_start DESC')
+                ->all(),
+//            'provider' => $provider,
             'taskModel' => $taskModel,
-            'categories' => Category::find()->all(),
+            'categories' => ArrayHelper::map(Category::find()->all(), 'id', 'title'),
             'period' => TasksFilter::PERIOD_LIST,
         ]);
     }
@@ -98,7 +104,7 @@ class TasksController extends SecuredController
                     'user_id' => $user->id,
                     'task_id' => $task->id,
                     'text' => $respondModel->text,
-                    'price' => $respondModel->text,
+                    'price' => $respondModel->price,
                     'status' => TaskRespond::STATUS_NEW,
                     'public_date' => date("Y-m-d h:i:s"),
                 ]))->save();
@@ -148,9 +154,6 @@ class TasksController extends SecuredController
                         $executor->userData->failing_counter = (int) $user->userData->failing_counter + 1;
                     }
 
-                    $task->save();
-                    $executor->userData->save();
-
                     (new Review([
                         'text' => $taskCompletionModel->text,
                         'rating' => $taskCompletionModel->rating,
@@ -158,6 +161,12 @@ class TasksController extends SecuredController
                         'author_id' => $task->author_id,
                         'executor_id' => $task->executor_id,
                     ]))->save();
+
+                    $queryRating = Yii::$app->db->createCommand("SELECT AVG(rating) as rating FROM review WHERE executor_id = 19")->queryOne();
+                    $executor->userData->rating = round($queryRating['rating'], 1);
+
+                    $task->save();
+                    $executor->userData->save();
 
                     // завершение задания, отправка события исполнителю
                     if($executor->userNotifications->is_task_actions) {
@@ -168,7 +177,7 @@ class TasksController extends SecuredController
                     $transaction->rollBack();
                 }
 
-                $this->goHome();
+                $this->redirect($taskUrl);
             }
         }
 
@@ -225,6 +234,19 @@ class TasksController extends SecuredController
 
         $taskRespond->save();
         $this->redirect($taskUrl);
+    }
+
+    public function actionCancel(int $taskId)
+    {
+        $task = Task::findOne($taskId);
+        if(!$task || $task->author_id !== Yii::$app->user->id || $task->status !== Task::STATUS_NEW) {
+            return;
+        }
+
+        $task->status = Task::STATUS_CANCELED;
+        $task->save();
+
+        return $this->redirect(Task::getBaseTasksUrl());
     }
 
     public function actionCreate()

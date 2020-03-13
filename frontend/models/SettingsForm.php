@@ -8,6 +8,7 @@ use yii\base\Model;
 class SettingsForm extends Model
 {
     public $avatar;
+    public $photos;
     public $name;
     public $email;
     public $cityId;
@@ -34,8 +35,13 @@ class SettingsForm extends Model
     public function rules()
     {
         return [
-            [['avatar', 'name', 'email', 'cityId', 'birthday', 'description', 'specializations', 'password', 'copyPassword', 'phone', 'skype', 'otherMessenger', 'notifications', 'settings'], 'safe'],
+            [['avatar', 'photos', 'name', 'email', 'cityId', 'birthday', 'description', 'specializations', 'password', 'copyPassword', 'phone', 'skype', 'otherMessenger', 'notifications', 'settings'], 'safe'],
             ['avatar', 'file', 'extensions' => ['png', 'jpg', 'jpeg', 'gif']],
+
+
+//            ['photos', 'file', 'extensions' => ['png', 'jpg', 'jpeg', 'gif'], 'maxFiles' => 6],
+
+
             [['name', 'email'], 'trim'],
             [['name', 'email'], 'required', 'message' => 'Обязательное поле'],
             ['name', 'validateName'],

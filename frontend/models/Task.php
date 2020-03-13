@@ -54,6 +54,11 @@ class Task extends ActiveRecord
         return Url::to("/tasks/view/$this->id");
     }
 
+    public function getMessagesCount()
+    {
+        return Message::find()->where(['task_id' => $this->id])->count();
+    }
+
     public function getExecutor()
     {
         return $this->hasOne(User::class, ['id' => 'executor_id']);

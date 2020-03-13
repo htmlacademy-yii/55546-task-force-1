@@ -4,6 +4,7 @@ namespace frontend\controllers;
 use app\models\Category;
 use app\models\ExecutorSearchForm;
 use app\models\FavoriteExecutor;
+use app\models\Review;
 use app\models\Task;
 use common\models\User;
 use frontend\components\DebugHelper\DebugHelper;
@@ -17,7 +18,6 @@ class UsersController extends SecuredController
 {
     public function actionIndex($sort = null)
     {
-        $model = new ExecutorSearchForm();
         $query = (new Query())->select([
             'user.id',
             'user.login',
@@ -26,7 +26,8 @@ class UsersController extends SecuredController
             'user_data.rating',
             'user_data.description',
             'CONCAT("[",GROUP_CONCAT(JSON_OBJECT("title", category.title, "id", category.id) SEPARATOR ","),"]") as specializations',
-            '(SELECT COUNT(*) FROM review WHERE review.executor_id = user.id) as reviews_count'
+            '(SELECT COUNT(*) FROM review WHERE review.executor_id = user.id) as reviews_count',
+            '(SELECT COUNT(*) FROM task WHERE task.executor_id = user.id || task.author_id = user.id) as tasks_count',
         ])
             ->from('user')
             ->where(['user.role' => User::ROLE_EXECUTOR, 'user_settings.is_hidden_profile' => false])
@@ -35,6 +36,7 @@ class UsersController extends SecuredController
             ->leftJoin('category', 'user_specialization.category_id = category.id')
             ->leftJoin('user_settings', 'user.id = user_settings.user_id');
 
+        $model = new ExecutorSearchForm();
         if(Yii::$app->request->get('ExecutorSearchForm') && $model->load(Yii::$app->request->get())) {
             $model->applyFilters($query);
         }
@@ -89,8 +91,13 @@ class UsersController extends SecuredController
             throw new NotFoundHttpException("Исполнитель не найден!");
         }
 
+        $user->userData->updateCounters(['views' => 1]);
         return $this->render('view', [
             'user' => $user,
+            'reviewsCount' => Review::find()->where(['executor_id' => $user->id])->count(),
+            'completedTasksCount' => Task::find()->where(['executor_id' => $user->id])
+                ->andWhere(["!=", 'status', Task::STATUS_EXECUTION])
+                ->count(),
             'isCustomer' => Task::find()->where([
                 'status' => Task::STATUS_EXECUTION,
                 'executor_id' => $user->id,

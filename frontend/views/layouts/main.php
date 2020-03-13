@@ -37,7 +37,7 @@ if (Yii::$app->session->get('city')) {
     <header class="page-header">
         <div class="main-container page-header__container">
             <div class="page-header__logo">
-                <a href="<?= Url::to('/tasks') ?>">
+                <a href="<?= Url::to('/') ?>">
                     <svg class="page-header__logo-image" id="Layer_2" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1634 646.35">
                         <title>taskforce_logo2-01</title>
                         <g>

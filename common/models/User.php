@@ -82,6 +82,16 @@ class User extends ActiveRecord implements IdentityInterface
         return FavoriteExecutor::find()->select('executor_id')->where(['client_id' => $this->id])->column();
     }
 
+    public function getReviewsCount()
+    {
+        return Review::find()->where(['executor_id' => $this->id])->count();
+    }
+
+    public function getOrdersCount()
+    {
+        return Task::find()->where(['executor_id' => $this->id])->count();
+    }
+
     public function getUserData()
     {
         return $this->hasOne(UserData::class, ['user_id' => 'id']);

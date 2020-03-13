@@ -12,7 +12,7 @@ $executor = $model;
             <?php $avatar = User::getCorrectAvatar($executor['avatar']); ?>
             <?= Html::a("<img src='$avatar' width='65' height='65'>",
                 "users/view/$executor[id]"); ?>
-            <span>17 заданий</span>
+            <span><?= $executor['tasks_count']; ?> заданий</span>
             <span><?= $executor['reviews_count']; ?> отзывов</span>
         </div>
         <div class="feedback-card__top--name user__search-card">

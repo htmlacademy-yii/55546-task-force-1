@@ -18,7 +18,8 @@ use app\models\Task;
                     <?php endfor; ?>
                     <b><?= $user->userData->rating; ?></b>
                 </div>
-                <b class="done-task">Выполнил 5 заказов</b><b class="done-review">Получил 6 отзывов</b>
+                <b class="done-task">Выполнил <?= $completedTasksCount; ?> заказов</b>
+                <b class="done-review">Получил <?= $reviewsCount; ?> отзывов</b>
             </div>
             <div class="content-view__headline user__card-bookmark <?= $isFavorite ? 'user__card-bookmark--current' : ''; ?>">
                 <span>Был на сайте <?= Yii::$app->formatter->asRelativeTime($user->last_activity); ?></span>

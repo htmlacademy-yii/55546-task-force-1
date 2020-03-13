@@ -30,9 +30,7 @@ class MyListController extends SecuredController
             $tasks = Task::findAll(['author_id' => $user->id, 'status' => $statusTasks]);
         } elseif($user->identity->role === User::ROLE_EXECUTOR) {
             // для исполнителя
-            $respondsTask = TaskRespond::find()->select('task_id')
-                ->where(['user_id' => $user->id, 'status' => TaskRespond::STATUS_ACCEPTED])->asArray()->column();
-            $tasks = Task::findAll(['id' => $respondsTask, 'status' => $statusTasks]);
+            $tasks = Task::findAll(['executor_id' => $user->id, 'status' => $statusTasks]);
         } else {
             throw new ErrorException('Роль пользователя не определена');
         }

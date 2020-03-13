@@ -11,6 +11,7 @@ $fieldConfig = ['template' => '<p>{label}{input}{error}</p>'];
 $respondsCount = count($task->responds);
 
 \frontend\assets\TaskViewAsset::register($this);
+
 ?>
 
 <section class="content-view">
@@ -73,6 +74,11 @@ $respondsCount = count($task->responds);
                             echo Html::button('Завершить', [
                                 'class' => 'button button__big-color request-button open-modal',
                                 'data-for' => 'complete-form'
+                            ]);
+                        } else {
+                            echo Html::a('Отмена', "/tasks/cancel/$task->id", [
+                                'class' => 'button button__big-color refusal-button open-modal',
+                                'data-for' => 'canceled-form'
                             ]);
                         }
                     } else if($isExecutor) {
@@ -152,8 +158,8 @@ $respondsCount = count($task->responds);
                 </div>
 
                 <p class="info-customer">
-                    <span>15 отзывов</span>
-                    <span class="last-">28 заказов</span>
+                    <span><?= $executor->reviewsCount; ?> отзывов</span>
+                    <span class="last-"><?= $executor->ordersCount; ?> заказов</span>
                 </p>
                 <?= Html::a('Смотреть профиль', "/users/view/{$executor->id}", ['class' => 'link-regular']) ?>
             </div>

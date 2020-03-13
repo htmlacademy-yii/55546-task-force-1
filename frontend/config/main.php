@@ -16,11 +16,12 @@ return [
     'controllerNamespace' => 'frontend\controllers',
     'modules' => [
         'api' => [
-            'class' => 'frontend\modules\api\Module'
+            'class' => 'frontend\modules\api\Module',
+            'on ' .\frontend\modules\api\Module::EVENT_AFTER_ACTION => function($event) {
+            }
         ]
     ],
     'components' => [
-
         'mailer' => [
             'class' => 'yii\swiftmailer\Mailer',
             'useFileTransport' => false,
@@ -31,7 +32,6 @@ return [
                 'encryption' => 'ssl',
             ],
         ],
-
         'formatter' => [
             'class' => 'yii\i18n\Formatter',
             'language' => 'ru-RU',
@@ -89,6 +89,7 @@ return [
             'rules' => [
                 'tasks/view/<id>' => 'tasks/view',
                 'tasks/decision/<status>/<id>/<taskId>' => 'tasks/decision',
+                'tasks/cancel/<taskId>' => 'tasks/cancel',
                 'users/view/<id>' => 'users/view',
                 [
                     'class' => RestMessagesUrlRule::class,
@@ -105,7 +106,8 @@ return [
     'container' => [
         'definitions' => [
             'frontend\controllers\SettingsController' => [
-                'avatarsPath' => 'users-files/avatars'
+                'avatarsPath' => 'users-files/avatars',
+                'photosPath' => 'users-files/work',
             ]
         ],
         'singletons' => [

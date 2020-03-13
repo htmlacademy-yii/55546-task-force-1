@@ -1,7 +1,6 @@
 <?php
 use app\models\Task;
 use yii\helpers\Html;
-
 ?>
 
 <section class="menu-toggle">
@@ -65,7 +64,7 @@ use yii\helpers\Html;
             <div class="new-task__card">
                 <div class="new-task__title">
                     <?= Html::a("<h2>$task->title</h2>", $task->getCurrentTaskUrl(), ['class' => 'link-regular']); ?>
-                    <?= Html::a('Переводы', '#', ['class' => 'new-task__type link-regular']); ?>
+                    <?= Html::a("<p>{$task->category->title}</p>", Task::getUrlTasksByCategory($task->category->id), ['class' => 'new-task__type link-regular']); ?>
                 </div>
                 <?php if ($task->status === Task::STATUS_NEW): ?>
                     <div class="task-status new-status">Новый</div>
@@ -75,12 +74,13 @@ use yii\helpers\Html;
                 <p class="new-task_description"><?= $task->description; ?></p>
                 <?php if($task->status === Task::STATUS_COMPLETED || $task->status === Task::STATUS_FAILING): ?>
                     <div class="feedback-card__top ">
-                        <?= Html::a('<img src="/img/man-glasses.jpg" width="36" height="36">', '#') ?>
+                        <?= Html::a("<img src='{$task->executor->userData->getAvatar()}' width='36' height='36'>", "/users/view/{$task->executor->id}"); ?>
                         <div class="feedback-card__top--name my-list__bottom">
                             <p class="link-name">
-                                <?= Html::a($task->review->executor->login, '#', ['class' => 'link-regular']); ?>
+                                <?= Html::a($task->executor->login, "/users/view/{$task->executor->id}", ['class' => 'link-regular']); ?>
                             </p>
-                            <?= Html::a('<b>3</b>', '#', ['class' => 'my-list__bottom-chat my-list__bottom-chat--new']); ?>
+                            <?= Html::a("<b>$task->messagesCount</b>", $task->getCurrentTaskUrl(),
+                                ['class' => 'my-list__bottom-chat my-list__bottom-chat--new']); ?>
                             <?php for ($i = 0; $i < 5; $i++): ?>
                                 <span <?= $task->review->rating > $i ? '' : 'class="star-disabled"'; ?>></span>
                             <?php endfor; ?>

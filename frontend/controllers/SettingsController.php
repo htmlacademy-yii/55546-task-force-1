@@ -4,19 +4,55 @@ namespace frontend\controllers;
 use app\models\SettingsForm;
 use app\models\Category;
 use app\models\City;
-use app\models\UserData;
 use app\models\UserNotifications;
+use app\models\UserPhoto;
 use app\models\UserSettings;
 use app\models\UserSpecialization;
 use common\models\User;
 use Yii;
 use yii\helpers\ArrayHelper;
+use yii\validators\FileValidator;
+use yii\web\NotAcceptableHttpException;
+use yii\web\UnsupportedMediaTypeHttpException;
 use yii\web\UploadedFile;
 
 class SettingsController extends SecuredController
 {
     /** @var string  */
     public $avatarsPath = '';
+
+    /** @var string  */
+    public $photosPath = '';
+
+    public function beforeAction($action)
+    {
+        if (parent::beforeAction($action)) {
+            if(Yii::$app->request->isAjax) {
+                $action->actionMethod = 'actionAjax';
+            }
+            return true;
+        }
+
+        return false;
+    }
+
+    public function actionAjax()
+    {
+        if (Yii::$app->request->isPost) {
+            $image = UploadedFile::getInstanceByName('file[0]');
+            if(!(new FileValidator(['skipOnEmpty' => false, 'extensions' => 'png, jpg']))->validate($image)) {
+                throw new UnsupportedMediaTypeHttpException('Не допустимый формат файла');
+            }
+
+            $userPhoto = new UserPhoto(['path' => $this->photosPath]);
+            $userPhoto->setPhoto($image);
+            $userPhoto->save();
+            $userPhoto->link('user', Yii::$app->user->identity);
+
+            return $this->asJson('success');
+        }
+        throw new NotAcceptableHttpException();
+    }
 
     public function actionIndex()
     {
@@ -32,7 +68,7 @@ class SettingsController extends SecuredController
             }
             $user->save();
 
-            $userData = UserData::findOne(['user_id' => $user->id]);
+            $userData = $user->userData;
             // обновление картинки
             $model->avatar = UploadedFile::getInstance($model, 'avatar');
             if($model->avatar) {

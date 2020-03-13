@@ -2,8 +2,11 @@
 
 namespace app\models;
 
+use common\models\User;
 use Yii;
 use yii\db\ActiveRecord;
+use yii\web\ServerErrorHttpException;
+use yii\web\UploadedFile;
 
 /**
  * This is the model class for table "user_photo".
@@ -13,6 +16,8 @@ use yii\db\ActiveRecord;
  */
 class UserPhoto extends ActiveRecord
 {
+    public $path = "";
+
     /**
      * {@inheritdoc}
      */
@@ -41,5 +46,19 @@ class UserPhoto extends ActiveRecord
             'user_id' => 'User ID',
             'photo' => 'Photo',
         ];
+    }
+
+    public function getUser()
+    {
+        return $this->hasOne(User::class, ['id' => 'user_id']);
+    }
+
+    public function setPhoto(UploadedFile $file)
+    {
+        $fileName = $this->path . '/' . $file->baseName . '.' . $file->extension;
+        if(!$file->saveAs($fileName)) {
+            throw new ServerErrorHttpException('Не удалось сохранить файл');
+        }
+        $this->photo = $fileName;
     }
 }
