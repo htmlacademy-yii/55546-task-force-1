@@ -23,10 +23,10 @@ class Task extends ActiveRecord
     public function rules()
     {
         return [
+            [['title', 'description', 'category_id', 'author_id', 'price', 'executor_id', 'date_start', 'date_end', 'status'], 'safe'],
             [['title', 'description', 'category_id'], 'required'],
             [['author_id', 'category_id', 'price', 'executor_id'], 'integer'],
             [['description'], 'string'],
-            [['date_start', 'date_end'], 'safe'],
             [['title', 'status'], 'string', 'max' => 255],
         ];
     }
@@ -52,6 +52,12 @@ class Task extends ActiveRecord
     public function getCurrentTaskUrl(): string
     {
         return Url::to("/tasks/view/$this->id");
+    }
+
+    public function getCorrectFileName(string $fileName): string
+    {
+        $arr = explode('/', $fileName);
+        return end($arr);
     }
 
     public function getMessagesCount()

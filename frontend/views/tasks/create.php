@@ -42,7 +42,7 @@ $labels = $model->attributeLabels();
             <span>Загрузите файлы, которые помогут исполнителю лучше выполнить или оценить работу</span>
             <div class="create__file">
                 <span>Добавить новый файл</span>
-                <!--                          <input type="file" name="files[]" class="dropzone">-->
+<!--                <input type="file" name="files[]" class="dropzone">-->
             </div>
             <?= $form->field($model, 'location', $fieldConfig)
                 ->input( 'search',[
@@ -97,5 +97,5 @@ $labels = $model->attributeLabels();
             <?php endif; ?>
         </div>
     </div>
-    <?= Html::submitButton('Опубликовать', ['form' => 'task-form', 'class' => 'button']); ?>
+    <?= Html::submitButton('Опубликовать', ['form' => 'task-form', 'class' => 'button', 'id' => 'submit-btn']); ?>
 </section>

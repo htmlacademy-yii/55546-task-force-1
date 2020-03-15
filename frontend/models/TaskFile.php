@@ -4,6 +4,7 @@ namespace app\models;
 
 use Yii;
 use yii\db\ActiveRecord;
+use yii\web\ServerErrorHttpException;
 
 /**
  * This is the model class for table "task_file".
@@ -13,6 +14,8 @@ use yii\db\ActiveRecord;
  */
 class TaskFile extends ActiveRecord
 {
+    public $path = '';
+
     /**
      * {@inheritdoc}
      */
@@ -32,14 +35,17 @@ class TaskFile extends ActiveRecord
         ];
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function attributeLabels()
+    public function setFiles(int $taskId, array $files)
     {
-        return [
-            'task_id' => 'Task ID',
-            'file' => 'File',
-        ];
+        $data = [];
+        foreach ($files as $file) {
+            $fileName = $this->path . '/' . $file->baseName . '.' . $file->extension;
+            if(!$file->saveAs($fileName)) {
+                throw new ServerErrorHttpException('Не удалось сохранить файл');
+            }
+            $data[] = [$taskId, $fileName];
+        }
+
+        Yii::$app->db->createCommand()->batchInsert(self::tableName(), ['task_id', 'file'], $data)->execute();
     }
 }

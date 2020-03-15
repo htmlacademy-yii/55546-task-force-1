@@ -5,7 +5,9 @@ namespace app\models;
 use common\models\User;
 use Yii;
 use yii\db\ActiveRecord;
+use yii\validators\FileValidator;
 use yii\web\ServerErrorHttpException;
+use yii\web\UnsupportedMediaTypeHttpException;
 use yii\web\UploadedFile;
 
 /**
@@ -37,28 +39,24 @@ class UserPhoto extends ActiveRecord
         ];
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function attributeLabels()
+    public function setPhotos(array $files)
     {
-        return [
-            'user_id' => 'User ID',
-            'photo' => 'Photo',
-        ];
-    }
-
-    public function getUser()
-    {
-        return $this->hasOne(User::class, ['id' => 'user_id']);
-    }
-
-    public function setPhoto(UploadedFile $file)
-    {
-        $fileName = $this->path . '/' . $file->baseName . '.' . $file->extension;
-        if(!$file->saveAs($fileName)) {
-            throw new ServerErrorHttpException('Не удалось сохранить файл');
+        if(count($files) > 6) {
+            throw new UnsupportedMediaTypeHttpException('Не более 6 файлов');
         }
-        $this->photo = $fileName;
+
+        $data = [];
+        foreach ($files as $file) {
+            if(!(new FileValidator(['skipOnEmpty' => false, 'extensions' => 'png, jpg']))->validate($file)) {
+                throw new UnsupportedMediaTypeHttpException('Не допустимый формат файла');
+            }
+            $fileName = $this->path . '/' . $file->baseName . '.' . $file->extension;
+            if(!$file->saveAs($fileName)) {
+                throw new ServerErrorHttpException('Не удалось сохранить файл');
+            }
+            $data[] = [Yii::$app->user->identity->id, $fileName];
+        }
+
+        Yii::$app->db->createCommand()->batchInsert(self::tableName(), ['user_id', 'photo'], $data)->execute();
     }
 }

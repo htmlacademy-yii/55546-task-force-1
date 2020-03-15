@@ -35,13 +35,8 @@ class SettingsForm extends Model
     public function rules()
     {
         return [
-            [['avatar', 'photos', 'name', 'email', 'cityId', 'birthday', 'description', 'specializations', 'password', 'copyPassword', 'phone', 'skype', 'otherMessenger', 'notifications', 'settings'], 'safe'],
+            [['avatar', 'name', 'email', 'cityId', 'birthday', 'description', 'specializations', 'password', 'copyPassword', 'phone', 'skype', 'otherMessenger', 'notifications', 'settings'], 'safe'],
             ['avatar', 'file', 'extensions' => ['png', 'jpg', 'jpeg', 'gif']],
-
-
-//            ['photos', 'file', 'extensions' => ['png', 'jpg', 'jpeg', 'gif'], 'maxFiles' => 6],
-
-
             [['name', 'email'], 'trim'],
             [['name', 'email'], 'required', 'message' => 'Обязательное поле'],
             ['name', 'validateName'],

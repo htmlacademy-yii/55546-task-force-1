@@ -21,6 +21,8 @@ class TaskCreate extends Model
     public function rules(): array
     {
         return [
+            [['title', 'description', 'categoryId', 'location', 'price', 'dateEnd', 'cityId', 'files'], 'safe'],
+
             [['title', 'description'], 'trim'],
             [['title', 'description', 'categoryId'], 'required', 'message' => 'Поле должно быть заполнено'],
             ['title', 'string', 'min' => 10],

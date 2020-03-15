@@ -119,6 +119,6 @@ $fieldConfig = ['template' => '{label}{input}{error}', 'options' => ['tag' => fa
                 </div>
             </div>
         </div>
-        <?= Html::submitButton('Сохранить изменения', ['class' => 'button']); ?>
+        <?= Html::submitButton('Сохранить изменения', ['class' => 'button', 'id' => 'submit-btn']); ?>
     <?php ActiveForm::end(); ?>
 </section>

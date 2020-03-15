@@ -11,9 +11,8 @@ use app\models\UserSpecialization;
 use common\models\User;
 use Yii;
 use yii\helpers\ArrayHelper;
-use yii\validators\FileValidator;
+use yii\helpers\FileHelper;
 use yii\web\NotAcceptableHttpException;
-use yii\web\UnsupportedMediaTypeHttpException;
 use yii\web\UploadedFile;
 
 class SettingsController extends SecuredController
@@ -24,34 +23,25 @@ class SettingsController extends SecuredController
     /** @var string  */
     public $photosPath = '';
 
-    public function beforeAction($action)
+    public function actionPhotoLoad()
     {
-        if (parent::beforeAction($action)) {
-            if(Yii::$app->request->isAjax) {
-                $action->actionMethod = 'actionAjax';
-            }
-            return true;
+        if(!Yii::$app->request->isAjax || !Yii::$app->request->isPost) {
+            throw new NotAcceptableHttpException();
         }
 
-        return false;
-    }
+        $userId = Yii::$app->user->identity->id;
+        $pathWorkDir = "$this->photosPath/$userId";
 
-    public function actionAjax()
-    {
-        if (Yii::$app->request->isPost) {
-            $image = UploadedFile::getInstanceByName('file[0]');
-            if(!(new FileValidator(['skipOnEmpty' => false, 'extensions' => 'png, jpg']))->validate($image)) {
-                throw new UnsupportedMediaTypeHttpException('Не допустимый формат файла');
-            }
-
-            $userPhoto = new UserPhoto(['path' => $this->photosPath]);
-            $userPhoto->setPhoto($image);
-            $userPhoto->save();
-            $userPhoto->link('user', Yii::$app->user->identity);
-
-            return $this->asJson('success');
+        UserPhoto::deleteAll(['user_id' => $userId]);
+        if(file_exists($pathWorkDir)) {
+            FileHelper::removeDirectory($pathWorkDir);
         }
-        throw new NotAcceptableHttpException();
+        mkdir($pathWorkDir);
+
+        (new UserPhoto(['path' => $pathWorkDir]))
+            ->setPhotos(UploadedFile::getInstancesByName('files'));
+
+        return $this->asJson(['success' => true]);
     }
 
     public function actionIndex()
@@ -59,6 +49,7 @@ class SettingsController extends SecuredController
         $user = Yii::$app->user->identity;
         $model = new SettingsForm();
         if(Yii::$app->request->isPost && $model->load(Yii::$app->request->post()) && $model->validate()) {
+
             // обновление основных данных пользователя
             $user->login = $model->name;
             $user->email = $model->email;

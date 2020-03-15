@@ -128,7 +128,7 @@ class User extends ActiveRecord implements IdentityInterface
         return $this->hasMany(Task::class, ['author_id' => 'id']);
     }
 
-    public function getPhoto()
+    public function getPhotos()
     {
         return $this->hasMany(UserPhoto::class, ['user_id' => 'id']);
     }

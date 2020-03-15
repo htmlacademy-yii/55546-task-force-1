@@ -47,11 +47,12 @@ use app\models\Task;
                 <?php endif; ?>
             </div>
 
-            <?php if($user->photo): ?>
+            <?php if($photos = $user->photos): ?>
                 <div class="user__card-photo">
                     <h3 class="content-view__h3">Фото работ</h3>
-                    <?php foreach ($user->photo as $data): ?>
-                        <?= Html::a("<img src='$data->photo' width='85' height='86' alt='Фото работы'>", '#') ?>
+                    <?php foreach ($photos as $data): ?>
+                        <?= Html::a("<img src='/$data->photo' width='85' height='86' alt='Фото работы'>",
+                            "/$data->photo", ['target' => '_blank']) ?>
                     <?php endforeach; ?>
                 </div>
             <?php endif; ?>

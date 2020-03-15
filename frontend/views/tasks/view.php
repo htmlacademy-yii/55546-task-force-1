@@ -40,7 +40,7 @@ $respondsCount = count($task->responds);
                 <div class="content-view__attach">
                     <h3 class="content-view__h3">Вложения</h3>
                     <?php foreach ($task->files as $file): ?>
-                        <a href="#"><?= $file['file']; ?></a>
+                        <?= Html::a($task->getCorrectFileName($file['file']), "/$file[file]", ['download' => true]); ?>
                     <?php endforeach; ?>
                 </div>
             <?php endif; ?>

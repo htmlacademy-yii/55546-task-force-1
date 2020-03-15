@@ -107,8 +107,11 @@ return [
         'definitions' => [
             'frontend\controllers\SettingsController' => [
                 'avatarsPath' => 'users-files/avatars',
-                'photosPath' => 'users-files/work',
-            ]
+                'photosPath' => 'users-files/works',
+            ],
+            'frontend\controllers\TasksController' => [
+                'tasksPath' => 'users-files/tasks',
+            ],
         ],
         'singletons' => [
             'yandexMap' => [

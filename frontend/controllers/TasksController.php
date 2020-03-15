@@ -5,6 +5,7 @@ use app\models\RespondForm;
 use app\models\Review;
 use app\models\TaskCompletionForm;
 use app\models\TaskCreate;
+use app\models\TaskFile;
 use app\models\TaskRespond;
 use common\models\User;
 use frontend\components\DebugHelper\DebugHelper;
@@ -16,12 +17,16 @@ use yii\data\Pagination;
 use yii\helpers\ArrayHelper;
 use app\models\Task;
 use app\models\Category;
+use yii\helpers\FileHelper;
 use yii\web\NotFoundHttpException;
 use app\models\TasksFilter;
 use yii\web\Response;
+use yii\web\UploadedFile;
 
 class TasksController extends SecuredController
 {
+    public $tasksPath = '';
+
     public function behaviors()
     {
         $rules = parent::behaviors();
@@ -252,9 +257,15 @@ class TasksController extends SecuredController
     public function actionCreate()
     {
         $model = new TaskCreate();
+
+        if(Yii::$app->request->isPost && $files = UploadedFile::getInstancesByName('files')) {
+            $model->files = $files;
+        }
+
         if(Yii::$app->request->post() && $model->load(Yii::$app->request->post()) && $model->validate()) {
-            (new Task([
-                'author_id' => Yii::$app->user->getId(),
+            $userId = Yii::$app->user->identity->id;
+            $task = new Task([
+                'author_id' => $userId,
                 'title' => $model->title,
                 'description' => $model->description,
                 'category_id' => $model->categoryId,
@@ -265,7 +276,18 @@ class TasksController extends SecuredController
                 'city_id' => $model->cityId,
                 'date_start' => date("Y-m-d h:i:s"),
                 'status' => Task::STATUS_NEW,
-            ]))->save();
+            ]);
+            $task->save();
+
+            if($model->files) {
+                $pathTaskDir = "$this->tasksPath/$task->id";
+                if(file_exists($pathTaskDir)) {
+                    FileHelper::removeDirectory($pathTaskDir);
+                }
+                mkdir($pathTaskDir);
+                (new TaskFile(['path' => $pathTaskDir]))->setFiles($task->id, $model->files);
+            }
+
             $this->redirect(Task::getBaseTasksUrl());
         }
 
