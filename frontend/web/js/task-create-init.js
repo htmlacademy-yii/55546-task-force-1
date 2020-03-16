@@ -5,10 +5,12 @@
   btn.addEventListener(`click`, evt => {
     evt.preventDefault();
 
-    const formData = new FormData(document.forms[0]);
-    if (files) {
-      files.forEach(it => formData.append('files[]', it));
+    if (files.length === 0) {
+      return document.forms[0].submit();
     }
+
+    const formData = new FormData(document.forms[0]);
+    files.forEach(it => formData.append('files[]', it));
 
     $.ajax({
       url: window.location.href,
@@ -17,6 +19,9 @@
       contentType: false,
       processData: false,
       data: formData,
+      success: function() {
+        document.forms[0].submit();
+      }
     });
   });
 
