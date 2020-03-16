@@ -16,6 +16,7 @@ if (Yii::$app->session->get('city')) {
     $selectedCity = Yii::$app->session->get('city');
 } elseif($user) {
     $selectedCity = $user->city_id;
+    $events = $user->events;
 }
 
 ?>
@@ -86,22 +87,21 @@ if (Yii::$app->session->get('city')) {
                     ArrayHelper::map(City::find()->asArray()->all(), 'id', 'name'),
                     ['class' => 'multiple-select input town-select', 'size' => 1, 'id' => 'city-session']); ?>
             </div>
-            <div class="header__lightbulb"></div>
-            <div class="lightbulb__pop-up">
-                <h3>Новые события</h3>
-                <p class="lightbulb__new-task lightbulb__new-task--message">
-                    Новое сообщение в чате
-                    <a href="#" class="link-regular">«Помочь с курсовой»</a>
-                </p>
-                <p class="lightbulb__new-task lightbulb__new-task--executor">
-                    Выбран исполнитель для
-                    <a href="#" class="link-regular">«Помочь с курсовой»</a>
-                </p>
-                <p class="lightbulb__new-task lightbulb__new-task--close">
-                    Завершено задание
-                    <a href="#" class="link-regular">«Помочь с курсовой»</a>
-                </p>
-            </div>
+
+            <div class="header__lightbulb <?= $events ? 'header__lightbulb--active' : ''; ?>"></div>
+            <?php if($user && $events): ?>
+                <div class="lightbulb__pop-up">
+                    <h3>Новые события</h3>
+                    <?php foreach ($events as $event): ?>
+                        <p class="lightbulb__new-task <?= $event->iconClass; ?>">
+                            <?= $event->description; ?>
+                            <br>
+                            «<?= Html::a($event->task->title, $event->task->getCurrentTaskUrl(), ['class' => 'link-regular']) ?>»
+                        </p>
+                    <?php endforeach; ?>
+                </div>
+            <?php endif; ?>
+
             <div class="header__account">
                 <?php if(!$isGuest): ?>
                     <a class="header__account-photo">

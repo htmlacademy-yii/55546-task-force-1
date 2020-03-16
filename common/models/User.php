@@ -3,6 +3,7 @@ namespace common\models;
 
 use app\models\Category;
 use app\models\City;
+use app\models\EventRibbon;
 use app\models\FavoriteExecutor;
 use app\models\Review;
 use app\models\Task;
@@ -75,6 +76,11 @@ class User extends ActiveRecord implements IdentityInterface
         }
 
         return '/img/user-photo.png';
+    }
+
+    public function getEvents()
+    {
+        return $this->hasMany(EventRibbon::class, ['user_id' => 'id']);
     }
 
     public function getFavoriteExecutorsId()

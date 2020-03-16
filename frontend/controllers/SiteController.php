@@ -3,6 +3,7 @@ namespace frontend\controllers;
 
 use app\models\{Auth,
     City,
+    EventRibbon,
     SignupForm,
     Task,
     LoginForm,
@@ -64,6 +65,13 @@ class SiteController extends SecuredController
     public function actionSetAjaxCity(int $id)
     {
         Yii::$app->session->set('city', $id);
+    }
+
+    public function actionClearEventRibbon()
+    {
+        if($user = Yii::$app->user->identity) {
+            EventRibbon::deleteAll(['user_id' => $user->id]);
+        }
     }
 
     /**

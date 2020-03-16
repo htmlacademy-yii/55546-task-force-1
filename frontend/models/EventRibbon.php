@@ -22,4 +22,32 @@ class EventRibbon extends ActiveRecord
             [['user_id', 'task_id', 'type', 'message'], 'safe'],
         ];
     }
+
+    public function getDescription()
+    {
+        return [
+            self::TYPE_NEW_TASK_RESPOND => 'Новый отклик к заданию',
+            self::TYPE_NEW_CHAT_MESSAGE => 'Новое сообщение в чате',
+            self::TYPE_TASK_DENIAL => 'Исполнитель отказался от задания',
+            self::TYPE_TASK_START => 'Ваш отклик был принят',
+            self::TYPE_TASK_COMPLETE => 'Завершено задание',
+        ][$this->type] ?? 'err';
+    }
+
+    public function getIconClass()
+    {
+        $class = 'lightbulb__new-task--executor';
+        if ($this->type === self::TYPE_NEW_CHAT_MESSAGE) {
+            $class = 'lightbulb__new-task--message';
+        } elseif($this->type === self::TYPE_TASK_COMPLETE) {
+            $class = 'lightbulb__new-task--close';
+        }
+
+        return $class;
+    }
+
+    public function getTask()
+    {
+        return $this->hasOne(Task::class, ['id' => 'task_id']);
+    }
 }
