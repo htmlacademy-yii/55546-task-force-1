@@ -5,8 +5,9 @@
     window.location.reload();
   });
 
-  const lightbulb = document.querySelector('.header__lightbulb');
-  lightbulb.addEventListener('mouseover', () => {
+  const lightbulb = document.querySelector('.header__lightbulb--active');
+  lightbulb && lightbulb.addEventListener('mouseover', () => {
+    lightbulb.classList.remove(`.header__lightbulb--active`);
     fetch('/site/clear-event-ribbon');
   });
 }) ();

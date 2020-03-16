@@ -7,7 +7,6 @@ use app\models\FavoriteExecutor;
 use app\models\Review;
 use app\models\Task;
 use common\models\User;
-use frontend\components\DebugHelper\DebugHelper;
 use Yii;
 use yii\db\Query;
 use yii\helpers\ArrayHelper;
@@ -124,11 +123,6 @@ class UsersController extends SecuredController
             (new FavoriteExecutor($params))->save();
         }
 
-        return $this->redirect("/users/view/{$userId}");
-    }
-
-    public function actionTest()
-    {
-        return $this->render('_test');
+        return $this->redirect(User::getUserUrl($userId));
     }
 }

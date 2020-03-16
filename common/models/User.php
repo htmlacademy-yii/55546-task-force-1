@@ -78,6 +78,16 @@ class User extends ActiveRecord implements IdentityInterface
         return '/img/user-photo.png';
     }
 
+    public static function getUserUrl(int $id)
+    {
+        return "/users/view/$id";
+    }
+
+    public function getCurrentUserUrl()
+    {
+        return self::getUserUrl($this->id);
+    }
+
     public function getEvents()
     {
         return $this->hasMany(EventRibbon::class, ['user_id' => 'id']);

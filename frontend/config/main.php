@@ -17,8 +17,6 @@ return [
     'modules' => [
         'api' => [
             'class' => 'frontend\modules\api\Module',
-            'on ' .\frontend\modules\api\Module::EVENT_AFTER_ACTION => function($event) {
-            }
         ]
     ],
     'components' => [

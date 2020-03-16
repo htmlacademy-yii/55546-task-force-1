@@ -8,12 +8,10 @@ use app\models\TaskCreate;
 use app\models\TaskFile;
 use app\models\TaskRespond;
 use common\models\User;
-use frontend\components\DebugHelper\DebugHelper;
 use frontend\components\NotificationHelper\NotificationHelper;
 use Yii;
 use yii\bootstrap\ActiveForm;
 use yii\data\ActiveDataProvider;
-use yii\data\Pagination;
 use yii\helpers\ArrayHelper;
 use app\models\Task;
 use app\models\Category;
@@ -60,27 +58,19 @@ class TasksController extends SecuredController
         }
         $taskModel->applyFilters($tasks);
 
-//        $provider = new ActiveDataProvider([
-//            'query' => $tasks->with(['category', 'author']),
-//            'pagination' => [
-//                'pageSize' => 5,
-//            ],
-//            'sort' => [
-//                'defaultOrder' => [
-//                    'date_start' => SORT_DESC
-//                ]
-//            ],
-//        ]);
-//        $provider->pagination = false;
-
-        $pages = new Pagination(['totalCount' => $tasks->count(), 'pageSize' => 5]);
+        $provider = new ActiveDataProvider([
+            'query' => $tasks->with(['category', 'author']),
+            'pagination' => [
+                'pageSize' => 5,
+            ],
+            'sort' => [
+                'defaultOrder' => [
+                    'date_start' => SORT_DESC
+                ]
+            ],
+        ]);
         return $this->render('index', [
-            'pages' => $pages,
-            'tasks' => $tasks->offset($pages->offset)
-                ->limit($pages->limit)
-                ->orderBy('date_start DESC')
-                ->all(),
-//            'provider' => $provider,
+            'provider' => $provider,
             'taskModel' => $taskModel,
             'categories' => ArrayHelper::map(Category::find()->all(), 'id', 'title'),
             'period' => TasksFilter::PERIOD_LIST,
@@ -153,10 +143,10 @@ class TasksController extends SecuredController
                     $executor = User::findOne((int) $task->executor_id);
                     if($taskCompletionModel->isCompletion === TaskCompletionForm::STATUS_YES) {
                         $task->status = Task::STATUS_COMPLETED;
-                        $executor->userData->success_counter = (int) $user->userData->success_counter + 1;
+                        $executor->userData->success_counter = (int) $executor->userData->success_counter + 1;
                     } else {
                         $task->status = Task::STATUS_FAILING;
-                        $executor->userData->failing_counter = (int) $user->userData->failing_counter + 1;
+                        $executor->userData->failing_counter = (int) $executor->userData->failing_counter + 1;
                     }
 
                     (new Review([
@@ -167,7 +157,7 @@ class TasksController extends SecuredController
                         'executor_id' => $task->executor_id,
                     ]))->save();
 
-                    $queryRating = Yii::$app->db->createCommand("SELECT AVG(rating) as rating FROM review WHERE executor_id = 19")->queryOne();
+                    $queryRating = Yii::$app->db->createCommand("SELECT AVG(rating) as rating FROM review WHERE executor_id = {$executor->id}")->queryOne();
                     $executor->userData->rating = round($queryRating['rating'], 1);
 
                     $task->save();
