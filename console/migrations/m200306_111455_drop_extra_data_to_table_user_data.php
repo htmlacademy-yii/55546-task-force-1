@@ -3,12 +3,16 @@
 use yii\db\Migration;
 
 /**
+ * Миграция для удаления лишних столбцов из таблицы с данными пользователя user_data
+ *
  * Class m200306_111455_drop_extra_data_to_table_user_data
  */
 class m200306_111455_drop_extra_data_to_table_user_data extends Migration
 {
     /**
-     * {@inheritdoc}
+     * Удаления лишних столбцов из таблицы с данными пользователя user_data
+     *
+     * @return bool|void
      */
     public function safeUp()
     {
@@ -17,7 +21,9 @@ class m200306_111455_drop_extra_data_to_table_user_data extends Migration
     }
 
     /**
-     * {@inheritdoc}
+     * Возврат удалённых столбцов из таблицы с данными пользователя user_data
+     *
+     * @return bool|void
      */
     public function safeDown()
     {

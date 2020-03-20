@@ -4,16 +4,29 @@ namespace app\models;
 use yii\base\Model;
 
 /**
- * Signup form
+ * Класс для работы с моделью формы регистрации
+ *
+ * Class SignupForm
+ *
+ * @package app\models
  */
 class SignupForm extends Model
 {
+    /** @var string строка с именем пользователя */
     public $login;
+    /** @var string строка с почтовым ящиком пользователя */
     public $email;
+    /** @var string строка с идентификатором пользователя */
     public $cityId;
+    /** @var string строка с паролем пользователя */
     public $password;
 
-    public function rules()
+    /**
+     * Получение списка правил валидации для модели
+     *
+     * @return array список правил валидации для модели
+     */
+    public function rules(): array
     {
         return [
             ['login', 'trim'],
@@ -35,7 +48,12 @@ class SignupForm extends Model
         ];
     }
 
-    public function attributeLabels()
+    /**
+     * Указание списка имён для атрибутов формы
+     *
+     * @return array список имён для атрибутов формы
+     */
+    public function attributeLabels(): array
     {
         return [
             'email' => 'Электронная почта',

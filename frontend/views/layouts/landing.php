@@ -1,9 +1,10 @@
 <?php
 use frontend\assets\AppAsset;
+use frontend\assets\LandingAsset;
 use yii\helpers\Html;
 
 AppAsset::register($this);
-\frontend\assets\LandingAsset::register($this);
+LandingAsset::register($this);
 
 $this->beginPage();
 $user = null;
@@ -13,7 +14,7 @@ $user = null;
 <head>
     <meta charset="<?= Yii::$app->charset; ?>">
     <?php $this->registerCsrfMetaTags(); ?>
-    <title><?= $this->title; ?></title>
+    <title><?= Html::encode($this->title); ?></title>
     <?php $this->head(); ?>
 </head>
 <body class="landing">

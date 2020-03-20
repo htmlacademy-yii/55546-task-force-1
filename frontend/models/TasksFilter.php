@@ -1,25 +1,40 @@
 <?php
-
 namespace app\models;
 
 use Yii;
 use yii\base\Model;
 use yii\db\ActiveQuery;
-use yii\db\Expression;
 
+/**
+ * Класс для работы с моделью формы фильтрации заданий
+ *
+ * Class TasksFilter
+ *
+ * @package app\models
+ */
 class TasksFilter extends Model
 {
+    /** @var array массив со списком категорий */
     public $category = [];
+    /** @var string строка с флагом - без исполнителя */
     public $isNoExecutor;
+    /** @var string строка с флагом - удалённая работа */
     public $isTelework;
+    /** @var string строка с именем задания */
     public $title;
+    /** @var string строка с периодом времени */
     public $time;
 
+    /** @var string строка с периодом за всё время */
     const PERIOD_ALL = 'all';
+    /** @var string строка с периодом за день */
     const PERIOD_DAY = 'day';
+    /** @var string строка с периодом за неделю */
     const PERIOD_WEEK = 'week';
+    /** @var string строка с периодом за месяц */
     const PERIOD_MONTH = 'month';
 
+    /** @var array массив со списком всех доступных периодов */
     const PERIOD_LIST = [
         self::PERIOD_ALL => 'За всё время',
         self::PERIOD_DAY => 'За день',
@@ -27,14 +42,24 @@ class TasksFilter extends Model
         self::PERIOD_MONTH => 'За месяц'
     ];
 
-    public function rules()
+    /**
+     * Получение списка правил валидации для модели
+     *
+     * @return array список правил валидации для модели
+     */
+    public function rules(): array
     {
         return [
             [['category', 'isNoExecutor', 'isTelework', 'title', 'time'], 'safe'],
         ];
     }
 
-    public function attributeLabels()
+    /**
+     * Указание списка имён для атрибутов формы
+     *
+     * @return array список имён для атрибутов формы
+     */
+    public function attributeLabels(): array
     {
         return [
             'category' => 'Категори',
@@ -45,7 +70,12 @@ class TasksFilter extends Model
         ];
     }
 
-    public function applyFilters(ActiveQuery &$taskQuery)
+    /**
+     * Применение фильтра для списка заданий
+     *
+     * @param ActiveQuery $taskQuery ссылка на объект
+     */
+    public function applyFilters(ActiveQuery &$taskQuery): void
     {
         if(!empty($this->category)) {
             $taskQuery->andWhere(['category_id' => $this->category]);

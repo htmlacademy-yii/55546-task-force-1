@@ -4,46 +4,20 @@ namespace app\models;
 use yii\db\ActiveRecord;
 
 /**
- * This is the model class for table "user_data".
+ * Класс для работы с моделью данных пользователя
  *
- * @property int|null $user_id
- * @property string|null $name
- * @property string|null $description
- * @property int|null $age
- * @property string|null $address
- * @property string|null $skype
- * @property string|null $phone
- * @property string|null $other_messenger
- * @property string|null $avatar
- * @property int|null $rating
- * @property int|null $views
- * @property int|null $order_count
- * @property string|null $status
+ * Class UserData
+ *
+ * @package app\models
  */
 class UserData extends ActiveRecord
 {
     /**
-     * {@inheritdoc}
+     * Получение обработанной ссылки на автара данного пользователя
+     *
+     * @return string обработанная строка ссылки на аватар
      */
-    public static function tableName()
-    {
-        return 'user_data';
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function rules()
-    {
-        return [
-            [['description', 'skype', 'phone', 'other_messenger', 'avatar', 'rating', 'views', 'success_counter', 'failing_counter'], 'safe'],
-            [['user_id', 'views', 'success_counter', 'failing_counter'], 'integer'],
-            ['description', 'string'],
-            [['skype', 'phone', 'other_messenger', 'avatar', 'rating'], 'string', 'max' => 255],
-        ];
-    }
-
-    public function getAvatar()
+    public function getAvatar(): string
     {
         if(!empty($this->avatar)) {
             return preg_match('/^http/', $this->avatar) ? $this->avatar : "/$this->avatar";
@@ -52,11 +26,28 @@ class UserData extends ActiveRecord
         return '/img/user-photo.png';
     }
 
-    public function save($runValidation = true, $attributeNames = null): bool
+    /**
+     * Получение имени таблицы модели
+     *
+     * @return string имя таблицы модели
+     */
+    public static function tableName(): string
     {
-        if(!($result = parent::save($runValidation, $attributeNames))) {
-            throw new \Exception();
-        }
-        return $result;
+        return 'user_data';
+    }
+
+    /**
+     * Получение списка правил валидации для модели
+     *
+     * @return array список правил валидации для модели
+     */
+    public function rules(): array
+    {
+        return [
+            [['description', 'skype', 'phone', 'other_messenger', 'avatar', 'rating', 'views', 'success_counter', 'failing_counter'], 'safe'],
+            [['user_id', 'views', 'success_counter', 'failing_counter'], 'integer'],
+            ['description', 'string'],
+            [['skype', 'phone', 'other_messenger', 'avatar', 'rating'], 'string', 'max' => 255],
+        ];
     }
 }

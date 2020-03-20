@@ -1,45 +1,37 @@
 <?php
-
 namespace app\models;
 
-use Yii;
 use yii\db\ActiveRecord;
 
 /**
- * This is the model class for table "user_specialization".
+ * Класс для работы с моделью специализаций пользователя
  *
- * @property int|null $user_id
- * @property int|null $category_id
+ * Class UserSpecialization
+ *
+ * @package app\models
  */
 class UserSpecialization extends ActiveRecord
 {
     /**
-     * {@inheritdoc}
+     * Получение имени таблицы модели
+     *
+     * @return string имя таблицы модели
      */
-    public static function tableName()
+    public static function tableName(): string
     {
         return 'user_specialization';
     }
 
     /**
-     * {@inheritdoc}
+     * Получение списка правил валидации для модели
+     *
+     * @return array список правил валидации для модели
      */
-    public function rules()
+    public function rules(): array
     {
         return [
             [['user_id', 'category_id'], 'required'],
             [['user_id', 'category_id'], 'integer'],
-        ];
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function attributeLabels()
-    {
-        return [
-            'user_id' => 'User ID',
-            'category_id' => 'Category ID',
         ];
     }
 }

@@ -1,12 +1,14 @@
 <?php
+
 use yii\helpers\Html;
 use yii\widgets\ActiveForm;
 use frontend\widgets\FrontendListView;
 use frontend\widgets\FrontendPager;
 
 $this->title = 'Новые задания';
-$this->params['breadcrumbs'][] = $this->title;
+$this->params['breadcrumbs'][] = Html::encode($this->title);
 $fieldConfig = ['template' => "{label}\n{input}", 'options' => ['tag' => false]];
+
 ?>
 
 <section class="new-task">
@@ -15,7 +17,7 @@ $fieldConfig = ['template' => "{label}\n{input}", 'options' => ['tag' => false]]
         'itemView' => 'task-card',
         'itemOptions' => ['tag' => false],
         'options' => ['tag' => false],
-        'summary' => Html::tag('h1', $this->title),
+        'summary' => Html::tag('h1', Html::encode($this->title)),
         'layout' => '{summary}' . PHP_EOL . '{items}' . PHP_EOL,
         'pager' => [
             'class' => FrontendPager::class,

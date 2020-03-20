@@ -3,12 +3,16 @@
 use yii\db\Migration;
 
 /**
+ * Миграция для добавления таблицы избранных исполнителей favorite_executor
+ *
  * Class m200306_111907_create_table_favorite_executor
  */
 class m200306_111907_create_table_favorite_executor extends Migration
 {
     /**
-     * {@inheritdoc}
+     * Добавление таблицы избранных исполнителей favorite_executor
+     *
+     * @return bool|void
      */
     public function safeUp()
     {
@@ -20,7 +24,9 @@ class m200306_111907_create_table_favorite_executor extends Migration
     }
 
     /**
-     * {@inheritdoc}
+     * Удаление таблицы избранных исполнителей favorite_executor
+     *
+     * @return bool|void
      */
     public function safeDown()
     {

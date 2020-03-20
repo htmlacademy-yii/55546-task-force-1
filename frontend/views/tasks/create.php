@@ -1,11 +1,12 @@
 <?php
+use frontend\assets\TaskCreateAsset;
 use yii\bootstrap\ActiveForm;
 use yii\helpers\Html;
 
 $fieldConfig = ['template' => '{label}{input}{hint}{error}', 'options' => ['tag' => false]];
 $labels = $model->attributeLabels();
 
-\frontend\assets\TaskCreateAsset::register($this);
+TaskCreateAsset::register($this);
 ?>
 
 <section class="create__task">
@@ -21,11 +22,11 @@ $labels = $model->attributeLabels();
             ]
         ]);
         echo $form->field($model, 'title', $fieldConfig)
-                ->textarea([
-                    'class' => 'input textarea',
-                    'rows' => 1,
-                    'placeholder' => 'Повесить полку',
-                ])->hint('<span>Кратко опишите суть работы</span>');
+            ->textarea([
+                'class' => 'input textarea',
+                'rows' => 1,
+                'placeholder' => 'Повесить полку',
+            ])->hint('<span>Кратко опишите суть работы</span>');
         echo $form->field($model, 'description', $fieldConfig)
             ->textarea([
                 'class' => 'input textarea',
@@ -42,7 +43,6 @@ $labels = $model->attributeLabels();
             <span>Загрузите файлы, которые помогут исполнителю лучше выполнить или оценить работу</span>
             <div class="create__file">
                 <span>Добавить новый файл</span>
-<!--                <input type="file" name="files[]" class="dropzone">-->
             </div>
             <?= $form->field($model, 'location', $fieldConfig)
                 ->input( 'search',[

@@ -3,12 +3,16 @@
 use yii\db\Migration;
 
 /**
+ * Миграция для добавления столбца с временем последней активности пользователя
+ *
  * Class m200307_085950_add_column_to_table_user
  */
 class m200307_085950_add_column_to_table_user extends Migration
 {
     /**
-     * {@inheritdoc}
+     * Добавление столбца с временем последней активности пользователя
+     *
+     * @return bool|void
      */
     public function safeUp()
     {
@@ -16,7 +20,9 @@ class m200307_085950_add_column_to_table_user extends Migration
     }
 
     /**
-     * {@inheritdoc}
+     * Удаление столбца с временем последней активности пользователя
+     *
+     * @return bool|void
      */
     public function safeDown()
     {

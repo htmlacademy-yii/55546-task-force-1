@@ -2,26 +2,10 @@
   const btn = document.querySelector(`#submit-btn`);
   const files = [];
 
-  btn.addEventListener(`click`, evt => {
-    evt.preventDefault();
-
-    if (files.length === 0) {
-      return document.forms[0].submit();
-    }
-
-    const formData = new FormData(document.forms[0]);
-    files.forEach(it => formData.append('files[]', it));
-
-    $.ajax({
-      url: window.location.href,
-      method: `POST`,
-      cache: false,
-      contentType: false,
-      processData: false,
-      data: formData,
-      success: function() {
-        document.forms[0].submit();
-      }
+  window.addEventListener(`load`, () => {
+    btn.addEventListener(`click`, evt => {
+      evt.preventDefault();
+      window.sendFiles(document.forms[0], files);
     });
   });
 

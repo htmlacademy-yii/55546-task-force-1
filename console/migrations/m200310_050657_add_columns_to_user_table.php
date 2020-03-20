@@ -3,12 +3,16 @@
 use yii\db\Migration;
 
 /**
- * Handles adding columns to table `{{%user}}`.
+ * Миграция для разделения счетчика выполненных заданий на две категории
+ *
+ * Class m200310_050657_add_columns_to_user_table
  */
 class m200310_050657_add_columns_to_user_table extends Migration
 {
     /**
-     * {@inheritdoc}
+     * Разделение счетчика выполненных заданий на две категории
+     *
+     * @return bool|void
      */
     public function safeUp()
     {
@@ -18,7 +22,9 @@ class m200310_050657_add_columns_to_user_table extends Migration
     }
 
     /**
-     * {@inheritdoc}
+     * Возврат единого счетчика выполенных заданий
+     *
+     * @return bool|void
      */
     public function safeDown()
     {

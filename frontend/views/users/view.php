@@ -1,16 +1,15 @@
 <?php
 use yii\helpers\Html;
 use app\models\Task;
-
 ?>
 <section class="content-view">
     <div class="user__card-wrapper">
         <div class="user__card">
             <img src="<?= $user->userData->getAvatar(); ?>" width="120" height="120" alt="Аватар пользователя">
             <div class="content-view__headline">
-                <h1><?= $user->login; ?></h1>
+                <h1><?= Html::encode($user->login ?? ''); ?></h1>
                 <?php if($user->city): ?>
-                    <p><?= $user->city->name; ?></p>
+                    <p><?= Html::encode($user->city->name ?? ''); ?></p>
                 <?php endif; ?>
                 <div class="profile-mini__name five-stars__rate">
                     <?php for ($i = 0; $i < 5; $i++): ?>
@@ -18,31 +17,33 @@ use app\models\Task;
                     <?php endfor; ?>
                     <b><?= $user->userData->rating; ?></b>
                 </div>
-                <b class="done-task">Выполнил <?= $completedTasksCount; ?> заказов</b>
-                <b class="done-review">Получил <?= $reviewsCount; ?> отзывов</b>
+                <b class="done-task">Выполнил <?= $completedTasksCount ?? 0; ?> заказов</b>
+                <b class="done-review">Получил <?= $reviewsCount ?? 0; ?> отзывов</b>
             </div>
             <div class="content-view__headline user__card-bookmark <?= $isFavorite ? 'user__card-bookmark--current' : ''; ?>">
-                <span>Был на сайте <?= Yii::$app->formatter->asRelativeTime($user->last_activity); ?></span>
-                <?= Html::a('<b></b>', "/users/select-favorite?userId={$user->id}"); ?>
+                <?php if($user->last_activity): ?>
+                    <span>Был на сайте <?= Yii::$app->formatter->asRelativeTime($user->last_activity); ?></span>
+                <?php endif; ?>
+                <?= Html::a('<b></b>', $user->getFavoriteUrl()); ?>
             </div>
         </div>
         <div class="content-view__description">
-            <p><?= $user->userData->description; ?></p>
+            <p><?= Html::encode($user->userData->description ?? ''); ?></p>
         </div>
         <div class="user__card-general-information">
             <div class="user__card-info">
                 <h3 class="content-view__h3">Специализации</h3>
                 <div class="link-specialization">
                     <?php foreach ($user->specializations as $specialization): ?>
-                        <?= Html::a($specialization->title, Task::getUrlTasksByCategory($specialization->id), ['class' => 'link-regular']) ?>
+                        <?= Html::a(Html::encode($specialization->title), Task::getUrlTasksByCategory($specialization->id), ['class' => 'link-regular']) ?>
                     <?php endforeach; ?>
                 </div>
                 <?php if (!$user->userSettings->is_hidden_contacts || $isCustomer): ?>
                     <h3 class="content-view__h3">Контакты</h3>
                     <div class="user__card-link">
-                        <?= Html::a($user->userData->phone, '#', ['class' => 'user__card-link--tel link-regular']); ?>
-                        <?= Html::a($user->email, '#', ['class' => 'user__card-link--email link-regular']); ?>
-                        <?= Html::a($user->userData->skype, '#', ['class' => 'user__card-link--skype link-regular']); ?>
+                        <?= Html::a(Html::encode($user->userData->phone ?? ''), '#', ['class' => 'user__card-link--tel link-regular']); ?>
+                        <?= Html::a(Html::encode($user->email ?? ''), '#', ['class' => 'user__card-link--email link-regular']); ?>
+                        <?= Html::a(Html::encode($user->userData->skype ?? ''), '#', ['class' => 'user__card-link--skype link-regular']); ?>
                     </div>
                 <?php endif; ?>
             </div>
@@ -64,12 +65,12 @@ use app\models\Task;
             <div class="content-view__feedback-wrapper reviews-wrapper">
                 <?php foreach ($user->reviews as $review): ?>
                     <div class="feedback-card__reviews">
-                        <p class="link-task link">Задание «<?= Html::a($review->task->title, "/tasks/view/{$review->task->id}", ['class' => 'link-regular']); ?>»</p>
+                        <p class="link-task link">Задание «<?= Html::a(Html::encode($review->task->title), $review->task->getCurrentTaskUrl(), ['class' => 'link-regular']); ?>»</p>
                         <div class="card__review">
-                            <?= Html::a("<img src='{$review->author->userData->getAvatar()}' width='55' height='54'>", "#"); ?>
+                            <?= Html::a("<img src='{$review->author->userData->getAvatar()}' width='55' height='54'>", $review->author->getCurrentUserUrl()); ?>
                             <div class="feedback-card__reviews-content">
-                                <p class="link-name link"><?= Html::a($review->author->login, "#", ['class' => 'link-regular']); ?></p>
-                                <p class="review-text"><?= $review->text; ?></p>
+                                <p class="link-name link"><?= Html::a(Html::encode($review->author->login), $review->author->getCurrentUserUrl(), ['class' => 'link-regular']); ?></p>
+                                <p class="review-text"><?= Html::encode($review->text); ?></p>
                             </div>
                             <div class="card__review-rate">
                                 <p class="<?= $review->rating > 3 ? 'five-rate' : 'three-rate'; ?> big-rate"><?= $review->rating; ?><span></span></p>

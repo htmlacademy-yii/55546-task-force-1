@@ -1,11 +1,13 @@
 <?php
 use app\models\Task;
 use yii\helpers\Html;
+
+$currentItemClass = 'menu_toggle__item--current';
 ?>
 
 <section class="menu-toggle">
     <ul class="menu-toggle__list">
-        <li class="menu-toggle__item menu-toggle__item--completed <?= $status === Task::STATUS_COMPLETED ? 'menu_toggle__item--current' : '' ?>">
+        <li class="menu-toggle__item menu-toggle__item--completed <?= $status === Task::STATUS_COMPLETED ? $currentItemClass : '' ?>">
             <div class="menu-toggle__svg-wrapper">
                 <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
                     <path fill-rule="evenodd" clip-rule="evenodd" d="M0 10C0 4.47715 4.47715 0 10 0C12.6522 0 15.1957 1.05357 17.0711 2.92893C18.9464 4.8043 20 7.34784 20 10C20 15.5228 15.5228 20 10 20C4.47715 20 0 15.5228 0 10ZM9.73 13.61L14.3 7.61V7.58C14.5179 7.29419 14.5668 6.91382 14.4283 6.58218C14.2897 6.25054 13.9848 6.01801 13.6283 5.97218C13.2718 5.92635 12.9179 6.07419 12.7 6.36L8.92 11.36L7.29 9.28C7.07028 8.99776 6.71668 8.85418 6.36239 8.90334C6.00811 8.9525 5.70696 9.18694 5.57239 9.51834C5.43783 9.84974 5.49028 10.2278 5.71 10.51L8.15 13.62C8.34082 13.8615 8.63222 14.0017 8.94 14C9.2495 13.9993 9.54121 13.8552 9.73 13.61Z" />
@@ -13,7 +15,7 @@ use yii\helpers\Html;
             </div>
             <?= Html::a('Завершённые',"my-list?status=". Task::STATUS_COMPLETED); ?>
         </li>
-        <li class="menu-toggle__item menu-toggle__item--new <?= $status === Task::STATUS_NEW ? 'menu_toggle__item--current' : '' ?>">
+        <li class="menu-toggle__item menu-toggle__item--new <?= $status === Task::STATUS_NEW ? $currentItemClass : '' ?>">
             <div class="menu-toggle__svg-wrapper">
                 <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                     <rect opacity="0.01" x="24" y="24" width="24" height="24" transform="rotate(180 24 24)" fill="white"/>
@@ -30,7 +32,7 @@ use yii\helpers\Html;
             </div>
             <?= Html::a('Новые',"my-list?status=". Task::STATUS_NEW); ?>
         </li>
-        <li class="menu-toggle__item menu-toggle__item--active <?= $status === Task::STATUS_EXECUTION ? 'menu_toggle__item--current' : '' ?>">
+        <li class="menu-toggle__item menu-toggle__item--active <?= $status === Task::STATUS_EXECUTION ? $currentItemClass : '' ?>">
             <div class="menu-toggle__svg-wrapper">
                 <svg width="21" height="19" viewBox="0 0 21 19" fill="none" xmlns="http://www.w3.org/2000/svg">
                     <path fill-rule="evenodd" clip-rule="evenodd" d="M16 4.52L20.6 8.22C20.8463 8.4046 20.9938 8.6923 21 9V13C21 13.5523 20.5523 14 20 14H19.8C20.252 15.2453 19.8336 16.6396 18.7708 17.4304C17.7079 18.2212 16.2521 18.2212 15.1892 17.4304C14.1264 16.6396 13.708 15.2453 14.16 14H7.8C8.25289 15.2595 7.81666 16.6667 6.73074 17.4491C5.64482 18.2315 4.17193 18.2 3.12053 17.3717C2.06912 16.5435 1.69357 15.1189 2.2 13.88C1.45527 13.5552 0.981015 12.8122 0.999999 12V2C0.948749 0.955797 1.74653 0.0644265 2.79 0H14.19C15.2414 0.0538855 16.051 0.948426 16 2V4.52ZM19 12V9.48L16 7.08V12H19ZM6 15C6 15.5523 5.55228 16 5 16C4.44771 16 4 15.5523 4 15C4 14.4477 4.44771 14 5 14C5.55228 14 6 14.4477 6 15ZM17 16C17.5523 16 18 15.5523 18 15C18 14.4477 17.5523 14 17 14C16.4477 14 16 14.4477 16 15C16 15.5523 16.4477 16 17 16Z" fill="black"/>
@@ -38,7 +40,7 @@ use yii\helpers\Html;
             </div>
             <?= Html::a('Активные',"my-list?status=". Task::STATUS_EXECUTION); ?>
         </li>
-        <li class="menu-toggle__item menu-toggle__item--canceled <?= $status === Task::STATUS_CANCELED ? 'menu_toggle__item--current' : '' ?>">
+        <li class="menu-toggle__item menu-toggle__item--canceled <?= $status === Task::STATUS_CANCELED ? $currentItemClass : '' ?>">
             <div class="menu-toggle__svg-wrapper">
                 <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
                     <path fill-rule="evenodd" clip-rule="evenodd" d="M0 10C0 4.47715 4.47715 0 10 0C12.6522 0 15.1957 1.05357 17.0711 2.92893C18.9464 4.8043 20 7.34784 20 10C20 15.5228 15.5228 20 10 20C4.47715 20 0 15.5228 0 10ZM13.0058 12C13.0058 11.7334 12.8993 11.4778 12.71 11.29L11.41 10L12.71 8.71C13.1021 8.31788 13.1021 7.68212 12.71 7.29C12.3179 6.89788 11.6821 6.89788 11.29 7.29L10 8.59L8.71 7.29C8.31788 6.89788 7.68212 6.89788 7.29 7.29C6.89788 7.68212 6.89788 8.31788 7.29 8.71L8.59 10L7.29 11.29C7.10069 11.4778 6.9942 11.7334 6.9942 12C6.9942 12.2666 7.10069 12.5222 7.29 12.71C7.47777 12.8993 7.73336 13.0058 8 13.0058C8.26664 13.0058 8.52223 12.8993 8.71 12.71L10 11.41L11.29 12.71C11.4778 12.8993 11.7334 13.0058 12 13.0058C12.2666 13.0058 12.5222 12.8993 12.71 12.71C12.8993 12.5222 13.0058 12.2666 13.0058 12Z" fill="black"/>
@@ -46,7 +48,7 @@ use yii\helpers\Html;
             </div>
             <?= Html::a('Отменённые',"my-list?status=". Task::STATUS_CANCELED); ?>
         </li>
-        <li class="menu-toggle__item menu-toggle__item--hidden <?= $status === Task::STATUS_EXPIRED ? 'menu_toggle__item--current' : '' ?>">
+        <li class="menu-toggle__item menu-toggle__item--hidden <?= $status === Task::STATUS_EXPIRED ? $currentItemClass : '' ?>">
             <div class="menu-toggle__svg-wrapper">
                 <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                     <rect opacity="0.01" x="24" width="24" height="24" transform="rotate(90 24 0)" fill="black"/>
@@ -63,28 +65,33 @@ use yii\helpers\Html;
         <?php foreach ($tasks as $task): ?>
             <div class="new-task__card">
                 <div class="new-task__title">
-                    <?= Html::a("<h2>$task->title</h2>", $task->getCurrentTaskUrl(), ['class' => 'link-regular']); ?>
-                    <?= Html::a("<p>{$task->category->title}</p>", Task::getUrlTasksByCategory($task->category->id), ['class' => 'new-task__type link-regular']); ?>
+                    <?= Html::a("<h2>" . Html::encode($task->title) . "</h2>", $task->getCurrentTaskUrl(), ['class' => 'link-regular']); ?>
+                    <?php if($task->category): ?>
+                        <?= Html::a("<p>" . Html::encode($task->category->title) . "</p>", Task::getUrlTasksByCategory($task->category->id), ['class' => 'new-task__type link-regular']); ?>
+                    <?php endif; ?>
                 </div>
                 <?php if ($task->status === Task::STATUS_NEW): ?>
                     <div class="task-status new-status">Новый</div>
                 <?php elseif ($task->status === Task::STATUS_COMPLETED): ?>
                     <div class="task-status done-status">Завершено</div>
                 <?php endif; ?>
-                <p class="new-task_description"><?= $task->description; ?></p>
-                <?php if($task->status === Task::STATUS_COMPLETED || $task->status === Task::STATUS_FAILING): ?>
+                <p class="new-task_description"><?= Html::encode($task->description); ?></p>
+                <?php if(($task->status === Task::STATUS_COMPLETED || $task->status === Task::STATUS_FAILING) && $task->executor): ?>
                     <div class="feedback-card__top ">
-                        <?= Html::a("<img src='{$task->executor->userData->getAvatar()}' width='36' height='36'>", "/users/view/{$task->executor->id}"); ?>
+                        <?= Html::a("<img src='{$task->executor->userData->getAvatar()}' width='36' height='36'>", $task->executor->getCurrentUserUrl()); ?>
                         <div class="feedback-card__top--name my-list__bottom">
                             <p class="link-name">
-                                <?= Html::a($task->executor->login, "/users/view/{$task->executor->id}", ['class' => 'link-regular']); ?>
+                                <?= Html::a(Html::encode($task->executor->login), $task->executor->getCurrentUserUrl(), ['class' => 'link-regular']); ?>
                             </p>
                             <?= Html::a("<b>$task->messagesCount</b>", $task->getCurrentTaskUrl(),
                                 ['class' => 'my-list__bottom-chat my-list__bottom-chat--new']); ?>
-                            <?php for ($i = 0; $i < 5; $i++): ?>
-                                <span <?= $task->review->rating > $i ? '' : 'class="star-disabled"'; ?>></span>
-                            <?php endfor; ?>
-                            <b><?= $task->review->rating; ?></b>
+
+                            <?php if ($task->review): ?>
+                                <?php for ($i = 0; $i < 5; $i++): ?>
+                                    <span <?= $task->review->rating > $i ? '' : 'class="star-disabled"'; ?>></span>
+                                <?php endfor; ?>
+                                <b><?= $task->review->rating; ?></b>
+                            <?php endif; ?>
                         </div>
                     </div>
                 <?php endif; ?>

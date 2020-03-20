@@ -3,12 +3,16 @@
 use yii\db\Migration;
 
 /**
+ * Миграция для добавления таблицы ленты событий пользователей event_ribbon
+ *
  * Class m200309_140521_create_table_event_ribbon
  */
 class m200309_140521_create_table_event_ribbon extends Migration
 {
     /**
-     * {@inheritdoc}
+     * Добавление таблицы ленты событий пользователей
+     *
+     * @return bool|void
      */
     public function safeUp()
     {
@@ -22,7 +26,9 @@ class m200309_140521_create_table_event_ribbon extends Migration
     }
 
     /**
-     * {@inheritdoc}
+     * Удаление таблицы ленты событий пользователей
+     *
+     * @return bool|void
      */
     public function safeDown()
     {

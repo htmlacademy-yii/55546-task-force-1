@@ -4,10 +4,18 @@ use yii\db\Migration;
 use yii\db\Expression;
 
 /**
+ * Миграция для разделения данных из поля location в отдельные столбцы
+ *
  * Class m200213_063536_add_task_location_two_column
  */
 class m200213_063536_add_task_location_two_column extends Migration
 {
+    /**
+     * Разделяет данные из поля location в отдельные столбцы
+     *
+     * @return bool|void
+     * @throws \yii\db\Exception
+     */
     public function up()
     {
         $this->addColumn('task', 'latitude', $this->decimal(10, 7));
@@ -19,6 +27,12 @@ class m200213_063536_add_task_location_two_column extends Migration
         $this->dropColumn('task', 'location');
     }
 
+    /**
+     * Соединяет данные из столбцов longitude и latitude в один столбец location
+     *
+     * @return bool|void
+     * @throws \yii\db\Exception
+     */
     public function down()
     {
         $this->addColumn('task', 'location', $this->char(255));

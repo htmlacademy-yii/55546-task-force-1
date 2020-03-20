@@ -1,8 +1,6 @@
 <?php
-
 use app\models\City;
 use frontend\assets\AppAsset;
-use yii\helpers\ArrayHelper;
 use yii\helpers\Html;
 use yii\helpers\Url;
 
@@ -12,14 +10,15 @@ $isGuest = Yii::$app->user->isGuest;
 $user = $isGuest ? null : Yii::$app->user->identity;
 
 $selectedCity = null;
+$events = null;
 if (Yii::$app->session->get('city')) {
     $selectedCity = Yii::$app->session->get('city');
-} elseif($user) {
+} elseif ($user) {
     $selectedCity = $user->city_id;
     $events = $user->events;
 }
-
 ?>
+
 <?php $this->beginPage() ?>
 <!DOCTYPE html>
 <html lang="<?= Yii::$app->language ?>">
@@ -28,7 +27,7 @@ if (Yii::$app->session->get('city')) {
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <?php $this->registerCsrfMetaTags() ?>
-    <title><?= $this->title; ?></title>
+    <title><?= Html::encode($this->title); ?></title>
     <?php $this->head() ?>
 </head>
 <body>
@@ -83,8 +82,7 @@ if (Yii::$app->session->get('city')) {
             </div>
 
             <div class="header__town">
-                <?= Html::dropDownList('town[]', $selectedCity,
-                    ArrayHelper::map(City::find()->asArray()->all(), 'id', 'name'),
+                <?= Html::dropDownList('town[]', $selectedCity, City::getCitiesArray(),
                     ['class' => 'multiple-select input town-select', 'size' => 1, 'id' => 'city-session']); ?>
             </div>
 
@@ -94,9 +92,11 @@ if (Yii::$app->session->get('city')) {
                     <h3>Новые события</h3>
                     <?php foreach ($events as $event): ?>
                         <p class="lightbulb__new-task <?= $event->iconClass; ?>">
-                            <?= $event->description; ?>
+                            <?= Html::encode($event->description); ?>
                             <br>
-                            «<?= Html::a($event->task->title, $event->task->getCurrentTaskUrl(), ['class' => 'link-regular']) ?>»
+                            <?php if ($event->task): ?>
+                                «<?= Html::a(Html::encode($event->task->title), $event->task->getCurrentTaskUrl(), ['class' => 'link-regular']) ?>»
+                            <?php endif; ?>
                         </p>
                     <?php endforeach; ?>
                 </div>
@@ -110,7 +110,7 @@ if (Yii::$app->session->get('city')) {
                              alt="Аватар пользователя">
                     </a>
                     <span class="header__account-name">
-                         <?= $user->login; ?>
+                         <?= Html::encode($user->login); ?>
                      </span>
                 <?php endif; ?>
             </div>

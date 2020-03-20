@@ -3,12 +3,16 @@
 use yii\db\Migration;
 
 /**
+ * Миграция для добавления первичных ключей в те таблицы где их не было
+ *
  * Class m200306_071647_update_to_criterion
  */
 class m200306_071647_update_to_criterion extends Migration
 {
     /**
-     * {@inheritdoc}
+     * Добавление первичных ключей в те таблицы где их не было
+     *
+     * @return bool|void
      */
     public function safeUp()
     {
@@ -20,7 +24,9 @@ class m200306_071647_update_to_criterion extends Migration
     }
 
     /**
-     * {@inheritdoc}
+     * Удаление добавленных первичных ключей из обновлённых таблиц
+     *
+     * @return bool|void
      */
     public function safeDown()
     {

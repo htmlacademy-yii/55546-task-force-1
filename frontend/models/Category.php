@@ -1,46 +1,47 @@
 <?php
-
 namespace app\models;
 
-use Yii;
 use yii\db\ActiveRecord;
+use yii\helpers\ArrayHelper;
 
 /**
- * This is the model class for table "category".
+ * Класс для работы с моделью категорий
  *
- * @property int $id
- * @property string|null $title
- * @property string|null $code
+ * Class Category
+ *
+ * @package app\models
  */
 class Category extends ActiveRecord
 {
     /**
-     * {@inheritdoc}
+     * Получение списка всех категорий отформатированных в массивы с парами id => title
+     *
+     * @return array список всех категорий отформатированных в массивы с парами id => title
      */
-    public static function tableName()
+    public static function getCategoriesArray(): array
+    {
+        return ArrayHelper::map(self::find()->all(), 'id', 'title');
+    }
+
+    /**
+     * Получение имени таблицы модели
+     *
+     * @return string имя таблицы модели
+     */
+    public static function tableName(): string
     {
         return 'category';
     }
 
     /**
-     * {@inheritdoc}
+     * Получение списка правил валидации для модели
+     *
+     * @return array список правил валидации для модели
      */
-    public function rules()
+    public function rules(): array
     {
         return [
             [['title', 'code'], 'string', 'max' => 255],
-        ];
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function attributeLabels()
-    {
-        return [
-            'id' => 'ID',
-            'title' => 'Title',
-            'code' => 'Code',
         ];
     }
 }

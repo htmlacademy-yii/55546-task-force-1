@@ -3,9 +3,21 @@ namespace app\models;
 
 use yii\db\ActiveRecord;
 
+/**
+ * Класс для работы с моделью сообщений
+ *
+ * Class Message
+ *
+ * @package app\models
+ */
 class Message extends ActiveRecord
 {
-    public function rules()
+    /**
+     * Получение списка правил валидации для модели
+     *
+     * @return array список правил валидации для модели
+     */
+    public function rules(): array
     {
         return [
             [['task_id', 'message', 'is_mine'], 'safe'],
@@ -17,7 +29,12 @@ class Message extends ActiveRecord
         ];
     }
 
-    public static function tableName()
+    /**
+     * Получение имени таблицы модели
+     *
+     * @return string имя таблицы модели
+     */
+    public static function tableName(): string
     {
         return 'message';
     }

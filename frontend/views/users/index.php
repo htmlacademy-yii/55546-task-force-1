@@ -5,7 +5,6 @@ use yii\widgets\ListView;
 use common\models\User;
 
 $fieldConfig = ['options' => ['tag' => false]];
-
 ?>
 
 <section class="user__search">

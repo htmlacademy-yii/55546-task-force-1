@@ -1,9 +1,9 @@
 <?php
-
 use yii\helpers\Url;
 use yii\widgets\ActiveForm;
 use yii\helpers\Html;
 use app\models\Task;
+use yii\authclient\widgets\AuthChoice;
 
 $this->title = 'Главная страница сайта TaskForce';
 
@@ -84,23 +84,29 @@ $fieldConfig = ['template' => "<p>{label}{input}{error}</p>"];
             <h2>Последние задания на сайте</h2>
             <?php foreach ($tasks as $task): ?>
                 <div class="landing-task">
-                    <div class="landing-task-top task-<?= $task->category->code === 'translation' ? 'courier' : $task->category->code; ?>"></div>
+                    <?php if ($task->category): ?>
+                        <div class="landing-task-top task-<?= $task->category->code; ?>"></div>
+                    <?php endif; ?>
                     <div class="landing-task-description">
-                        <h3><?= Html::a($task->title, "tasks/view/$task->id", ['class' => 'link-regular']) ?></h3>
-                        <p><?= $task->description; ?></p>
+                        <h3><?= Html::a(Html::encode($task->title ?? ''), $task->getCurrentTaskUrl(), ['class' => 'link-regular']) ?></h3>
+                        <p><?= Html::encode($task->description ?? ''); ?></p>
                     </div>
                     <div class="landing-task-info">
                         <div class="task-info-left">
-                            <p><?= Html::a($task->category->title, Task::getUrlTasksByCategory($task->category->id), ['class' => 'link-regular']) ?></p>
-                            <p><?= Yii::$app->formatter->asRelativeTime($task->date_start); ?></p>
+                            <?php if ($task->category): ?>
+                                <p><?= Html::a(Html::encode($task->category->title), Task::getUrlTasksByCategory($task->category->id), ['class' => 'link-regular']) ?></p>
+                            <?php endif; ?>
+                            <p><?= $task->date_start ? Yii::$app->formatter->asRelativeTime($task->date_start) : ''; ?></p>
                         </div>
-                        <span><?= $task->price; ?> <b>₽</b></span>
+                        <?php if ($task->price): ?>
+                            <span><?= Html::encode($task->price); ?> <b>₽</b></span>
+                        <?php endif; ?>
                     </div>
                 </div>
             <?php endforeach; ?>
         </div>
         <div class="landing-bottom-container">
-            <?= Html::a('смотреть все задания', "/tasks", ['class' => 'button red-button']); ?>
+            <?= Html::a('смотреть все задания', Task::getBaseTasksUrl(), ['class' => 'button red-button']); ?>
         </div>
     </div>
 </div>
@@ -120,7 +126,7 @@ $fieldConfig = ['template' => "<p>{label}{input}{error}</p>"];
         ->passwordInput(['class' => 'enter-form-email input input-middle', 'id' => 'enter-password'])
         ->label(null, ['class' => 'form-modal-description']); ?>
         <p>
-            <?= \yii\authclient\widgets\AuthChoice::widget([
+            <?= AuthChoice::widget([
                 'baseAuthUrl' => ['site/auth'],
                 'popupMode' => false,
             ]); ?>

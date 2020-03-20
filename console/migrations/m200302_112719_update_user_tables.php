@@ -3,12 +3,16 @@
 use yii\db\Migration;
 
 /**
+ * Миграция для добавления ограничений на заполненность столбцов в таблицах
+ *
  * Class m200302_112719_update_user_tables
  */
 class m200302_112719_update_user_tables extends Migration
 {
     /**
-     * {@inheritdoc}
+     * Добавляет ограничение на заполненность столбцов в таблицах
+     *
+     * @return bool|void
      */
     public function safeUp()
     {
@@ -19,7 +23,9 @@ class m200302_112719_update_user_tables extends Migration
     }
 
     /**
-     * {@inheritdoc}
+     * Убирает ограничение на заполненность столбцов в таблицах
+     *
+     * @return bool|void
      */
     public function safeDown()
     {

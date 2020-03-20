@@ -1,19 +1,35 @@
 <?php
 namespace app\models;
 
-use frontend\components\DebugHelper;
 use yii\base\Model;
 
+/**
+ * Класс для работы с моделью формы завершения задания
+ *
+ * Class TaskCompletionForm
+ *
+ * @package app\models
+ */
 class TaskCompletionForm extends Model
 {
+    /** @var string строка со статусом исполнения задания - возниклик проблемы */
     const STATUS_DIFFICULT = 'difficult';
+    /** @var string строка со статусом исполнения задания - нет проблемы */
     const STATUS_YES = 'yes';
 
+    /** @var string строка со статусом исполнения задания выбранным заказчиком */
     public $isCompletion;
+    /** @var string строка с рейтингом качества исполнения */
     public $rating;
+    /** @var string строка с описанием по поводу выполненного задания */
     public $text;
 
-    public function rules()
+    /**
+     * Получение списка правил валидации для модели
+     *
+     * @return array список правил валидации для модели
+     */
+    public function rules(): array
     {
         return [
             ['rating', 'required'],
@@ -22,7 +38,12 @@ class TaskCompletionForm extends Model
         ];
     }
 
-    public function attributeLabels()
+    /**
+     * Указание списка имён для атрибутов формы
+     *
+     * @return array список имён для атрибутов формы
+     */
+    public function attributeLabels(): array
     {
         return [
             'rating' => 'Оценка',

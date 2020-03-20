@@ -5,8 +5,18 @@ use yii\helpers\ArrayHelper;
 use yii\helpers\Html;
 use yii\widgets\ListView;
 
+/**
+ * Виджет для работы со списком моделей
+ *
+ * Class FrontendListView
+ *
+ * @package frontend\widgets
+ */
 class FrontendListView extends ListView
 {
+    /**
+     * @return string|void
+     */
     public function run()
     {
         if ($this->showOnEmpty || $this->dataProvider->getCount() > 0) {

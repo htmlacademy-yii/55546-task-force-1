@@ -1,5 +1,5 @@
 <?php
-use frontend\modules\api\components\RestMessagesUrlRule;
+use frontend\modules\api\v1\src\RestMessagesUrlRule;
 
 $params = array_merge(
     require __DIR__ . '/../../common/config/params.php',
@@ -81,13 +81,16 @@ return [
             'errorAction' => 'site/error',
         ],
         'urlManager' => [
-            'class' => 'frontend\components\TaskforceUrlManager\TaskforceUrlManager',
+            'class' => 'frontend\src\TaskforceUrlManager\TaskforceUrlManager',
             'enablePrettyUrl' => true,
             'showScriptName' => false,
             'rules' => [
                 'tasks/view/<id>' => 'tasks/view',
-                'tasks/decision/<status>/<id>/<taskId>' => 'tasks/decision',
+                'tasks/completion/<taskId>' => 'tasks/completion',
+                'tasks/respond/<taskId>' => 'tasks/respond',
+                'tasks/refusal/<taskId>' => 'tasks/refusal',
                 'tasks/cancel/<taskId>' => 'tasks/cancel',
+                'tasks/decision/<respondId>/<status>' => 'tasks/decision',
                 'users/view/<id>' => 'users/view',
                 [
                     'class' => RestMessagesUrlRule::class,
@@ -113,7 +116,7 @@ return [
         ],
         'singletons' => [
             'yandexMap' => [
-                'class' => 'frontend\components\YandexMap\YandexMap',
+                'class' => 'frontend\src\YandexMap\YandexMap',
                 'apiKey' => 'e666f398-c983-4bde-8f14-e3fec900592a',
             ]
         ]

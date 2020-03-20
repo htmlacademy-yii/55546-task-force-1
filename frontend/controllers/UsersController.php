@@ -9,13 +9,26 @@ use app\models\Task;
 use common\models\User;
 use Yii;
 use yii\db\Query;
-use yii\helpers\ArrayHelper;
 use yii\web\NotFoundHttpException;
 use yii\data\ActiveDataProvider;
 
+/**
+ * Контроллер для работы с исполнителями
+ *
+ * Class UsersController
+ *
+ * @package frontend\controllers
+ */
 class UsersController extends SecuredController
 {
-    public function actionIndex($sort = null)
+    /**
+     * Действие для страницы списка исполнителей
+     *
+     * @param string $sort параметр сортировки для списка исполнителей
+     *
+     * @return string шаблон с данными страницы
+     */
+    public function actionIndex(string $sort = '')
     {
         $query = (new Query())->select([
             'user.id',
@@ -27,8 +40,7 @@ class UsersController extends SecuredController
             'CONCAT("[",GROUP_CONCAT(JSON_OBJECT("title", category.title, "id", category.id) SEPARATOR ","),"]") as specializations',
             '(SELECT COUNT(*) FROM review WHERE review.executor_id = user.id) as reviews_count',
             '(SELECT COUNT(*) FROM task WHERE task.executor_id = user.id || task.author_id = user.id) as tasks_count',
-        ])
-            ->from('user')
+        ])->from('user')
             ->where(['user.role' => User::ROLE_EXECUTOR, 'user_settings.is_hidden_profile' => false])
             ->leftJoin('user_data', 'user.id = user_data.user_id')
             ->leftJoin('user_specialization', 'user.id = user_specialization.user_id')
@@ -39,16 +51,7 @@ class UsersController extends SecuredController
         if(Yii::$app->request->get('ExecutorSearchForm') && $model->load(Yii::$app->request->get())) {
             $model->applyFilters($query);
         }
-
-        if(!$sort) {
-            $query->orderBy('user.date_registration DESC');
-        } elseif ($sort === User::SORT_TYPE_RATING) {
-            $query->orderBy('user_data.rating DESC');
-        } elseif ($sort === User::SORT_TYPE_ORDERS) {
-            $query->orderBy('(SELECT COUNT(*) FROM task WHERE task.executor_id = user.id) DESC');
-        } elseif ($sort === User::SORT_TYPE_POPULARITY) {
-            $query->orderBy('user_data.views DESC');
-        }
+        $model->applySort($query, $sort);
 
         $provider = new ActiveDataProvider([
             'query' => $query->groupBy([
@@ -61,28 +64,23 @@ class UsersController extends SecuredController
             'pagination' => [
                 'pageSize' => 5,
             ],
-//            'sort' => [
-//                'attributes' => [
-//                    'rating' => [
-//                        'asc' => ['rating' => SORT_ASC],
-//                        'desc' => ['rating' => SORT_DESC],
-//                        'default' => SORT_ASC,
-//                        'label' => 'Рейтинг',
-//                    ]
-//                ],
-//                'defaultOrder' => [
-//                    'rating' => SORT_DESC
-//                ]
-//            ],
         ]);
 
         return $this->render('index', [
             'model' => $model,
             'dataProvider' => $provider,
-            'categories' => ArrayHelper::map(Category::find()->all(), 'id', 'title'),
+            'categories' => Category::getCategoriesArray(),
         ]);
     }
 
+    /**
+     * Действие для страницы профиля исполнителя
+     *
+     * @param int $id идентификатор исполнителя
+     *
+     * @return string шаблон с данными страницы
+     * @throws NotFoundHttpException ошибка при попытке найти несуществующего исполнителя
+     */
     public function actionView(int $id)
     {
         $user = User::findOne($id);
@@ -109,7 +107,16 @@ class UsersController extends SecuredController
         ]);
     }
 
-    public function actionSelectFavorite($userId)
+    /**
+     * Действие для добавления исполнителя в избранное
+     *
+     * @param int $userId идентификатор исполнитлея
+     *
+     * @return \yii\web\Response
+     * @throws \Throwable
+     * @throws \yii\db\StaleObjectException
+     */
+    public function actionSelectFavorite(int $userId)
     {
         $params = [
             'client_id' => Yii::$app->user->identity->id,

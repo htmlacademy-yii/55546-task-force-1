@@ -1,10 +1,11 @@
 <?php
+use frontend\assets\ProfileAsset;
 use yii\widgets\ActiveForm;
 use yii\helpers\Html;
 
 $fieldConfig = ['template' => '{label}{input}{error}', 'options' => ['tag' => false]];
 
-\frontend\assets\ProfileAsset::register($this);
+ProfileAsset::register($this);
 ?>
 
 <section class="account__redaction-wrapper">
@@ -21,33 +22,34 @@ $fieldConfig = ['template' => '{label}{input}{error}', 'options' => ['tag' => fa
                 <div class="account__redaction">
                     <div class="account__input account__input--name">
                         <?= $form->field($model, 'name', $fieldConfig)
-                            ->textInput(['class' => 'input textarea', 'value' => $user->login]); ?>
+                            ->textInput(['class' => 'input textarea', 'value' => Html::encode($user->login ?? '')]); ?>
                     </div>
                     <div class="account__input account__input--email" >
                         <?= $form->field($model, 'email', $fieldConfig)
-                            ->textInput(['class' => 'input textarea', 'value' => $user->email]); ?>
+                            ->textInput(['class' => 'input textarea', 'value' => Html::encode($user->email ?? '')]); ?>
                     </div>
                     <div class="account__input account__input--name">
                         <?= $form->field($model, 'cityId', $fieldConfig)
                             ->dropDownList($cities, [
                                 'class' => 'multiple-select input multiple-select-big',
                                 'size' => 1,
-                                'options' => [$user->city_id => ['selected' => true]],
+                                'options' => [$user->city_id ?? 1 => ['selected' => true]],
                             ]); ?>
                     </div>
                     <div class="account__input account__input--date">
-                        <?= $form->field($model, 'birthday', $fieldConfig)->input('date', ['class' => 'input-middle input input-date', 'value' => $user->userData->birthday]); ?>
+                        <?= $form->field($model, 'birthday', $fieldConfig)->input('date',
+                            ['class' => 'input-middle input input-date', 'value' => Html::encode($user->userData->birthday ?? '')]); ?>
                     </div>
                     <div class="account__input account__input--info">
                         <?= $form->field($model, 'description', $fieldConfig)
-                            ->textarea(['class' => 'input textarea', 'rows' => 7, 'value' => $user->userData->description]); ?>
+                            ->textarea(['class' => 'input textarea', 'rows' => 7, 'value' => Html::encode($user->userData->description ?? '')]); ?>
                     </div>
                 </div>
             </div>
             <h3 class="div-line">Выберите свои специализации</h3>
             <div class="account__redaction-section-wrapper">
                 <?= $form->field($model, 'specializations')
-                    ->checkboxList(yii\helpers\ArrayHelper::map($categories, 'id', 'title'), [
+                    ->checkboxList($categories, [
                         'item' => function ($_index, $label, $name, $checked, $id) use ($user) {
                             $checked = in_array($id, $user->specializationsId) ? 'checked' : '';
                             return "<input
@@ -82,15 +84,15 @@ $fieldConfig = ['template' => '{label}{input}{error}', 'options' => ['tag' => fa
             <div class="account__redaction-section-wrapper account__redaction">
                 <div class="account__input">
                     <?= $form->field($model, 'phone', $fieldConfig)
-                        ->input('tel', ['class' => 'input textarea', 'value' => $user->userData->phone]); ?>
+                        ->input('tel', ['class' => 'input textarea', 'value' => Html::encode($user->userData->phone ?? '')]); ?>
                 </div>
                 <div class="account__input">
                     <?= $form->field($model, 'skype', $fieldConfig)
-                        ->textInput(['class' => 'input textarea', 'value' => $user->userData->skype]); ?>
+                        ->textInput(['class' => 'input textarea', 'value' => Html::encode($user->userData->skype ?? '')]); ?>
                 </div>
                 <div class="account__input" >
                     <?= $form->field($model, 'otherMessenger', $fieldConfig)
-                        ->textInput(['class' => 'input textarea', 'value' => $user->userData->other_messenger]); ?>
+                        ->textInput(['class' => 'input textarea', 'value' => Html::encode($user->userData->other_messenger ?? '')]); ?>
                 </div>
             </div>
             <h3 class="div-line">Настройки сайта</h3>
@@ -99,22 +101,22 @@ $fieldConfig = ['template' => '{label}{input}{error}', 'options' => ['tag' => fa
                 <div class="search-task__categories account_checkbox--bottom">
                     <?php $checkboxConfig = ['template' => '{input}{label}', 'options' => ['tag' => false]]; ?>
                     <?= $form->field($model, 'notifications[new-message]', $checkboxConfig)
-                        ->checkbox(['class' => 'visually-hidden checkbox__input', 'value' => true, 'id' => 'notifications-1', 'checked' => (bool) $user->userNotifications->is_new_message], false)
+                        ->checkbox(['class' => 'visually-hidden checkbox__input', 'value' => true, 'id' => 'notifications-1', 'checked' => (bool) $user->userNotifications->is_new_message ?? 0], false)
                         ->label('Новое сообщение', ['for' => 'notifications-1']); ?>
                     <?= $form->field($model, 'notifications[task-actions]', $checkboxConfig)
-                        ->checkbox(['class' => 'visually-hidden checkbox__input', 'value' => true, 'id' => 'notifications-2', 'checked' => (bool) $user->userNotifications->is_task_actions], false)
+                        ->checkbox(['class' => 'visually-hidden checkbox__input', 'value' => true, 'id' => 'notifications-2', 'checked' => (bool) $user->userNotifications->is_task_actions ?? 0], false)
                         ->label('Действия по заданию', ['for' => 'notifications-2']); ?>
                     <?= $form->field($model, 'notifications[new-review]', $checkboxConfig)
-                        ->checkbox(['class' => 'visually-hidden checkbox__input', 'value' => true, 'id' => 'notifications-3', 'checked' => (bool) $user->userNotifications->is_new_review], false)
+                        ->checkbox(['class' => 'visually-hidden checkbox__input', 'value' => true, 'id' => 'notifications-3', 'checked' => (bool) $user->userNotifications->is_new_review ?? 0], false)
                         ->label('Новый отзыв', ['for' => 'notifications-3']); ?>
                 </div>
 
                 <div class="search-task__categories account_checkbox account_checkbox--secrecy">
                     <?= $form->field($model, 'settings[show-only-client]', $checkboxConfig)
-                        ->checkbox(['class' => 'visually-hidden checkbox__input', 'value' => true, 'id' => 'settings-1', 'checked' => (bool) $user->userSettings->is_hidden_contacts], false)
+                        ->checkbox(['class' => 'visually-hidden checkbox__input', 'value' => true, 'id' => 'settings-1', 'checked' => (bool) $user->userSettings->is_hidden_contacts ?? 0], false)
                         ->label('Показывать мои контакты только заказчику', ['for' => 'settings-1']); ?>
                     <?= $form->field($model, 'settings[hidden-profile]', $checkboxConfig)
-                        ->checkbox(['class' => 'visually-hidden checkbox__input', 'value' => true, 'id' => 'settings-2', 'checked' => (bool) $user->userSettings->is_hidden_profile], false)
+                        ->checkbox(['class' => 'visually-hidden checkbox__input', 'value' => true, 'id' => 'settings-2', 'checked' => (bool) $user->userSettings->is_hidden_profile ?? 0], false)
                         ->label('Не показывать мой профиль', ['for' => 'settings-2']); ?>
                 </div>
             </div>

@@ -1,28 +1,48 @@
 <?php
 namespace app\models;
 
-use frontend\components\DebugHelper\DebugHelper;
 use Yii;
 use yii\base\Model;
 
+/**
+ * Класс для работы с моделью формы создания задания
+ *
+ * Class TaskCreate
+ *
+ * @package app\models
+ */
 class TaskCreate extends Model
 {
+    /** @var string строка с названием задания */
     public $title;
+    /** @var string строка с описанием задания */
     public $description;
+    /** @var string строка с идентификатором категории */
     public $categoryId;
+    /** @var array массив со списком файлов к заданию */
     public $files;
+    /** @var string строка с локацией задания */
     public $location;
+    /** @var string строка с наградой за задание */
     public $price;
+    /** @var string строка с датой завершения */
     public $dateEnd;
+    /** @var string строка с координатами широты */
     public $latitude;
+    /** @var string строка с координатами долготы */
     public $longitude;
+    /** @var string строка с идентификатором города */
     public $cityId;
 
+    /**
+     * Получение списка правил валидации для модели
+     *
+     * @return array список правил валидации для модели
+     */
     public function rules(): array
     {
         return [
             [['title', 'description', 'categoryId', 'location', 'price', 'dateEnd', 'cityId', 'files'], 'safe'],
-
             [['title', 'description'], 'trim'],
             [['title', 'description', 'categoryId'], 'required', 'message' => 'Поле должно быть заполнено'],
             ['title', 'string', 'min' => 10],
@@ -39,6 +59,11 @@ class TaskCreate extends Model
         ];
     }
 
+    /**
+     * Указание списка имён для атрибутов формы
+     *
+     * @return array список имён для атрибутов формы
+     */
     public function attributeLabels(): array
     {
         return [
@@ -52,6 +77,9 @@ class TaskCreate extends Model
         ];
     }
 
+    /**
+     * Валидатор для проверки существование указанной категории в базе данных сайта
+     */
     public function checkCategory(): void
     {
         if(!Category::findOne((int) $this->categoryId)) {
@@ -59,6 +87,9 @@ class TaskCreate extends Model
         }
     }
 
+    /**
+     * Валидатор для проверки существование указанного города в базе данных сайта
+     */
     public function checkCity(): void
     {
         $city = City::findOne(['name' => explode(',', $this->location)[0]]);
@@ -69,6 +100,9 @@ class TaskCreate extends Model
         }
     }
 
+    /**
+     * Валидатор для проверки даты завершения задания
+     */
     public function checkDate(): void
     {
         if(time() > strtotime($this->dateEnd)) {
@@ -76,6 +110,12 @@ class TaskCreate extends Model
         }
     }
 
+    /**
+     * Валидатор для проверки локации задания через яндекс карты
+     *
+     * @throws \yii\base\InvalidConfigException
+     * @throws \yii\di\NotInstantiableException
+     */
     public function checkLocation(): void
     {
         if(!empty($this->location)) {

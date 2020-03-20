@@ -3,12 +3,16 @@
 use yii\db\Migration;
 
 /**
+ * Миграция для удаления лишнего столбца из таблицы заданий task
+ *
  * Class m200307_105042_drop_task_table_column_is_telework
  */
 class m200307_105042_drop_task_table_column_is_telework extends Migration
 {
     /**
-     * {@inheritdoc}
+     * Удаление лишнего столбца из таблицы заданий task
+     *
+     * @return bool|void
      */
     public function safeUp()
     {
@@ -16,7 +20,9 @@ class m200307_105042_drop_task_table_column_is_telework extends Migration
     }
 
     /**
-     * {@inheritdoc}
+     * Возврат удалённого столбца в таблицу заданий task
+     *
+     * @return bool|void
      */
     public function safeDown()
     {

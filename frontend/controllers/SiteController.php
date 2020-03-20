@@ -1,6 +1,7 @@
 <?php
 namespace frontend\controllers;
 
+use yii\authclient\clients\VKontakte;
 use app\models\{Auth,
     City,
     EventRibbon,
@@ -11,39 +12,45 @@ use app\models\{Auth,
     UserNotifications,
     UserSettings};
 use common\models\User;
-use frontend\components\UserInitHelper\UserInitHelper;
+use frontend\src\UserInitHelper\UserInitHelper;
 use Yii;
-use yii\filters\VerbFilter;
-
-use yii\helpers\ArrayHelper;
+use yii\filters\AccessControl;
 use yii\web\Response;
 use yii\widgets\ActiveForm;
 
 /**
- * Site controller
+ * Контроллер для работы с общими страницами сайта
+ *
+ * Class SiteController
+ *
+ * @package frontend\controllers
  */
 class SiteController extends SecuredController
 {
     /**
-     * {@inheritdoc}
+     * Определением фильтра
+     *
+     * @return array
+     * @throws \yii\db\Exception
      */
     public function behaviors()
     {
-        return ArrayHelper::merge([
+        return [
             'access' => [
-                'except' => ['index', 'signup', 'login', 'auth', 'login-ajax-validation', 'set-ajax-city'],
-            ],
-//            'verbs' => [
-//                'class' => VerbFilter::class,
-//                'actions' => [
-//                    'logout' => ['post'],
-//                ],
-//            ],
-        ], parent::behaviors());
+                'class' => AccessControl::class,
+                'only' => ['signup', 'login', 'auth', 'onAuthSuccess'],
+                'rules' => [
+                    [
+                        'allow' => true,
+                        'roles' => ['?']
+                    ]
+                ]
+            ]
+        ];
     }
 
     /**
-     * {@inheritdoc}
+     * @return array
      */
     public function actions()
     {
@@ -62,11 +69,19 @@ class SiteController extends SecuredController
         ];
     }
 
+    /**
+     * Действие для ajax установки в сессию активного города для фильтрации задач
+     *
+     * @param int $id идентификатор города
+     */
     public function actionSetAjaxCity(int $id)
     {
         Yii::$app->session->set('city', $id);
     }
 
+    /**
+     * Действие для ajax очистки просмотренных событий
+     */
     public function actionClearEventRibbon()
     {
         if($user = Yii::$app->user->identity) {
@@ -75,9 +90,9 @@ class SiteController extends SecuredController
     }
 
     /**
-     * Displays homepage.
+     * Действие для главной страницы стайта
      *
-     * @return mixed
+     * @return string шаблон с данными страницы
      */
     public function actionIndex()
     {
@@ -89,6 +104,11 @@ class SiteController extends SecuredController
         ]);
     }
 
+    /**
+     * Действие для ajax валидации формы авторизации
+     *
+     * @return array|Response
+     */
     public function actionLoginAjaxValidation()
     {
         if(Yii::$app->request->isAjax) {
@@ -105,9 +125,9 @@ class SiteController extends SecuredController
     }
 
     /**
-     * Logs out the current user.
+     * Действие для выхода пользователя из системы
      *
-     * @return mixed
+     * @return Response
      */
     public function actionLogout()
     {
@@ -116,9 +136,9 @@ class SiteController extends SecuredController
     }
 
     /**
-     * Signs user up.
+     * Действие для регистрации нового пользователя
      *
-     * @return mixed
+     * @return string|Response шаблон с данными страницы
      */
     public function actionSignup()
     {
@@ -144,25 +164,26 @@ class SiteController extends SecuredController
 
         return $this->render('signup', [
             'model' => $model,
-            'cities' => ArrayHelper::map(City::find()->asArray()->all(), 'id', 'name')
+            'cities' => City::getCitiesArray()
         ]);
     }
 
-    public function onAuthSuccess($client)
+    /**
+     * Действие для авторизации пользователя с помощью API VK
+     *
+     * @param VKontakte $client объект с данными пользователя из VK
+     *
+     * @return Response
+     */
+    public function onAuthSuccess(VKontakte $client)
     {
-        // если пользователь зарегистрирован, то и новая регистрация ему не нужна
-        if(!Yii::$app->user->isGuest) {
-            return $this->redirect(Task::getBaseTasksUrl());
-        }
-
         $clientId = $client->getId();
         $attributes = $client->getUserAttributes();
-
         $auth = Auth::findOne(['source' => $clientId, 'source_id' => $attributes['id']]);
         $user = null;
-        if($auth) { // Пользователь гость, но уже имеет аккаунт через VK
+        if($auth) {
             $user = $auth->user;
-        } else { // Пользователь гость, и ещё не имеет аккаунта VK
+        } else {
             $transaction = Yii::$app->db->beginTransaction();
             try {
                 $user = (new UserInitHelper(new User([
@@ -185,11 +206,9 @@ class SiteController extends SecuredController
                 $transaction->rollBack();
             }
         }
-
         if($user) {
             Yii::$app->user->login($user);
         }
-
         return $this->redirect(Task::getBaseTasksUrl());
     }
 }
