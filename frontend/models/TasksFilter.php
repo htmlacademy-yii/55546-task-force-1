@@ -1,4 +1,5 @@
 <?php
+
 namespace app\models;
 
 use Yii;
@@ -35,12 +36,13 @@ class TasksFilter extends Model
     const PERIOD_MONTH = 'month';
 
     /** @var array массив со списком всех доступных периодов */
-    const PERIOD_LIST = [
-        self::PERIOD_ALL => 'За всё время',
-        self::PERIOD_DAY => 'За день',
-        self::PERIOD_WEEK => 'За неделю',
-        self::PERIOD_MONTH => 'За месяц'
-    ];
+    const PERIOD_LIST
+        = [
+            self::PERIOD_ALL => 'За всё время',
+            self::PERIOD_DAY => 'За день',
+            self::PERIOD_WEEK => 'За неделю',
+            self::PERIOD_MONTH => 'За месяц',
+        ];
 
     /**
      * Получение списка правил валидации для модели
@@ -50,7 +52,10 @@ class TasksFilter extends Model
     public function rules(): array
     {
         return [
-            [['category', 'isNoExecutor', 'isTelework', 'title', 'time'], 'safe'],
+            [
+                ['category', 'isNoExecutor', 'isTelework', 'title', 'time'],
+                'safe',
+            ],
         ];
     }
 
@@ -77,26 +82,30 @@ class TasksFilter extends Model
      */
     public function applyFilters(ActiveQuery &$taskQuery): void
     {
-        if(!empty($this->category)) {
+        if (!empty($this->category)) {
             $taskQuery->andWhere(['category_id' => $this->category]);
         }
 
-        if($this->isNoExecutor) {
+        if ($this->isNoExecutor) {
             $taskQuery->andWhere(['executor_id' => null]);
         }
 
-        if(!$this->isTelework) {
+        if (!$this->isTelework) {
             $taskQuery->andWhere([
                 'city_id' => Yii::$app->session->get('city') ?
-                    Yii::$app->session->get('city') : Yii::$app->user->identity->city_id
+                    Yii::$app->session->get('city')
+                    : Yii::$app->user->identity->city_id,
             ]);
         }
 
-        if(isset($this->title)) {
+        if (isset($this->title)) {
             $taskQuery->andWhere(['like', 'title', $this->title]);
         }
 
-        if(isset($this->time) && in_array($this->time, [self::PERIOD_DAY, self::PERIOD_WEEK, self::PERIOD_MONTH])) {
+        if (isset($this->time)
+            && in_array($this->time,
+                [self::PERIOD_DAY, self::PERIOD_WEEK, self::PERIOD_MONTH])
+        ) {
             $taskQuery->andWhere("date_start > CURRENT_TIMESTAMP() - INTERVAL 1 $this->time");
         }
     }

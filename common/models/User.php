@@ -1,4 +1,5 @@
 <?php
+
 namespace common\models;
 
 use app\models\Category;
@@ -221,7 +222,7 @@ class User extends ActiveRecord implements IdentityInterface
      */
     public static function getCorrectAvatar(string $avatar): string
     {
-        if(!empty($avatar)) {
+        if (!empty($avatar)) {
             return preg_match('/^http/', $avatar) ? $avatar : "/$avatar";
         }
 
@@ -266,7 +267,11 @@ class User extends ActiveRecord implements IdentityInterface
             ['email', 'required'],
             ['email', 'email'],
             ['email', 'string', 'max' => 255],
-            ['email', 'unique', 'message' => 'This email address has already been taken.'],
+            [
+                'email',
+                'unique',
+                'message' => 'This email address has already been taken.',
+            ],
 
             ['password', 'required'],
             ['password', 'string', 'min' => 6],
@@ -282,7 +287,7 @@ class User extends ActiveRecord implements IdentityInterface
      */
     public static function findIdentity($id): ActiveRecord
     {
-        return static::findOne((int) $id);
+        return static::findOne((int)$id);
     }
 
     /**
@@ -300,6 +305,7 @@ class User extends ActiveRecord implements IdentityInterface
      * Finds user by password reset token
      *
      * @param string $token password reset token
+     *
      * @return static|null
      */
     public static function findByPasswordResetToken($token)
@@ -318,13 +324,14 @@ class User extends ActiveRecord implements IdentityInterface
      * Finds user by verification email token
      *
      * @param string $token verify email token
+     *
      * @return static|null
      */
     public static function findByVerificationToken($token): ActiveRecord
     {
         return static::findOne([
             'verification_token' => $token,
-            'status' => self::STATUS_INACTIVE
+            'status' => self::STATUS_INACTIVE,
         ]);
     }
 
@@ -332,6 +339,7 @@ class User extends ActiveRecord implements IdentityInterface
      * Finds out if password reset token is valid
      *
      * @param string $token password reset token
+     *
      * @return bool
      */
     public static function isPasswordResetTokenValid($token): bool
@@ -340,8 +348,9 @@ class User extends ActiveRecord implements IdentityInterface
             return false;
         }
 
-        $timestamp = (int) substr($token, strrpos($token, '_') + 1);
+        $timestamp = (int)substr($token, strrpos($token, '_') + 1);
         $expire = Yii::$app->params['user.passwordResetTokenExpire'];
+
         return $timestamp + $expire >= time();
     }
 
@@ -359,11 +368,13 @@ class User extends ActiveRecord implements IdentityInterface
      * Validates password
      *
      * @param string $password password to validate
+     *
      * @return bool if password provided is valid for current user
      */
     public function validatePassword(string $password): bool
     {
-        return Yii::$app->security->validatePassword($password, $this->password_hash);
+        return Yii::$app->security->validatePassword($password,
+            $this->password_hash);
     }
 
     /**
@@ -373,7 +384,8 @@ class User extends ActiveRecord implements IdentityInterface
      */
     public function setPassword(string $password): void
     {
-        $this->password_hash = Yii::$app->security->generatePasswordHash($password);
+        $this->password_hash
+            = Yii::$app->security->generatePasswordHash($password);
     }
 
     /**
@@ -389,12 +401,14 @@ class User extends ActiveRecord implements IdentityInterface
      */
     public function generatePasswordResetToken(): void
     {
-        $this->password_reset_token = Yii::$app->security->generateRandomString() . '_' . time();
+        $this->password_reset_token
+            = Yii::$app->security->generateRandomString().'_'.time();
     }
 
     public function generateEmailVerificationToken(): void
     {
-        $this->verification_token = Yii::$app->security->generateRandomString() . '_' . time();
+        $this->verification_token = Yii::$app->security->generateRandomString()
+            .'_'.time();
     }
 
     /**

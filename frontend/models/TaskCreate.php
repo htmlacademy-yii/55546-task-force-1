@@ -1,4 +1,5 @@
 <?php
+
 namespace app\models;
 
 use Yii;
@@ -42,20 +43,50 @@ class TaskCreate extends Model
     public function rules(): array
     {
         return [
-            [['title', 'description', 'categoryId', 'location', 'price', 'dateEnd', 'cityId', 'files'], 'safe'],
+            [
+                [
+                    'title',
+                    'description',
+                    'categoryId',
+                    'location',
+                    'price',
+                    'dateEnd',
+                    'cityId',
+                    'files',
+                ],
+                'safe',
+            ],
             [['title', 'description'], 'trim'],
-            [['title', 'description', 'categoryId'], 'required', 'message' => 'Поле должно быть заполнено'],
+            [
+                ['title', 'description', 'categoryId'],
+                'required',
+                'message' => 'Поле должно быть заполнено',
+            ],
             ['title', 'string', 'min' => 10],
             ['description', 'string', 'min' => 30],
-            [['categoryId', 'price'], 'integer', 'message' => 'Это поле может быть только целым числом'],
+            [
+                ['categoryId', 'price'],
+                'integer',
+                'message' => 'Это поле может быть только целым числом',
+            ],
             ['categoryId', 'checkCategory'],
             [['description', 'location'], 'string'],
             ['location', 'checkCity'],
             ['location', 'checkLocation'],
-            ['price', 'number', 'min' => 1, 'message' => 'Цена должна быть больше нуля'],
-            ['dateEnd', 'match', 'pattern' => '/^\d{4}-\d{2}-\d{2}$/', 'message' => 'Не корректный формат даты'],
+            [
+                'price',
+                'number',
+                'min' => 1,
+                'message' => 'Цена должна быть больше нуля',
+            ],
+            [
+                'dateEnd',
+                'match',
+                'pattern' => '/^\d{4}-\d{2}-\d{2}$/',
+                'message' => 'Не корректный формат даты',
+            ],
             ['dateEnd', 'checkDate'],
-            ['cityId', 'checkCity']
+            ['cityId', 'checkCity'],
         ];
     }
 
@@ -82,7 +113,7 @@ class TaskCreate extends Model
      */
     public function checkCategory(): void
     {
-        if(!Category::findOne((int) $this->categoryId)) {
+        if (!Category::findOne((int)$this->categoryId)) {
             $this->addError('categoryId', 'Указанной категории не существует');
         }
     }
@@ -93,8 +124,9 @@ class TaskCreate extends Model
     public function checkCity(): void
     {
         $city = City::findOne(['name' => explode(',', $this->location)[0]]);
-        if(!$city) {
-            $this->addError('location', 'Указанный город не найден в нашей базе данных');
+        if (!$city) {
+            $this->addError('location',
+                'Указанный город не найден в нашей базе данных');
         } else {
             $this->cityId = $city->id;
         }
@@ -105,8 +137,9 @@ class TaskCreate extends Model
      */
     public function checkDate(): void
     {
-        if(time() > strtotime($this->dateEnd)) {
-            $this->addError('dateEnd', 'Дата завершение задачи должна быть после текущей');
+        if (time() > strtotime($this->dateEnd)) {
+            $this->addError('dateEnd',
+                'Дата завершение задачи должна быть после текущей');
         }
     }
 
@@ -118,10 +151,11 @@ class TaskCreate extends Model
      */
     public function checkLocation(): void
     {
-        if(!empty($this->location)) {
-            $geocode = Yii::$container->get('yandexMap')->getPosition($this->location);
+        if (!empty($this->location)) {
+            $geocode = Yii::$container->get('yandexMap')
+                ->getPosition($this->location);
 
-            if(!$geocode) {
+            if (!$geocode) {
                 $this->addError('location', 'Указанная локация не определена');
             } else {
                 $geocode = explode(' ', $geocode);

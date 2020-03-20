@@ -1,4 +1,5 @@
 <?php
+
 namespace app\models;
 
 use common\models\User;
@@ -42,18 +43,20 @@ class SettingsForm extends Model
     /** @var string строка с другим мессенджером пользователя */
     public $otherMessenger;
     /** @var array массив со списком уведомлений пользователя */
-    public $notifications = [
-        'new-message' => false,
-        'task-actions' => false,
-        'new-review' => false,
-        'show-only-client' => false,
-        'hidden-profile' => false,
-    ];
+    public $notifications
+        = [
+            'new-message' => false,
+            'task-actions' => false,
+            'new-review' => false,
+            'show-only-client' => false,
+            'hidden-profile' => false,
+        ];
     /** @var array массив со списком настроек пользователя */
-    public $settings = [
-        'show-only-client' => false,
-        'hidden-profile' => false,
-    ];
+    public $settings
+        = [
+            'show-only-client' => false,
+            'hidden-profile' => false,
+        ];
 
     /**
      * Получение списка правил валидации для модели
@@ -63,14 +66,38 @@ class SettingsForm extends Model
     public function rules(): array
     {
         return [
-            [['avatar', 'files', 'name', 'email', 'cityId', 'birthday', 'description', 'specializations', 'password', 'copyPassword', 'phone', 'skype', 'otherMessenger', 'notifications', 'settings'], 'safe'],
+            [
+                [
+                    'avatar',
+                    'files',
+                    'name',
+                    'email',
+                    'cityId',
+                    'birthday',
+                    'description',
+                    'specializations',
+                    'password',
+                    'copyPassword',
+                    'phone',
+                    'skype',
+                    'otherMessenger',
+                    'notifications',
+                    'settings',
+                ],
+                'safe',
+            ],
             ['avatar', 'file', 'extensions' => ['png', 'jpg', 'jpeg', 'gif']],
             [['name', 'email'], 'trim'],
             [['name', 'email'], 'required', 'message' => 'Обязательное поле'],
             ['name', 'validateName'],
             ['email', 'email', 'message' => 'Не корректный тип email'],
             ['email', 'validateEmail'],
-            ['birthday', 'match', 'pattern' => '/^\d{4}-\d{2}-\d{2}$/', 'message' => 'Не корректный формат даты'],
+            [
+                'birthday',
+                'match',
+                'pattern' => '/^\d{4}-\d{2}-\d{2}$/',
+                'message' => 'Не корректный формат даты',
+            ],
             ['birthday', 'validateBirthday'],
             ['specializations', 'validateSpecializations'],
             ['password', 'compare', 'compareAttribute' => 'copyPassword'],
@@ -113,7 +140,9 @@ class SettingsForm extends Model
      */
     public function validateName(): void
     {
-        if((Yii::$app->user->identity->login !== $this->name) && User::findOne(['login' => $this->name])) {
+        if ((Yii::$app->user->identity->login !== $this->name)
+            && User::findOne(['login' => $this->name])
+        ) {
             $this->addError('login', 'Выбранное имя уже занято');
         }
     }
@@ -124,7 +153,9 @@ class SettingsForm extends Model
      */
     public function validateEmail(): void
     {
-        if((Yii::$app->user->identity->email !== $this->email) && User::findOne(['email' => $this->email])) {
+        if ((Yii::$app->user->identity->email !== $this->email)
+            && User::findOne(['email' => $this->email])
+        ) {
             $this->addError('email', 'Указанный email уже используется');
         }
     }
@@ -134,7 +165,7 @@ class SettingsForm extends Model
      */
     public function validateCity(): void
     {
-        if(!City::findOne((int) $this->cityId)) {
+        if (!City::findOne((int)$this->cityId)) {
             $this->addError('email', 'Город с указанным id не найден');
         }
     }
@@ -144,8 +175,9 @@ class SettingsForm extends Model
      */
     public function validateBirthday(): void
     {
-        if(strtotime($this->birthday) >= time()) {
-            $this->addError('birthday', 'День рождения должен быть датой прошедшего времени');
+        if (strtotime($this->birthday) >= time()) {
+            $this->addError('birthday',
+                'День рождения должен быть датой прошедшего времени');
         }
     }
 
@@ -154,8 +186,11 @@ class SettingsForm extends Model
      */
     public function validateSpecializations(): void
     {
-        if((int) Category::find()->where(['id' => $this->specializations])->count() !== count($this->specializations)) {
-            $this->addError('specializations', 'Одна или несколько из выбранных вами специализаций не найдена');
+        if ((int)Category::find()->where(['id' => $this->specializations])
+                ->count() !== count($this->specializations)
+        ) {
+            $this->addError('specializations',
+                'Одна или несколько из выбранных вами специализаций не найдена');
         }
     }
 }

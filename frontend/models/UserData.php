@@ -1,4 +1,5 @@
 <?php
+
 namespace app\models;
 
 use yii\db\ActiveRecord;
@@ -19,8 +20,9 @@ class UserData extends ActiveRecord
      */
     public function getAvatar(): string
     {
-        if(!empty($this->avatar)) {
-            return preg_match('/^http/', $this->avatar) ? $this->avatar : "/$this->avatar";
+        if (!empty($this->avatar)) {
+            return preg_match('/^http/', $this->avatar) ? $this->avatar
+                : "/$this->avatar";
         }
 
         return '/img/user-photo.png';
@@ -44,10 +46,30 @@ class UserData extends ActiveRecord
     public function rules(): array
     {
         return [
-            [['description', 'skype', 'phone', 'other_messenger', 'avatar', 'rating', 'views', 'success_counter', 'failing_counter'], 'safe'],
-            [['user_id', 'views', 'success_counter', 'failing_counter'], 'integer'],
+            [
+                [
+                    'description',
+                    'skype',
+                    'phone',
+                    'other_messenger',
+                    'avatar',
+                    'rating',
+                    'views',
+                    'success_counter',
+                    'failing_counter',
+                ],
+                'safe',
+            ],
+            [
+                ['user_id', 'views', 'success_counter', 'failing_counter'],
+                'integer',
+            ],
             ['description', 'string'],
-            [['skype', 'phone', 'other_messenger', 'avatar', 'rating'], 'string', 'max' => 255],
+            [
+                ['skype', 'phone', 'other_messenger', 'avatar', 'rating'],
+                'string',
+                'max' => 255,
+            ],
         ];
     }
 }

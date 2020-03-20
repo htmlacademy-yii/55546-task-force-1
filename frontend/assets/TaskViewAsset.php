@@ -1,4 +1,5 @@
 <?php
+
 namespace frontend\assets;
 
 use Yii;
@@ -14,7 +15,8 @@ class TaskViewAsset extends AssetBundle
     public function __construct($config = [])
     {
         $this->js = [
-            "https://api-maps.yandex.ru/2.1/?apikey=".Yii::$container->get('yandexMap')->apiKey."&lang=ru_RU",
+            "https://api-maps.yandex.ru/2.1/?apikey="
+            .Yii::$container->get('yandexMap')->apiKey."&lang=ru_RU",
             'js/main.js',
             'js/yandex-map.js',
             'js/messenger.js',

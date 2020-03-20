@@ -1,4 +1,5 @@
 <?php
+
 namespace frontend\src\YandexMap;
 
 use GuzzleHttp\Client;
@@ -34,6 +35,7 @@ class YandexMap
      * Запрос к серверу яндекс карт с целью получить свписок необходимых координат и локаций
      *
      * @param string $geocode - строка с названием или координатами нужной локации
+     *
      * @return GuzzleResponse - список найденных локаций
      **/
     public function getDataMap(string $geocode): string
@@ -42,7 +44,7 @@ class YandexMap
         $content = '';
         $key = md5($geocode);
 
-        if($cache && ($content = $cache->get($key))) {
+        if ($cache && ($content = $cache->get($key))) {
             return $content;
         }
 
@@ -52,7 +54,7 @@ class YandexMap
                 'apikey' => $this->apiKey,
                 'format' => $this->format,
                 'lang' => $this->lang,
-            ]
+            ],
         ])->getBody()->getContents();
 
         if ($cache) {
@@ -66,13 +68,16 @@ class YandexMap
      * Получение координат для локации
      *
      * @param string $geocode - строка с названием или координатами нужной локации
+     *
      * @return string - строка с координатами найденной локации
      **/
     public function getPosition(string $geocode): string
     {
         $content = json_decode($this->getDataMap($geocode))
             ->response->GeoObjectCollection;
-        if((int) $content->metaDataProperty->GeocoderResponseMetaData->found === 0) {
+        if ((int)$content->metaDataProperty->GeocoderResponseMetaData->found
+            === 0
+        ) {
             return false;
         }
 
@@ -80,15 +85,18 @@ class YandexMap
     }
 
     /**
-     * @param float $lat - дробное число со значением широты
+     * @param float $lat  - дробное число со значением широты
      * @param float $long - дробное число со значением долготы
+     *
      * @return \stdClass - объект с данными найденной локации
      **/
     public function getAddressByPositions(float $lat, float $long): \stdClass
     {
         $content = json_decode($this->getDataMap("$long $lat"))
             ->response->GeoObjectCollection;
-        if((int) $content->metaDataProperty->GeocoderResponseMetaData->found === 0) {
+        if ((int)$content->metaDataProperty->GeocoderResponseMetaData->found
+            === 0
+        ) {
             return false;
         }
 

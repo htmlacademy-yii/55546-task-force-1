@@ -14,14 +14,14 @@
       contentType: false,
       processData: false,
       data: formData,
-      success: function() {
+      success: function () {
         form.submit();
       }
     });
   };
 
   const citiesList = document.querySelector(`#city-session`);
-  citiesList && citiesList.addEventListener(`change`, async ({ target }) => {
+  citiesList && citiesList.addEventListener(`change`, async ({target}) => {
     const data = await fetch(`/site/set-ajax-city?id=${target.value}`);
     window.location.reload();
   });
@@ -31,4 +31,4 @@
     lightbulb.classList.remove(`.header__lightbulb--active`);
     fetch('/site/clear-event-ribbon');
   });
-}) ();
+})();

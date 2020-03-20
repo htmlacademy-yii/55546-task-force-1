@@ -1,4 +1,5 @@
 <?php
+
 namespace app\models;
 
 use Yii;
@@ -18,15 +19,15 @@ class Task extends ActiveRecord
 {
     /** @var string строка со статусом нового задания */
     const STATUS_NEW = 'new';
-    /** @var string строка со статусом выполняемого задания  */
+    /** @var string строка со статусом выполняемого задания */
     const STATUS_EXECUTION = 'execution';
-    /** @var string строка со статусом завершенного задания  */
+    /** @var string строка со статусом завершенного задания */
     const STATUS_COMPLETED = 'completed';
-    /** @var string строка со статусом отменённого задания  */
+    /** @var string строка со статусом отменённого задания */
     const STATUS_CANCELED = 'canceled';
-    /** @var string строка со статусом проваленного задания  */
+    /** @var string строка со статусом проваленного задания */
     const STATUS_FAILING = 'failing';
-    /** @var string строка со статусом просроченного задания  */
+    /** @var string строка со статусом просроченного задания */
     const STATUS_EXPIRED = 'expired';
 
     /**
@@ -38,8 +39,10 @@ class Task extends ActiveRecord
      */
     public function getLocation()
     {
-        return ($this->latitude && $this->longitude) ? Yii::$container->get('yandexMap')
-            ->getAddressByPositions($this->latitude, $this->longitude) : null;
+        return ($this->latitude && $this->longitude)
+            ? Yii::$container->get('yandexMap')
+                ->getAddressByPositions($this->latitude, $this->longitude)
+            : null;
     }
 
     /**
@@ -52,6 +55,7 @@ class Task extends ActiveRecord
     public function getCorrectFileName(string $fileName): string
     {
         $arr = explode('/', $fileName);
+
         return end($arr);
     }
 
@@ -192,7 +196,20 @@ class Task extends ActiveRecord
     public function rules(): array
     {
         return [
-            [['title', 'description', 'category_id', 'author_id', 'price', 'executor_id', 'date_start', 'date_end', 'status'], 'safe'],
+            [
+                [
+                    'title',
+                    'description',
+                    'category_id',
+                    'author_id',
+                    'price',
+                    'executor_id',
+                    'date_start',
+                    'date_end',
+                    'status',
+                ],
+                'safe',
+            ],
             [['title', 'description', 'category_id'], 'required'],
             [['author_id', 'category_id', 'price', 'executor_id'], 'integer'],
             [['description'], 'string'],

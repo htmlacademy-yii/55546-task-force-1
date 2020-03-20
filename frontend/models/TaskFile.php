@@ -1,4 +1,5 @@
 <?php
+
 namespace app\models;
 
 use Yii;
@@ -21,7 +22,7 @@ class TaskFile extends ActiveRecord
      * Сохранение списка файлов к заданию в нужную директорию
      *
      * @param int   $taskId числом с идентификатором задания
-     * @param array $files массив со списком файлов
+     * @param array $files  массив со списком файлов
      *
      * @throws ServerErrorHttpException
      * @throws \yii\db\Exception
@@ -30,14 +31,16 @@ class TaskFile extends ActiveRecord
     {
         $data = [];
         foreach ($files as $file) {
-            $fileName = $this->path . '/' . $file->baseName . '.' . $file->extension;
-            if(!$file->saveAs($fileName)) {
+            $fileName = $this->path.'/'.$file->baseName.'.'.$file->extension;
+            if (!$file->saveAs($fileName)) {
                 throw new ServerErrorHttpException('Не удалось сохранить файл');
             }
             $data[] = [$taskId, $fileName];
         }
 
-        Yii::$app->db->createCommand()->batchInsert(self::tableName(), ['task_id', 'file'], $data)->execute();
+        Yii::$app->db->createCommand()
+            ->batchInsert(self::tableName(), ['task_id', 'file'], $data)
+            ->execute();
     }
 
     /**

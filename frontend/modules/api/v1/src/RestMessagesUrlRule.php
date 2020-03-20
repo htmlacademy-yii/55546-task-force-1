@@ -1,4 +1,5 @@
 <?php
+
 namespace frontend\modules\api\v1\src;
 
 use yii\web\UrlManager;
@@ -19,6 +20,7 @@ class RestMessagesUrlRule extends BaseObject implements UrlRuleInterface
     public $routes = [];
     /** @var array */
     public $verbs = [];
+
     /**
      * {@inheritDoc}
      * @see \yii\base\BaseObject::init()
@@ -32,9 +34,11 @@ class RestMessagesUrlRule extends BaseObject implements UrlRuleInterface
 
     /**
      * Creates a URL according to the given route and parameters.
+     *
      * @param UrlManager $manager the URL manager
-     * @param string $route the route. It should not have slashes at the beginning or the end.
-     * @param array $params the parameters
+     * @param string     $route   the route. It should not have slashes at the beginning or the end.
+     * @param array      $params  the parameters
+     *
      * @return string|bool the created URL, or false if this rule cannot be used for creating this URL.
      */
     public function createUrl($manager, $route, $params): bool
@@ -50,55 +54,61 @@ class RestMessagesUrlRule extends BaseObject implements UrlRuleInterface
     {
         $pathInfo = $request->getPathInfo();
         $matches = [];
-        if(in_array($request->getMethod(), $this->verbs) && preg_match($this->pattern, $pathInfo, $matches)) {
+        if (in_array($request->getMethod(), $this->verbs)
+            && preg_match($this->pattern, $pathInfo, $matches)
+        ) {
             switch ($request->getMethod()) {
                 case 'GET':
                     return $this->parseGet($matches, $request);
-                break;
+                    break;
                 case 'POST':
                     return $this->parsePost($matches, $request);
-                break;
+                    break;
                 default:
                     return false;
-                break;
+                    break;
             }
         }
+
         return false;
     }
 
     /**
-     * @param array $matches
+     * @param array   $matches
      * @param Request $request
+     *
      * @return array
      * */
     private function parseGet(array $matches, Request $request): array
     {
         $filter = ['filter' => [],];
         foreach ($matches as $param => $value) {
-            if(is_string($param)) {
+            if (is_string($param)) {
                 $filter['filter'][$param] = $value;
             }
         }
+
         return [$this->routes['GET'] ?? $request->getPathInfo(), $filter];
     }
 
     /**
-     * @param array $matches
+     * @param array   $matches
      * @param Request $request
      * */
     private function parsePost(array $matches, Request $request): array
     {
         $bodyParams = $request->getBodyParams();
         foreach ($matches as $param => $value) {
-            if(is_string($param)) {
+            if (is_string($param)) {
                 $bodyParams[$param] = $value;
             }
         }
         $rawBody = json_decode($request->getRawBody(), true);
-        if((json_last_error() == JSON_ERROR_NONE) && is_array($rawBody)) {
+        if ((json_last_error() == JSON_ERROR_NONE) && is_array($rawBody)) {
             $bodyParams = array_merge($bodyParams, $rawBody);
         }
         $request->setBodyParams($bodyParams);
+
         return [$this->routes['POST'] ?? $request->getPathInfo(), []];
     }
 }

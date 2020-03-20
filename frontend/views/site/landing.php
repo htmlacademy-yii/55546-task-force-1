@@ -1,4 +1,5 @@
 <?php
+
 use yii\helpers\Url;
 use yii\widgets\ActiveForm;
 use yii\helpers\Html;
@@ -14,8 +15,10 @@ $fieldConfig = ['template' => "<p>{label}{input}{error}</p>"];
     <div class="landing-top">
         <h1>Работа для всех.<br>
             Найди исполнителя на любую задачу.</h1>
-        <p>Сломался кран на кухне? Надо отправить документы? Нет времени самому гулять с собакой?
-            У нас вы быстро найдёте исполнителя для любой жизненной ситуации?<br>
+        <p>Сломался кран на кухне? Надо отправить документы? Нет времени самому
+            гулять с собакой?
+            У нас вы быстро найдёте исполнителя для любой жизненной
+            ситуации?<br>
             Быстро, безопасно и с гарантией. Просто, как раз, два, три. </p>
         <?= Html::button('Создать аккаунт', ['class' => 'button']) ?>
     </div>
@@ -27,7 +30,7 @@ $fieldConfig = ['template' => "<p>{label}{input}{error}</p>"];
                     <h3>Публикация заявки</h3>
                     <p>Создайте новую заявку.</p>
                     <p>Опишите в ней все детали
-                        и  стоимость работы.</p>
+                        и стоимость работы.</p>
                 </div>
             </div>
             <div class="landing-instruction-step">
@@ -61,7 +64,7 @@ $fieldConfig = ['template' => "<p>{label}{input}{error}</p>"];
                 <h3>Исполнителям</h3>
                 <ul class="notice-card-list">
                     <li>Большой выбор заданий</li>
-                    <li>Работайте где  удобно</li>
+                    <li>Работайте где удобно</li>
                     <li>Свободный график</li>
                     <li>Удалённая работа</li>
                     <li>Гарантия оплаты</li>
@@ -85,18 +88,25 @@ $fieldConfig = ['template' => "<p>{label}{input}{error}</p>"];
             <?php foreach ($tasks as $task): ?>
                 <div class="landing-task">
                     <?php if ($task->category): ?>
-                        <div class="landing-task-top task-<?= $task->category->code; ?>"></div>
+                        <div
+                            class="landing-task-top task-<?= $task->category->code; ?>"></div>
                     <?php endif; ?>
                     <div class="landing-task-description">
-                        <h3><?= Html::a(Html::encode($task->title ?? ''), $task->getCurrentTaskUrl(), ['class' => 'link-regular']) ?></h3>
+                        <h3><?= Html::a(Html::encode($task->title ?? ''),
+                                $task->getCurrentTaskUrl(),
+                                ['class' => 'link-regular']) ?></h3>
                         <p><?= Html::encode($task->description ?? ''); ?></p>
                     </div>
                     <div class="landing-task-info">
                         <div class="task-info-left">
                             <?php if ($task->category): ?>
-                                <p><?= Html::a(Html::encode($task->category->title), Task::getUrlTasksByCategory($task->category->id), ['class' => 'link-regular']) ?></p>
+                                <p><?= Html::a(Html::encode($task->category->title),
+                                        Task::getUrlTasksByCategory($task->category->id),
+                                        ['class' => 'link-regular']) ?></p>
                             <?php endif; ?>
-                            <p><?= $task->date_start ? Yii::$app->formatter->asRelativeTime($task->date_start) : ''; ?></p>
+                            <p><?= $task->date_start
+                                    ? Yii::$app->formatter->asRelativeTime($task->date_start)
+                                    : ''; ?></p>
                         </div>
                         <?php if ($task->price): ?>
                             <span><?= Html::encode($task->price); ?> <b>₽</b></span>
@@ -106,7 +116,8 @@ $fieldConfig = ['template' => "<p>{label}{input}{error}</p>"];
             <?php endforeach; ?>
         </div>
         <div class="landing-bottom-container">
-            <?= Html::a('смотреть все задания', Task::getBaseTasksUrl(), ['class' => 'button red-button']); ?>
+            <?= Html::a('смотреть все задания', Task::getBaseTasksUrl(),
+                ['class' => 'button red-button']); ?>
         </div>
     </div>
 </div>
@@ -120,19 +131,27 @@ $fieldConfig = ['template' => "<p>{label}{input}{error}</p>"];
         'validationUrl' => Url::to('/site/login-ajax-validation'),
     ]); ?>
     <?= $form->field($model, 'email', $fieldConfig)
-        ->input('email', ['class' => 'enter-form-email input input-middle', 'id' => 'enter-email'])
+        ->input('email', [
+            'class' => 'enter-form-email input input-middle',
+            'id' => 'enter-email',
+        ])
         ->label(null, ['class' => 'form-modal-description']); ?>
     <?= $form->field($model, 'password', $fieldConfig)
-        ->passwordInput(['class' => 'enter-form-email input input-middle', 'id' => 'enter-password'])
+        ->passwordInput([
+            'class' => 'enter-form-email input input-middle',
+            'id' => 'enter-password',
+        ])
         ->label(null, ['class' => 'form-modal-description']); ?>
-        <p>
-            <?= AuthChoice::widget([
-                'baseAuthUrl' => ['site/auth'],
-                'popupMode' => false,
-            ]); ?>
-        </p>
-        <?= Html::submitButton('Войти', ['id' => 'btn-login', 'class' => 'button']); ?>
+    <p>
+        <?= AuthChoice::widget([
+            'baseAuthUrl' => ['site/auth'],
+            'popupMode' => false,
+        ]); ?>
+    </p>
+    <?= Html::submitButton('Войти',
+        ['id' => 'btn-login', 'class' => 'button']); ?>
     <?php ActiveForm::end(); ?>
-    <?= Html::button('Закрыть', ['id' => 'close-modal', 'class' => 'form-modal-close']); ?>
+    <?= Html::button('Закрыть',
+        ['id' => 'close-modal', 'class' => 'form-modal-close']); ?>
 </section>
 <div class="overlay"></div>

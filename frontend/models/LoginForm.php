@@ -1,4 +1,5 @@
 <?php
+
 namespace app\models;
 
 use Yii;
@@ -54,7 +55,10 @@ class LoginForm extends Model
     public function checkPassword(): void
     {
         $user = User::findOne(['email' => $this->email]);
-        if(!$user || !Yii::$app->getSecurity()->validatePassword($this->password, $user->password)) {
+        if (!$user
+            || !Yii::$app->getSecurity()
+                ->validatePassword($this->password, $user->password)
+        ) {
             $this->addError('password', "Не верный пароль");
         }
     }

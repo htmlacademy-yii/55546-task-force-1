@@ -1,4 +1,5 @@
 <?php
+
 namespace frontend\widgets;
 
 use yii\helpers\ArrayHelper;
@@ -22,6 +23,7 @@ class FrontendListView extends ListView
         if ($this->showOnEmpty || $this->dataProvider->getCount() > 0) {
             $content = preg_replace_callback('/{\\w+}/', function ($matches) {
                 $content = $this->renderSection($matches[0]);
+
                 return $content === false ? $matches[0] : $content;
             }, $this->layout);
         } else {
@@ -33,7 +35,7 @@ class FrontendListView extends ListView
 
         $content = Html::tag($tag, $content, $options);
         $content = Html::tag('div', $content, [
-            'class' => 'new-task__wrapper'
+            'class' => 'new-task__wrapper',
         ]);
         $content .= $this->renderSection('{pager}');
         echo $content;

@@ -1,4 +1,5 @@
 <?php
+
 namespace app\models;
 
 use Yii;
@@ -30,23 +31,29 @@ class UserPhoto extends ActiveRecord
      */
     public function setPhotos(array $files): void
     {
-        if(count($files) > 6) {
+        if (count($files) > 6) {
             throw new UnsupportedMediaTypeHttpException('Не более 6 файлов');
         }
 
         $data = [];
         foreach ($files as $file) {
-            if(!(new FileValidator(['skipOnEmpty' => false, 'extensions' => 'png, jpg']))->validate($file)) {
+            if (!(new FileValidator([
+                'skipOnEmpty' => false,
+                'extensions' => 'png, jpg',
+            ]))->validate($file)
+            ) {
                 throw new UnsupportedMediaTypeHttpException('Не допустимый формат файла');
             }
-            $fileName = $this->path . '/' . $file->baseName . '.' . $file->extension;
-            if(!$file->saveAs($fileName)) {
+            $fileName = $this->path.'/'.$file->baseName.'.'.$file->extension;
+            if (!$file->saveAs($fileName)) {
                 throw new ServerErrorHttpException('Не удалось сохранить файл');
             }
             $data[] = [Yii::$app->user->identity->id, $fileName];
         }
 
-        Yii::$app->db->createCommand()->batchInsert(self::tableName(), ['user_id', 'photo'], $data)->execute();
+        Yii::$app->db->createCommand()
+            ->batchInsert(self::tableName(), ['user_id', 'photo'], $data)
+            ->execute();
     }
 
     /**

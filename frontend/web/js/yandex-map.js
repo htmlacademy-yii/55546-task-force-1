@@ -2,11 +2,12 @@
   // Функция ymaps.ready() будет вызвана, когда
   // загрузятся все компоненты API, а также когда будет готово DOM-дерево.
   ymaps.ready(init);
-  function init(){
+
+  function init() {
     // Создание карты.
 
     const locationPosition = document.querySelector('[name="location-position"]');
-    if(locationPosition) {
+    if (locationPosition) {
       const center = locationPosition.value.split(` `);
       const map = new ymaps.Map("map", {
         // Координаты центра карты.
@@ -27,4 +28,4 @@
 
     }
   }
-}) ();
+})();

@@ -1,4 +1,5 @@
 <?php
+
 namespace frontend\controllers;
 
 use app\models\Task;
@@ -28,12 +29,13 @@ class SecuredController extends Controller
     {
         Yii::$app->user->loginUrl = Url::to('/site/index');
         $user = Yii::$app->user->identity;
-        if($user) {
+        if ($user) {
             Yii::$app->db->createCommand("UPDATE user SET last_activity = NOW() WHERE id = :id",
                 [':id' => $user->id])->execute();
         }
 
-        Task::updateAll(['status' => Task::STATUS_EXPIRED], "date_end IS NOT NULL AND NOW() > date_end");
+        Task::updateAll(['status' => Task::STATUS_EXPIRED],
+            "date_end IS NOT NULL AND NOW() > date_end");
 
         return $action;
     }
@@ -52,7 +54,7 @@ class SecuredController extends Controller
                 'rules' => [
                     [
                         'allow' => true,
-                        'roles' => ['@']
+                        'roles' => ['@'],
                     ],
                 ],
             ],

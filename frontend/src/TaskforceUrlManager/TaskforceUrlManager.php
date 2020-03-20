@@ -1,4 +1,5 @@
 <?php
+
 namespace frontend\src\TaskforceUrlManager;
 
 use yii\web\UrlManager;

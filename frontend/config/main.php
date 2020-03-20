@@ -1,11 +1,12 @@
 <?php
+
 use frontend\modules\api\v1\src\RestMessagesUrlRule;
 
 $params = array_merge(
-    require __DIR__ . '/../../common/config/params.php',
-    require __DIR__ . '/../../common/config/params-local.php',
-    require __DIR__ . '/params.php',
-    require __DIR__ . '/params-local.php'
+    require __DIR__.'/../../common/config/params.php',
+    require __DIR__.'/../../common/config/params-local.php',
+    require __DIR__.'/params.php',
+    require __DIR__.'/params-local.php'
 );
 
 return [
@@ -17,7 +18,7 @@ return [
     'modules' => [
         'api' => [
             'class' => 'frontend\modules\api\Module',
-        ]
+        ],
     ],
     'components' => [
         'mailer' => [
@@ -26,7 +27,7 @@ return [
             'transport' => [
                 'class' => 'Swift_SmtpTransport',
                 'host' => 'smtp.mail.ru',
-                'port'     => 465,
+                'port' => 465,
                 'encryption' => 'ssl',
             ],
         ],
@@ -46,7 +47,7 @@ return [
             'csrfParam' => '_csrf-frontend',
             'parsers' => [
                 'application/json' => 'yii\web\JsonParser',
-            ]
+            ],
         ],
         'authClientCollection' => [
             'class' => 'yii\authclient\Collection',
@@ -62,7 +63,10 @@ return [
         'user' => [
             'identityClass' => 'common\models\User',
             'enableAutoLogin' => true,
-            'identityCookie' => ['name' => '_identity-frontend', 'httpOnly' => true],
+            'identityCookie' => [
+                'name' => '_identity-frontend',
+                'httpOnly' => true,
+            ],
         ],
         'session' => [
             // this is the name of the session cookie used for login on the frontend
@@ -98,7 +102,7 @@ return [
                     'routes' => [
                         'GET' => 'api/message',
                         'POST' => 'api/message/create',
-                    ]
+                    ],
                 ],
                 ['class' => 'yii\rest\UrlRule', 'controller' => 'api/message'],
             ],
@@ -118,8 +122,8 @@ return [
             'yandexMap' => [
                 'class' => 'frontend\src\YandexMap\YandexMap',
                 'apiKey' => 'e666f398-c983-4bde-8f14-e3fec900592a',
-            ]
-        ]
+            ],
+        ],
     ],
     'params' => $params,
 ];

@@ -1,4 +1,5 @@
 <?php
+
 namespace frontend\src\UserSettingsHelper;
 
 use app\models\UserPhoto;
@@ -24,7 +25,7 @@ class UserSettingsHelper
      * UserSettingsHelper constructor.
      *
      * @param Model             $model объект модели формы с валиднами данными
-     * @param IdentityInterface $user объект текущего пользователя
+     * @param IdentityInterface $user  объект текущего пользователя
      */
     public function __construct(Model $model, IdentityInterface $user)
     {
@@ -46,9 +47,9 @@ class UserSettingsHelper
      */
     public function updateFileWorks(string $dir): UserSettingsHelper
     {
-        if($this->model->files) {
+        if ($this->model->files) {
             UserPhoto::deleteAll(['user_id' => $this->user->id]);
-            if(file_exists($dir)) {
+            if (file_exists($dir)) {
                 FileHelper::removeDirectory($dir);
             }
             FileHelper::createDirectory($dir);
@@ -69,8 +70,9 @@ class UserSettingsHelper
         $this->user->login = $this->model->name;
         $this->user->email = $this->model->email;
         $this->user->city_id = $this->model->cityId;
-        if(!empty($this->model->password)) {
-            $this->user->password = Yii::$app->getSecurity()->generatePasswordHash($this->model->password);
+        if (!empty($this->model->password)) {
+            $this->user->password = Yii::$app->getSecurity()
+                ->generatePasswordHash($this->model->password);
         }
         $this->user->save();
 
@@ -87,10 +89,12 @@ class UserSettingsHelper
     public function updateUserData(string $dir): UserSettingsHelper
     {
         $userData = $this->user->userData;
-        $this->model->avatar = UploadedFile::getInstance($this->model, 'avatar');
-        if($this->model->avatar) {
-            $filePath = "{$dir}/{$this->model->avatar->baseName}.{$this->model->avatar->extension}";
-            if($userData->avatar && file_exists($userData->avatar)) {
+        $this->model->avatar = UploadedFile::getInstance($this->model,
+            'avatar');
+        if ($this->model->avatar) {
+            $filePath
+                = "{$dir}/{$this->model->avatar->baseName}.{$this->model->avatar->extension}";
+            if ($userData->avatar && file_exists($userData->avatar)) {
                 unlink($userData->avatar);
             }
 
@@ -116,9 +120,12 @@ class UserSettingsHelper
     public function updateUserNotifications(): UserSettingsHelper
     {
         $userNotifications = $this->user->userNotifications;
-        $userNotifications->is_new_message = (bool) $this->model->notifications['new-message'];
-        $userNotifications->is_task_actions = (bool) $this->model->notifications['task-actions'];
-        $userNotifications->is_new_review = (bool) $this->model->notifications['new-review'];
+        $userNotifications->is_new_message
+            = (bool)$this->model->notifications['new-message'];
+        $userNotifications->is_task_actions
+            = (bool)$this->model->notifications['task-actions'];
+        $userNotifications->is_new_review
+            = (bool)$this->model->notifications['new-review'];
         $userNotifications->save();
 
         return $this;
@@ -132,8 +139,10 @@ class UserSettingsHelper
     public function updateUserSettings(): UserSettingsHelper
     {
         $userSettings = $this->user->userSettings;
-        $userSettings->is_hidden_contacts = (bool) $this->model->settings['show-only-client'];
-        $userSettings->is_hidden_profile = (bool) $this->model->settings['hidden-profile'];
+        $userSettings->is_hidden_contacts
+            = (bool)$this->model->settings['show-only-client'];
+        $userSettings->is_hidden_profile
+            = (bool)$this->model->settings['hidden-profile'];
         $userSettings->save();
 
         return $this;
@@ -147,11 +156,14 @@ class UserSettingsHelper
      */
     public function updateUserSpecializations(): UserSettingsHelper
     {
-        $specializations = is_array($this->model->specializations) ? $this->model->specializations : [];
+        $specializations = is_array($this->model->specializations)
+            ? $this->model->specializations : [];
         UserSpecialization::deleteAll(['user_id' => $this->user->id]);
-        Yii::$app->db->createCommand()->batchInsert('user_specialization', ['user_id', 'category_id'], array_map(function($id) {
-            return [$this->user->id, $id];
-        }, $specializations))->execute();
+        Yii::$app->db->createCommand()
+            ->batchInsert('user_specialization', ['user_id', 'category_id'],
+                array_map(function ($id) {
+                    return [$this->user->id, $id];
+                }, $specializations))->execute();
 
         return $this;
     }
@@ -159,15 +171,19 @@ class UserSettingsHelper
     /**
      * Обновление роли пользователя
      *
-     * @param string $roleClient строка с ролько клиент
+     * @param string $roleClient   строка с ролько клиент
      * @param string $roleExecutor строка с ролько исполнителя
      *
      * @return UserSettingsHelper текущий экземпляр класса помошника
      */
-    public function updateUserRole(string $roleClient, string $roleExecutor): UserSettingsHelper
-    {
-        $specializations = is_array($this->model->specializations) ? $this->model->specializations : [];
-        $this->user->role = empty($specializations) ? $roleClient : $roleExecutor;
+    public function updateUserRole(
+        string $roleClient,
+        string $roleExecutor
+    ): UserSettingsHelper {
+        $specializations = is_array($this->model->specializations)
+            ? $this->model->specializations : [];
+        $this->user->role = empty($specializations) ? $roleClient
+            : $roleExecutor;
         $this->user->save();
 
         return $this;

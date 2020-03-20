@@ -35,7 +35,7 @@ var starRating = document.getElementsByClassName("completion-form-star");
 if (starRating.length) {
   starRating = starRating[0];
 
-  starRating.addEventListener("click", function(event) {
+  starRating.addEventListener("click", function (event) {
     var stars = event.currentTarget.childNodes;
     var rating = 0;
 

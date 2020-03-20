@@ -1,4 +1,5 @@
 <?php
+
 namespace app\models;
 
 use yii\base\Model;
@@ -26,7 +27,12 @@ class RespondForm extends Model
     {
         return [
             ['price', 'required', 'message' => 'Поле должно быть заполнено'],
-            ['price', 'integer', 'min' => 1, 'message' => 'Цена должна быть больше нуля'],
+            [
+                'price',
+                'integer',
+                'min' => 1,
+                'message' => 'Цена должна быть больше нуля',
+            ],
             ['text', 'string'],
         ];
     }
@@ -40,7 +46,7 @@ class RespondForm extends Model
     {
         return [
             'price' => 'Ваша цена',
-            'text' => 'Комментарий'
+            'text' => 'Комментарий',
         ];
     }
 }

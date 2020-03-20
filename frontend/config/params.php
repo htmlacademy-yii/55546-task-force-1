@@ -1,5 +1,5 @@
 <?php
 return [
     'adminEmail' => 'admin@example.com',
-    'maxRating' => 5
+    'maxRating' => 5,
 ];

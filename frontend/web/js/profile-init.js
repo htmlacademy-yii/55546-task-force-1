@@ -11,7 +11,8 @@
 
   Dropzone.autoDiscover = false;
   let dropzone = new Dropzone(".dropzone", {
-    url: function() {},
+    url: function () {
+    },
     maxFiles: 6,
     uploadMultiple: true,
     acceptedFiles: 'image/*',
@@ -19,4 +20,4 @@
   });
 
   dropzone.on("addedfile", file => files.push(file));
-}) ();
+})();

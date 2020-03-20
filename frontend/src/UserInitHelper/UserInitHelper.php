@@ -1,4 +1,5 @@
 <?php
+
 namespace frontend\src\UserInitHelper;
 
 use yii\db\ActiveRecord;
@@ -44,9 +45,10 @@ class UserInitHelper
             'avatar' => $uData->avatar ?? '',
             'rating' => '0',
             'views' => 0,
-            'order_count' => 0
+            'order_count' => 0,
         ];
         $uData->save();
+
         return $this;
     }
 
@@ -55,8 +57,8 @@ class UserInitHelper
      *
      * @return UserInitHelper - текущий объект
      */
-    public function initNotifications(ActiveRecord $uNotifications): UserInitHelper
-    {
+    public function initNotifications(ActiveRecord $uNotifications
+    ): UserInitHelper {
         $uNotifications->attributes = [
             'user_id' => $this->user->id,
             'is_new_message' => 0,
@@ -64,6 +66,7 @@ class UserInitHelper
             'is_new_review' => 0,
         ];
         $uNotifications->save();
+
         return $this;
     }
 
@@ -77,9 +80,10 @@ class UserInitHelper
         $uSettings->attributes = [
             'user_id' => $this->user->id,
             'is_hidden_contacts' => 0,
-            'is_hidden_profile' => 0
+            'is_hidden_profile' => 0,
         ];
         $uSettings->save();
+
         return $this;
     }
 }

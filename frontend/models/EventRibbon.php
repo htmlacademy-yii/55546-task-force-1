@@ -1,4 +1,5 @@
 <?php
+
 namespace app\models;
 
 use yii\db\ActiveQuery;
@@ -51,7 +52,7 @@ class EventRibbon extends ActiveRecord
         $class = 'lightbulb__new-task--executor';
         if ($this->type === self::TYPE_NEW_CHAT_MESSAGE) {
             $class = 'lightbulb__new-task--message';
-        } elseif($this->type === self::TYPE_TASK_COMPLETE) {
+        } elseif ($this->type === self::TYPE_TASK_COMPLETE) {
             $class = 'lightbulb__new-task--close';
         }
 

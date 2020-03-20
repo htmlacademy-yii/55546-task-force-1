@@ -1,4 +1,5 @@
 <?php
+
 namespace app\models;
 
 use common\models\User;
@@ -42,7 +43,7 @@ class ExecutorSearchForm extends Model
     public function rules(): array
     {
         return [
-            [['categories', 'additionally', 'name'], 'safe']
+            [['categories', 'additionally', 'name'], 'safe'],
         ];
     }
 
@@ -53,17 +54,19 @@ class ExecutorSearchForm extends Model
      */
     public function applyFilters(Query &$query): void
     {
-        if(!empty($this->name)) {
+        if (!empty($this->name)) {
             $query->andWhere(['like', 'user.login', $this->name]);
+
             return;
         }
 
-        if(!empty($this->categories)) {
+        if (!empty($this->categories)) {
             $categories = array_map(function ($item) {
-                return (int) $item;
+                return (int)$item;
             }, $this->categories);
             $query->andWhere("(SELECT COUNT(*) FROM user_specialization us 
-                WHERE us.user_id = user.id AND us.category_id IN (" . implode(',', $categories) . "))");
+                WHERE us.user_id = user.id AND us.category_id IN (".implode(',',
+                    $categories)."))");
         }
 
         if ($this->additionally) {
@@ -87,11 +90,11 @@ class ExecutorSearchForm extends Model
      * Применение сортировки к списку исполнителей
      *
      * @param Query  $query ссылка на объект
-     * @param string $sort строка с типом сортировки
+     * @param string $sort  строка с типом сортировки
      */
     public function applySort(Query &$query, string $sort): void
     {
-        if(empty($sort)) {
+        if (empty($sort)) {
             $query->orderBy('user.date_registration DESC');
         } elseif ($sort === User::SORT_TYPE_RATING) {
             $query->orderBy('user_data.rating DESC');

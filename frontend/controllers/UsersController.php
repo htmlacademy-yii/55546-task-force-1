@@ -1,4 +1,5 @@
 <?php
+
 namespace frontend\controllers;
 
 use app\models\Category;
@@ -41,14 +42,21 @@ class UsersController extends SecuredController
             '(SELECT COUNT(*) FROM review WHERE review.executor_id = user.id) as reviews_count',
             '(SELECT COUNT(*) FROM task WHERE task.executor_id = user.id || task.author_id = user.id) as tasks_count',
         ])->from('user')
-            ->where(['user.role' => User::ROLE_EXECUTOR, 'user_settings.is_hidden_profile' => false])
+            ->where([
+                'user.role' => User::ROLE_EXECUTOR,
+                'user_settings.is_hidden_profile' => false,
+            ])
             ->leftJoin('user_data', 'user.id = user_data.user_id')
-            ->leftJoin('user_specialization', 'user.id = user_specialization.user_id')
-            ->leftJoin('category', 'user_specialization.category_id = category.id')
+            ->leftJoin('user_specialization',
+                'user.id = user_specialization.user_id')
+            ->leftJoin('category',
+                'user_specialization.category_id = category.id')
             ->leftJoin('user_settings', 'user.id = user_settings.user_id');
 
         $model = new ExecutorSearchForm();
-        if(Yii::$app->request->get('ExecutorSearchForm') && $model->load(Yii::$app->request->get())) {
+        if (Yii::$app->request->get('ExecutorSearchForm')
+            && $model->load(Yii::$app->request->get())
+        ) {
             $model->applyFilters($query);
         }
         $model->applySort($query, $sort);
@@ -84,15 +92,18 @@ class UsersController extends SecuredController
     public function actionView(int $id)
     {
         $user = User::findOne($id);
-        if(!$user || $user->role !== User::ROLE_EXECUTOR) {
+        if (!$user || $user->role !== User::ROLE_EXECUTOR) {
             throw new NotFoundHttpException("Исполнитель не найден!");
         }
 
         $user->userData->updateCounters(['views' => 1]);
+
         return $this->render('view', [
             'user' => $user,
-            'reviewsCount' => Review::find()->where(['executor_id' => $user->id])->count(),
-            'completedTasksCount' => Task::find()->where(['executor_id' => $user->id])
+            'reviewsCount' => Review::find()
+                ->where(['executor_id' => $user->id])->count(),
+            'completedTasksCount' => Task::find()
+                ->where(['executor_id' => $user->id])
                 ->andWhere(["!=", 'status', Task::STATUS_EXECUTION])
                 ->count(),
             'isCustomer' => Task::find()->where([
@@ -102,7 +113,7 @@ class UsersController extends SecuredController
             ])->exists(),
             'isFavorite' => FavoriteExecutor::find()->where([
                 'client_id' => Yii::$app->user->identity->id,
-                'executor_id' => $user->id
+                'executor_id' => $user->id,
             ])->exists(),
         ]);
     }
@@ -120,11 +131,11 @@ class UsersController extends SecuredController
     {
         $params = [
             'client_id' => Yii::$app->user->identity->id,
-            'executor_id' => $userId
+            'executor_id' => $userId,
         ];
 
         $data = FavoriteExecutor::findOne($params);
-        if($data) {
+        if ($data) {
             $data->delete();
         } else {
             (new FavoriteExecutor($params))->save();

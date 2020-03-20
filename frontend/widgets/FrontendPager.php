@@ -1,4 +1,5 @@
 <?php
+
 namespace frontend\widgets;
 
 use yii\helpers\Html;
@@ -32,7 +33,7 @@ class FrontendPager extends LinkPager
 
         $content = $this->renderPageButtons();
         $content = Html::tag('div', $content, [
-            'class' => 'new-task__pagination'
+            'class' => 'new-task__pagination',
         ]);
 
         echo $content;

@@ -1,4 +1,5 @@
 <?php
+
 namespace frontend\controllers;
 
 use yii\authclient\clients\VKontakte;
@@ -42,10 +43,10 @@ class SiteController extends SecuredController
                 'rules' => [
                     [
                         'allow' => true,
-                        'roles' => ['?']
-                    ]
-                ]
-            ]
+                        'roles' => ['?'],
+                    ],
+                ],
+            ],
         ];
     }
 
@@ -65,7 +66,7 @@ class SiteController extends SecuredController
             'auth' => [
                 'class' => 'yii\authclient\AuthAction',
                 'successCallback' => [$this, 'onAuthSuccess'],
-            ]
+            ],
         ];
     }
 
@@ -84,7 +85,7 @@ class SiteController extends SecuredController
      */
     public function actionClearEventRibbon()
     {
-        if($user = Yii::$app->user->identity) {
+        if ($user = Yii::$app->user->identity) {
             EventRibbon::deleteAll(['user_id' => $user->id]);
         }
     }
@@ -97,9 +98,11 @@ class SiteController extends SecuredController
     public function actionIndex()
     {
         $this->layout = 'landing';
+
         return $this->render('landing', [
             'model' => new LoginForm(),
-            'tasks' => Task::find()->with(['category'])->where(['status' => Task::STATUS_NEW])
+            'tasks' => Task::find()->with(['category'])
+                ->where(['status' => Task::STATUS_NEW])
                 ->orderBy('date_start DESC')->limit(4)->all(),
         ]);
     }
@@ -111,15 +114,16 @@ class SiteController extends SecuredController
      */
     public function actionLoginAjaxValidation()
     {
-        if(Yii::$app->request->isAjax) {
+        if (Yii::$app->request->isAjax) {
             Yii::$app->response->format = Response::FORMAT_JSON;
             $model = new LoginForm();
             $model->setAttributes(Yii::$app->request->post('LoginForm'));
-            if($validate = ActiveForm::validate($model)) {
+            if ($validate = ActiveForm::validate($model)) {
                 return $validate;
             }
 
             Yii::$app->user->login(User::findOne(['email' => $model->email]));
+
             return $this->redirect(Task::getBaseTasksUrl());
         }
     }
@@ -132,6 +136,7 @@ class SiteController extends SecuredController
     public function actionLogout()
     {
         Yii::$app->user->logout();
+
         return $this->goHome();
     }
 
@@ -143,19 +148,24 @@ class SiteController extends SecuredController
     public function actionSignup()
     {
         $model = new SignupForm();
-        if(Yii::$app->request->isPost && $model->load(Yii::$app->request->post()) && $model->validate()) {
+        if (Yii::$app->request->isPost
+            && $model->load(Yii::$app->request->post())
+            && $model->validate()
+        ) {
             $transaction = Yii::$app->db->beginTransaction();
             try {
                 (new UserInitHelper(new User([
                     'login' => $model->login,
                     'email' => $model->email,
-                    'password' => Yii::$app->getSecurity()->generatePasswordHash($model->password),
+                    'password' => Yii::$app->getSecurity()
+                        ->generatePasswordHash($model->password),
                     'city_id' => $model->cityId,
                     'role' => User::ROLE_CLIENT,
                 ])))->initNotifications(new UserNotifications())
                     ->initSetting(new UserSettings())
                     ->initUserData(new UserData());
                 $transaction->commit();
+
                 return $this->goHome();
             } catch (\Exception $e) {
                 $transaction->rollBack();
@@ -164,7 +174,7 @@ class SiteController extends SecuredController
 
         return $this->render('signup', [
             'model' => $model,
-            'cities' => City::getCitiesArray()
+            'cities' => City::getCitiesArray(),
         ]);
     }
 
@@ -179,15 +189,19 @@ class SiteController extends SecuredController
     {
         $clientId = $client->getId();
         $attributes = $client->getUserAttributes();
-        $auth = Auth::findOne(['source' => $clientId, 'source_id' => $attributes['id']]);
+        $auth = Auth::findOne([
+            'source' => $clientId,
+            'source_id' => $attributes['id'],
+        ]);
         $user = null;
-        if($auth) {
+        if ($auth) {
             $user = $auth->user;
         } else {
             $transaction = Yii::$app->db->beginTransaction();
             try {
                 $user = (new UserInitHelper(new User([
-                    'login' => $attributes['first_name'] . ' ' . $attributes['last_name'],
+                    'login' => $attributes['first_name'].' '
+                        .$attributes['last_name'],
                     'email' => $attributes['email'],
                     'password' => Yii::$app->security->generateRandomString(6),
                     'city_id' => null,
@@ -206,9 +220,10 @@ class SiteController extends SecuredController
                 $transaction->rollBack();
             }
         }
-        if($user) {
+        if ($user) {
             Yii::$app->user->login($user);
         }
+
         return $this->redirect(Task::getBaseTasksUrl());
     }
 }

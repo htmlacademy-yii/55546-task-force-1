@@ -1,4 +1,5 @@
 <?php
+
 use yii\helpers\Html;
 use yii\widgets\ActiveForm;
 use yii\widgets\ListView;
@@ -12,13 +13,16 @@ $fieldConfig = ['options' => ['tag' => false]];
         <p>Сортировать по:</p>
         <ul class="user__search-list">
             <li class="user__search-item user__search-item--current">
-                <?= Html::a('Рейтингу', "?sort=" . User::SORT_TYPE_RATING, ['class' => 'link-regular']); ?>
+                <?= Html::a('Рейтингу', "?sort=".User::SORT_TYPE_RATING,
+                    ['class' => 'link-regular']); ?>
             </li>
             <li class="user__search-item">
-                <?= Html::a('Числу заказов', "?sort=" . User::SORT_TYPE_ORDERS, ['class' => 'link-regular']); ?>
+                <?= Html::a('Числу заказов', "?sort=".User::SORT_TYPE_ORDERS,
+                    ['class' => 'link-regular']); ?>
             </li>
             <li class="user__search-item">
-                <?= Html::a('Популярности', "?sort=" . User::SORT_TYPE_POPULARITY, ['class' => 'link-regular']); ?>
+                <?= Html::a('Популярности', "?sort=".User::SORT_TYPE_POPULARITY,
+                    ['class' => 'link-regular']); ?>
             </li>
         </ul>
     </div>
@@ -38,18 +42,22 @@ $fieldConfig = ['options' => ['tag' => false]];
             'activePageCssClass' => 'pagination__item--current',
             'nextPageLabel' => '_',
             'prevPageLabel' => '_',
-        ]
+        ],
     ]); ?>
 </section>
 <section class="search-task">
     <div class="search-task__wrapper">
-        <?php $form = ActiveForm::begin(['method' => 'GET', 'options' => ['class' => 'search-task__form']]); ?>
+        <?php $form = ActiveForm::begin([
+            'method' => 'GET',
+            'options' => ['class' => 'search-task__form'],
+        ]); ?>
         <fieldset class="search-task__categories">
             <legend>Категории</legend>
             <?= $form->field($model, 'categories', $fieldConfig)
                 ->checkboxList($categories, [
-                    'item' => function($_index, $label, $name, $checked, $id) {
+                    'item' => function ($_index, $label, $name, $checked, $id) {
                         $checked = $checked ? "checked" : "";
+
                         return "<input
                                     class='visually-hidden checkbox__input'
                                     type='checkbox'
@@ -71,8 +79,9 @@ $fieldConfig = ['options' => ['tag' => false]];
                     'there-are-reviews' => 'Есть отзывы',
                     'in-favorites' => 'В избранном',
                 ], [
-                    'item' => function($_index, $label, $name, $checked, $id) {
+                    'item' => function ($_index, $label, $name, $checked, $id) {
                         $checked = $checked ? 'checked' : '';
+
                         return "<input
                                     class='visually-hidden checkbox__input'
                                     type='checkbox'
@@ -85,7 +94,8 @@ $fieldConfig = ['options' => ['tag' => false]];
                     'tag' => false,
                 ])->label(false); ?>
         </fieldset>
-        <?= $form->field($model, 'name', ['template' => '{label}{input}', 'options' => ['tag' => false]])
+        <?= $form->field($model, 'name',
+            ['template' => '{label}{input}', 'options' => ['tag' => false]])
             ->input('search', ['class' => 'input-middle input'])
             ->label(null, ['class' => 'search-task__name']); ?>
         <?= Html::submitButton('Искать', ['class' => 'button']); ?>

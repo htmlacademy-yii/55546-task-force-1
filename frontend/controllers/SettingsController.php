@@ -1,4 +1,5 @@
 <?php
+
 namespace frontend\controllers;
 
 use app\models\SettingsForm;
@@ -38,8 +39,11 @@ class SettingsController extends SecuredController
     {
         $user = Yii::$app->user->identity;
         $model = new SettingsForm();
-        if(Yii::$app->request->isPost && $model->load(Yii::$app->request->post()) && $model->validate()) {
-            if($files = UploadedFile::getInstancesByName('files')) {
+        if (Yii::$app->request->isPost
+            && $model->load(Yii::$app->request->post())
+            && $model->validate()
+        ) {
+            if ($files = UploadedFile::getInstancesByName('files')) {
                 $model->files = $files;
             }
 

@@ -1,4 +1,5 @@
 <?php
+
 namespace frontend\modules\api\controllers;
 
 use app\models\Message;
@@ -32,9 +33,10 @@ class MessageController extends ActiveController
 
         $actions['index']['dataFilter'] = [
             'class' => ActiveDataFilter::class,
-            'searchModel' => function() {
-                return (new DynamicModel(['task_id' => null]))->addRule('task_id', 'integer');
-            }
+            'searchModel' => function () {
+                return (new DynamicModel(['task_id' => null]))->addRule('task_id',
+                    'integer');
+            },
         ];
 
         return $actions;
@@ -50,12 +52,14 @@ class MessageController extends ActiveController
     {
         $handlerResult = parent::afterAction($action, $result);
 
-        if (($action instanceof CreateAction) && isset($handlerResult['task_id'])) {
-            $task = Task::findOne((int) $result->task_id);
+        if (($action instanceof CreateAction)
+            && isset($handlerResult['task_id'])
+        ) {
+            $task = Task::findOne((int)$result->task_id);
             try {
-                NotificationHelper::taskMessage(User::findOne((int) (
-                    (int) Yii::$app->user->identity->id === (int) $task->author_id ?
-                        $task->executor_id : $task->author_id)), $task);
+                NotificationHelper::taskMessage(User::findOne((int)(
+                (int)Yii::$app->user->identity->id === (int)$task->author_id ?
+                    $task->executor_id : $task->author_id)), $task);
             } catch (\Exception $err) {
                 Yii::warning('Mail notification not sended');
             }

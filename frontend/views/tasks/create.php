@@ -1,9 +1,13 @@
 <?php
+
 use frontend\assets\TaskCreateAsset;
 use yii\bootstrap\ActiveForm;
 use yii\helpers\Html;
 
-$fieldConfig = ['template' => '{label}{input}{hint}{error}', 'options' => ['tag' => false]];
+$fieldConfig = [
+    'template' => '{label}{input}{hint}{error}',
+    'options' => ['tag' => false],
+];
 $labels = $model->attributeLabels();
 
 TaskCreateAsset::register($this);
@@ -18,8 +22,8 @@ TaskCreateAsset::register($this);
             'options' => [
                 'class' => 'create__task-form form-create',
                 'enctype' => 'multipart/form-data',
-                'id' => 'task-form'
-            ]
+                'id' => 'task-form',
+            ],
         ]);
         echo $form->field($model, 'title', $fieldConfig)
             ->textarea([
@@ -32,44 +36,47 @@ TaskCreateAsset::register($this);
                 'class' => 'input textarea',
                 'rows' => 7,
                 'placeholder' => 'Place your text',
-            ])->hint('<span>Укажите все пожелания и детали, чтобы исполнителям было проще соориентироваться</span>');
+            ])
+            ->hint('<span>Укажите все пожелания и детали, чтобы исполнителям было проще соориентироваться</span>');
         echo $form->field($model, 'categoryId', $fieldConfig)
             ->dropDownList($categories, [
                 'class' => 'multiple-select input multiple-select-big',
-                'size' => 1
+                'size' => 1,
             ])->hint('<span>Выберите категорию</span>');
         ?>
-            <label>Файлы</label>
-            <span>Загрузите файлы, которые помогут исполнителю лучше выполнить или оценить работу</span>
-            <div class="create__file">
-                <span>Добавить новый файл</span>
-            </div>
-            <?= $form->field($model, 'location', $fieldConfig)
-                ->input( 'search',[
-                    'class' => 'input-navigation input-middle input',
-                    'list' => 'cities-list',
-                    'placeholder' => 'Санкт-Петербург, Калининский район',
-                    'id' => 'autoComplete'
-                ])->hint('<span>Укажите адрес исполнения, если задание требует присутствия</span>')?>
-            <datalist id="cities-list"></datalist>
+        <label>Файлы</label>
+        <span>Загрузите файлы, которые помогут исполнителю лучше выполнить или оценить работу</span>
+        <div class="create__file">
+            <span>Добавить новый файл</span>
+        </div>
+        <?= $form->field($model, 'location', $fieldConfig)
+            ->input('search', [
+                'class' => 'input-navigation input-middle input',
+                'list' => 'cities-list',
+                'placeholder' => 'Санкт-Петербург, Калининский район',
+                'id' => 'autoComplete',
+            ])
+            ->hint('<span>Укажите адрес исполнения, если задание требует присутствия</span>') ?>
+        <datalist id="cities-list"></datalist>
 
-            <div class="create__price-time">
-                <div class="create__price-time--wrapper">
-                    <?= $form->field($model, 'price', $fieldConfig)
-                        ->textarea([
-                            'class' => 'input textarea input-money',
-                            'rows' => 1,
-                            'placeholder' => '1000',
-                        ])->hint('<span>Не заполняйте для оценки исполнителем</span>')?>
-                </div>
-                <div class="create__price-time--wrapper">
-                    <?= $form->field($model, 'dateEnd', $fieldConfig)
-                        ->input('date', [
-                            'class' => 'input-middle input input-date',
-                            'placeholder' => '10.11, 15:00',
-                        ])->hint('<span>Укажите крайний срок исполнения</span>')?>
-                </div>
+        <div class="create__price-time">
+            <div class="create__price-time--wrapper">
+                <?= $form->field($model, 'price', $fieldConfig)
+                    ->textarea([
+                        'class' => 'input textarea input-money',
+                        'rows' => 1,
+                        'placeholder' => '1000',
+                    ])
+                    ->hint('<span>Не заполняйте для оценки исполнителем</span>') ?>
             </div>
+            <div class="create__price-time--wrapper">
+                <?= $form->field($model, 'dateEnd', $fieldConfig)
+                    ->input('date', [
+                        'class' => 'input-middle input input-date',
+                        'placeholder' => '10.11, 15:00',
+                    ])->hint('<span>Укажите крайний срок исполнения</span>') ?>
+            </div>
+        </div>
         <?php ActiveForm::end() ?>
         <div class="create__warnings">
             <div class="warning-item warning-item--advice">
@@ -97,5 +104,6 @@ TaskCreateAsset::register($this);
             <?php endif; ?>
         </div>
     </div>
-    <?= Html::submitButton('Опубликовать', ['form' => 'task-form', 'class' => 'button', 'id' => 'submit-btn']); ?>
+    <?= Html::submitButton('Опубликовать',
+        ['form' => 'task-form', 'class' => 'button', 'id' => 'submit-btn']); ?>
 </section>

@@ -1,4 +1,5 @@
 <?php
+
 namespace frontend\controllers;
 
 use app\models\RespondForm;
@@ -45,18 +46,20 @@ class TasksController extends SecuredController
         $rule = [
             'allow' => false,
             'actions' => [
-                'create'
+                'create',
             ],
-            'matchCallback' => function($rule, $action) {
+            'matchCallback' => function ($rule, $action) {
                 $user = Yii::$app->user->identity;
+
                 return $user && $user->role === User::ROLE_EXECUTOR;
             },
-            'denyCallback' => function($rule, $action) {
+            'denyCallback' => function ($rule, $action) {
                 return $action->controller->redirect(Task::getBaseTasksUrl());
             },
         ];
 
         array_unshift($rules['access']['rules'], $rule);
+
         return $rules;
     }
 
@@ -71,8 +74,9 @@ class TasksController extends SecuredController
         $taskModel = new TasksFilter();
         if (Yii::$app->request->get('TasksFilter')) {
             $taskModel->load(Yii::$app->request->get());
-        } elseif(!empty(Yii::$app->request->queryParams['filter'])) {
-            $filter = ['TasksFilter' => Yii::$app->request->queryParams['filter']];
+        } elseif (!empty(Yii::$app->request->queryParams['filter'])) {
+            $filter
+                = ['TasksFilter' => Yii::$app->request->queryParams['filter']];
             $taskModel->load($filter);
         }
         $taskModel->applyFilters($tasks);
@@ -84,10 +88,11 @@ class TasksController extends SecuredController
             ],
             'sort' => [
                 'defaultOrder' => [
-                    'date_start' => SORT_DESC
-                ]
+                    'date_start' => SORT_DESC,
+                ],
             ],
         ]);
+
         return $this->render('index', [
             'provider' => $provider,
             'taskModel' => $taskModel,
@@ -110,7 +115,7 @@ class TasksController extends SecuredController
     {
         $task = Task::findOne($id);
         $user = Yii::$app->user->identity;
-        if(!$task) {
+        if (!$task) {
             throw new NotFoundHttpException("Страница не найдена!");
         }
 
@@ -121,9 +126,12 @@ class TasksController extends SecuredController
             'isExecutor' => $user->role === User::ROLE_EXECUTOR,
             'isSelectedExecutor' => $task->executor_id === $user->id,
             'executor' => $task->executor,
-            'isRespond' => TaskRespond::find()->where(['task_id' => $task->id, 'user_id' => $user->id])->exists(),
+            'isRespond' => TaskRespond::find()->where([
+                'task_id' => $task->id,
+                'user_id' => $user->id,
+            ])->exists(),
             'respondModel' => new RespondForm(),
-            'taskCompletionModel' => new TaskCompletionForm()
+            'taskCompletionModel' => new TaskCompletionForm(),
         ]);
     }
 
@@ -134,10 +142,11 @@ class TasksController extends SecuredController
      */
     public function actionRespondAjaxValidation()
     {
-        if(Yii::$app->request->isAjax) {
+        if (Yii::$app->request->isAjax) {
             Yii::$app->response->format = Response::FORMAT_JSON;
             $respondModel = new RespondForm();
             $respondModel->setAttributes(Yii::$app->request->post('RespondForm'));
+
             return ActiveForm::validate($respondModel);
         }
     }
@@ -156,7 +165,7 @@ class TasksController extends SecuredController
             $task = Task::findOne($taskId);
             $transaction = Yii::$app->db->beginTransaction();
             try {
-                $executor = User::findOne((int) $task->executor_id);
+                $executor = User::findOne((int)$task->executor_id);
                 if ($model->isCompletion === TaskCompletionForm::STATUS_YES) {
                     $task->status = Task::STATUS_COMPLETED;
                     $executor->userData->updateCounters(['success_counter' => 1]);
@@ -188,6 +197,7 @@ class TasksController extends SecuredController
                 $transaction->rollBack();
             }
         }
+
         return $this->redirect(Task::getBaseTasksUrl());
     }
 
@@ -203,7 +213,11 @@ class TasksController extends SecuredController
     {
         $user = Yii::$app->user->identity;
         $task = Task::findOne($taskId);
-        if($respond = TaskRespond::findOne(['task_id' => $task->id, 'user_id' => $user->id])) {
+        if ($respond = TaskRespond::findOne([
+            'task_id' => $task->id,
+            'user_id' => $user->id,
+        ])
+        ) {
             $transaction = Yii::$app->db->beginTransaction();
             try {
                 $respond->delete();
@@ -214,8 +228,8 @@ class TasksController extends SecuredController
                 $user->userData->updateCounters(['failing_counter' => 1]);
                 $user->userData->save();
 
-                $authorTask = User::findOne((int) $task->author_id);
-                if($authorTask->userNotifications->is_task_actions) {
+                $authorTask = User::findOne((int)$task->author_id);
+                if ($authorTask->userNotifications->is_task_actions) {
                     NotificationHelper::taskDenial($authorTask, $task);
                 }
                 $transaction->commit();
@@ -237,7 +251,7 @@ class TasksController extends SecuredController
     public function actionRespond(int $taskId)
     {
         $model = new RespondForm();
-        if($model->load(Yii::$app->request->post()) && $model->validate()) {
+        if ($model->load(Yii::$app->request->post()) && $model->validate()) {
             $task = Task::findOne($taskId);
             (new TaskRespond([
                 'user_id' => Yii::$app->user->identity->id,
@@ -248,18 +262,19 @@ class TasksController extends SecuredController
                 'public_date' => date("Y-m-d h:i:s"),
             ]))->save();
 
-            $authorTask = User::findOne((int) $task->author_id);
-            if($authorTask->userNotifications->is_task_actions) {
+            $authorTask = User::findOne((int)$task->author_id);
+            if ($authorTask->userNotifications->is_task_actions) {
                 NotificationHelper::taskRespond($authorTask, $task);
             }
         }
+
         return $this->redirect(Task::getBaseTasksUrl());
     }
 
     /**
      * Действие для обработки завершения задания
      *
-     * @param int    $respondId идентификатор отклика к заданию
+     * @param int $respondId идентификатор отклика к заданию
      * @param string $status статус выполненности задания
      *
      * @return Response
@@ -270,18 +285,18 @@ class TasksController extends SecuredController
         $task = Task::findOne($taskRespond->task_id);
         $taskUrl = $task->getCurrentTaskUrl();
 
-        if(Yii::$app->user->identity->id !== $task->author_id) {
+        if (Yii::$app->user->identity->id !== $task->author_id) {
             $this->redirect($taskUrl);
         }
 
-        if($status === TaskRespond::STATUS_ACCEPTED) {
+        if ($status === TaskRespond::STATUS_ACCEPTED) {
             $taskRespond->status = TaskRespond::STATUS_ACCEPTED;
             $task->status = Task::STATUS_EXECUTION;
             $task->executor_id = $taskRespond->user_id;
             $task->save();
 
-            $executorTask = User::findOne((int) $taskRespond->user_id);
-            if($executorTask->userNotifications->is_task_actions) {
+            $executorTask = User::findOne((int)$taskRespond->user_id);
+            if ($executorTask->userNotifications->is_task_actions) {
                 NotificationHelper::taskStart($executorTask, $task);
             }
         } else {
@@ -289,6 +304,7 @@ class TasksController extends SecuredController
         }
 
         $taskRespond->save();
+
         return $this->redirect($taskUrl);
     }
 
@@ -302,7 +318,9 @@ class TasksController extends SecuredController
     public function actionCancel(int $taskId)
     {
         $task = Task::findOne($taskId);
-        if(!$task || $task->author_id !== Yii::$app->user->id || $task->status !== Task::STATUS_NEW) {
+        if (!$task || $task->author_id !== Yii::$app->user->id
+            || $task->status !== Task::STATUS_NEW
+        ) {
             return;
         }
 
@@ -323,10 +341,15 @@ class TasksController extends SecuredController
     public function actionCreate()
     {
         $model = new TaskCreate();
-        if(Yii::$app->request->isPost && $files = UploadedFile::getInstancesByName('files')) {
+        if (Yii::$app->request->isPost
+            && $files = UploadedFile::getInstancesByName('files')
+        ) {
             $model->files = $files;
         }
-        if(Yii::$app->request->post() && $model->load(Yii::$app->request->post()) && $model->validate()) {
+        if (Yii::$app->request->post()
+            && $model->load(Yii::$app->request->post())
+            && $model->validate()
+        ) {
             $userId = Yii::$app->user->identity->id;
             $task = new Task([
                 'author_id' => $userId,
@@ -343,13 +366,14 @@ class TasksController extends SecuredController
             ]);
             $task->save();
 
-            if($model->files) {
+            if ($model->files) {
                 $pathTaskDir = "$this->tasksPath/$task->id";
-                if(file_exists($pathTaskDir)) {
+                if (file_exists($pathTaskDir)) {
                     FileHelper::removeDirectory($pathTaskDir);
                 }
                 mkdir($pathTaskDir);
-                (new TaskFile(['path' => $pathTaskDir]))->setFiles($task->id, $model->files);
+                (new TaskFile(['path' => $pathTaskDir]))->setFiles($task->id,
+                    $model->files);
             }
             $this->redirect(Task::getBaseTasksUrl());
         }
@@ -372,7 +396,9 @@ class TasksController extends SecuredController
     public function actionAjaxGetYandexPlace(string $place = '')
     {
         Yii::$app->response->format = Response::FORMAT_JSON;
-        return json_decode(Yii::$container->get('yandexMap')->getDataMap($place))
+
+        return json_decode(Yii::$container->get('yandexMap')
+            ->getDataMap($place))
             ->response->GeoObjectCollection->featureMember;
     }
 }
