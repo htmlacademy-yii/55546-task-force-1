@@ -9,14 +9,41 @@ use yii\helpers\FileHelper;
 use yii\web\IdentityInterface;
 use yii\web\UploadedFile;
 
+/**
+ * Класс для работы c разделённым обновлением настроек пользователя
+ *
+ * Class UserSettingsHelper
+ *
+ * @package frontend\src\UserSettingsHelper
+ */
 class UserSettingsHelper
 {
+    /**
+     * Начальная инициализация класса помошника
+     *
+     * UserSettingsHelper constructor.
+     *
+     * @param Model             $model объект модели формы с валиднами данными
+     * @param IdentityInterface $user объект текущего пользователя
+     */
     public function __construct(Model $model, IdentityInterface $user)
     {
         $this->model = $model;
         $this->user = $user;
     }
 
+    /**
+     * Обновление фотографий с примерами работ пользователя
+     *
+     * @param string $dir строка с адресом директории для сохранения фотографий
+     *
+     * @return UserSettingsHelper текущий экземпляр класса помошника
+     * @throws \yii\base\ErrorException
+     * @throws \yii\base\Exception
+     * @throws \yii\db\Exception
+     * @throws \yii\web\ServerErrorHttpException
+     * @throws \yii\web\UnsupportedMediaTypeHttpException
+     */
     public function updateFileWorks(string $dir): UserSettingsHelper
     {
         if($this->model->files) {
@@ -31,6 +58,12 @@ class UserSettingsHelper
         return $this;
     }
 
+    /**
+     * Обновления основной информации пользователя
+     *
+     * @return UserSettingsHelper текущий экземпляр класса помошника
+     * @throws \yii\base\Exception
+     */
     public function updateUser(): UserSettingsHelper
     {
         $this->user->login = $this->model->name;
@@ -44,6 +77,13 @@ class UserSettingsHelper
         return $this;
     }
 
+    /**
+     * Обновления второстепенной информации пользователя
+     *
+     * @param string $dir строка с адресом директории для сохранения аватарки пользователя
+     *
+     * @return UserSettingsHelper текущий экземпляр класса помошника
+     */
     public function updateUserData(string $dir): UserSettingsHelper
     {
         $userData = $this->user->userData;
@@ -68,6 +108,11 @@ class UserSettingsHelper
         return $this;
     }
 
+    /**
+     * Обновление активных уведомлений пользователя
+     *
+     * @return UserSettingsHelper текущий экземпляр класса помошника
+     */
     public function updateUserNotifications(): UserSettingsHelper
     {
         $userNotifications = $this->user->userNotifications;
@@ -79,6 +124,11 @@ class UserSettingsHelper
         return $this;
     }
 
+    /**
+     * Обновление настроек пользователя
+     *
+     * @return UserSettingsHelper текущий экземпляр класса помошника
+     */
     public function updateUserSettings(): UserSettingsHelper
     {
         $userSettings = $this->user->userSettings;
@@ -89,6 +139,12 @@ class UserSettingsHelper
         return $this;
     }
 
+    /**
+     * Обновление специализаций пользователя
+     *
+     * @return UserSettingsHelper текущий экземпляр класса помошника
+     * @throws \yii\db\Exception
+     */
     public function updateUserSpecializations(): UserSettingsHelper
     {
         $specializations = is_array($this->model->specializations) ? $this->model->specializations : [];
@@ -100,6 +156,14 @@ class UserSettingsHelper
         return $this;
     }
 
+    /**
+     * Обновление роли пользователя
+     *
+     * @param string $roleClient строка с ролько клиент
+     * @param string $roleExecutor строка с ролько исполнителя
+     *
+     * @return UserSettingsHelper текущий экземпляр класса помошника
+     */
     public function updateUserRole(string $roleClient, string $roleExecutor): UserSettingsHelper
     {
         $specializations = is_array($this->model->specializations) ? $this->model->specializations : [];
