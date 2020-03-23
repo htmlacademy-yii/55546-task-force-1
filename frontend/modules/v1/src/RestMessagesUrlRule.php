@@ -59,7 +59,8 @@ class RestMessagesUrlRule extends BaseObject implements UrlRuleInterface
         if (in_array($request->getMethod(), $this->verbs)
             && preg_match($this->pattern, $pathInfo, $matches)
         ) {
-            $this->currentRoute = $this->routes[$request->getMethod()] ?? $pathInfo;
+            $this->currentRoute = $this->routes[$request->getMethod()] ??
+                $pathInfo;
 
             switch ($request->getMethod()) {
                 case 'GET':
@@ -125,7 +126,9 @@ class RestMessagesUrlRule extends BaseObject implements UrlRuleInterface
     private function makeRoute(string $param, string $value): bool
     {
         $before = $this->currentRoute;
-        $this->currentRoute = str_replace("<$param>", $value, $this->currentRoute);
+        $this->currentRoute = str_replace("<$param>", $value,
+            $this->currentRoute);
+
         return $before !== $this->currentRoute;
     }
 }

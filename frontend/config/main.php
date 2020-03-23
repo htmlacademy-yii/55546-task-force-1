@@ -1,4 +1,5 @@
 <?php
+
 use frontend\modules\v1\src\RestMessagesUrlRule;
 
 $params = array_merge(
@@ -21,7 +22,8 @@ return [
     ],
     'components' => [
         'assetManager' => [
-            'bundles' => (YII_ENV_PROD ? require __DIR__ . '/assets-prod.php' : []),
+            'bundles' => (YII_ENV_PROD ? require __DIR__.'/assets-prod.php'
+                : []),
         ],
         'mailer' => [
             'class' => 'yii\swiftmailer\Mailer',

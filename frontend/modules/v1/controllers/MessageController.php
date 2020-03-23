@@ -28,10 +28,11 @@ class MessageController extends ActiveController
 
     public function beforeAction($action)
     {
-        if(parent::beforeAction($action)) {
-            $version = ArrayHelper::getValue(Yii::$app->response->acceptParams, 'version', '1.0');
+        if (parent::beforeAction($action)) {
+            $version = ArrayHelper::getValue(Yii::$app->response->acceptParams,
+                'version', '1.0');
 
-            if(!preg_match('/^\D*1\.0$/', $version)) {
+            if (!preg_match('/^\D*1\.0$/', $version)) {
                 throw new NotAcceptableHttpException('Use only v1.0 version');
             }
         }

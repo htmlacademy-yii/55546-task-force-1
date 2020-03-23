@@ -274,8 +274,8 @@ class TasksController extends SecuredController
     /**
      * Действие для обработки завершения задания
      *
-     * @param int $respondId идентификатор отклика к заданию
-     * @param string $status статус выполненности задания
+     * @param int    $respondId идентификатор отклика к заданию
+     * @param string $status    статус выполненности задания
      *
      * @return Response
      */
