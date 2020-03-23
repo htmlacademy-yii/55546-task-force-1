@@ -1,6 +1,5 @@
 <?php
-
-use frontend\modules\api\v1\src\RestMessagesUrlRule;
+use frontend\modules\v1\src\RestMessagesUrlRule;
 
 $params = array_merge(
     require __DIR__.'/../../common/config/params.php',
@@ -16,11 +15,14 @@ return [
     'bootstrap' => ['log'],
     'controllerNamespace' => 'frontend\controllers',
     'modules' => [
-        'api' => [
-            'class' => 'frontend\modules\api\Module',
+        'v1' => [
+            'class' => 'frontend\modules\v1\Module',
         ],
     ],
     'components' => [
+        'assetManager' => [
+            'bundles' => (YII_ENV_PROD ? require __DIR__ . '/assets-prod.php' : []),
+        ],
         'mailer' => [
             'class' => 'yii\swiftmailer\Mailer',
             'useFileTransport' => false,
@@ -98,10 +100,18 @@ return [
                 'users/view/<id>' => 'users/view',
                 [
                     'class' => RestMessagesUrlRule::class,
+                    'pattern' => '/(?P<version>v\d+)\/messages\/(?P<task_id>\d+)$/',
+                    'routes' => [
+                        'GET' => '<version>/message',
+                        'POST' => '<version>/message/create',
+                    ],
+                ],
+                [
+                    'class' => RestMessagesUrlRule::class,
                     'pattern' => '/api\/messages\/(?P<task_id>\d+)$/',
                     'routes' => [
-                        'GET' => 'api/message',
-                        'POST' => 'api/message/create',
+                        'GET' => 'v1/message',
+                        'POST' => 'v1/message/create',
                     ],
                 ],
                 ['class' => 'yii\rest\UrlRule', 'controller' => 'api/message'],
@@ -116,12 +126,6 @@ return [
             ],
             'frontend\controllers\TasksController' => [
                 'tasksPath' => 'users-files/tasks',
-            ],
-        ],
-        'singletons' => [
-            'yandexMap' => [
-                'class' => 'frontend\src\YandexMap\YandexMap',
-                'apiKey' => 'e666f398-c983-4bde-8f14-e3fec900592a',
             ],
         ],
     ],

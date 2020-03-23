@@ -1,6 +1,7 @@
 <?php
 
 use frontend\assets\TaskViewAsset;
+use frontend\assets\YandexMapAsset;
 use yii\helpers\Html;
 use yii\bootstrap\ActiveForm;
 use app\models\TaskRespond;
@@ -12,6 +13,7 @@ $this->title = "Задание: $task->title";
 $fieldConfig = ['template' => '<p>{label}{input}{error}</p>'];
 $respondsCount = count($task->responds);
 
+YandexMapAsset::register($this);
 TaskViewAsset::register($this);
 ?>
 

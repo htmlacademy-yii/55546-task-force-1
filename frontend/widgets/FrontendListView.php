@@ -27,7 +27,7 @@ class FrontendListView extends ListView
                 return $content === false ? $matches[0] : $content;
             }, $this->layout);
         } else {
-            $content = $this->options;
+            $content = $this->renderEmpty();
         }
 
         $options = $this->options;

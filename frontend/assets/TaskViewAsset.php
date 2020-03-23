@@ -2,21 +2,32 @@
 
 namespace frontend\assets;
 
-use Yii;
-use frontend\components\YandexMap\YandexMap;
 use yii\web\AssetBundle;
 
+/**
+ * Ассет для страницы просмотра задания
+ *
+ * Class TaskViewAsset
+ *
+ * @package frontend\assets
+ */
 class TaskViewAsset extends AssetBundle
 {
+    /** @var string строка с адресом базового пути */
     public $basePath = '@webroot';
+    /** @var string строка с адресом базового пути */
     public $baseUrl = '@web';
+    /** @var array массив со списком скриптов */
     public $js = [];
 
+    /**
+     * TaskViewAsset constructor.
+     *
+     * @param array $config
+     */
     public function __construct($config = [])
     {
         $this->js = [
-            "https://api-maps.yandex.ru/2.1/?apikey="
-            .Yii::$container->get('yandexMap')->apiKey."&lang=ru_RU",
             'js/main.js',
             'js/yandex-map.js',
             'js/messenger.js',
