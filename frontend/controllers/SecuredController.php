@@ -28,7 +28,7 @@ class SecuredController extends Controller
      */
     public function beforeAction($action)
     {
-        if(!parent::beforeAction($action)) {
+        if (!parent::beforeAction($action)) {
             return false;
         }
 
