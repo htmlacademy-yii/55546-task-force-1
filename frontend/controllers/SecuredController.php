@@ -24,9 +24,14 @@ class SecuredController extends Controller
      *
      * @return bool
      * @throws \yii\db\Exception
+     * @throws \yii\web\BadRequestHttpException
      */
     public function beforeAction($action)
     {
+        if(!parent::beforeAction($action)) {
+            return false;
+        }
+
         Yii::$app->user->loginUrl = Url::to('/site/index');
         $user = Yii::$app->user->identity;
         if ($user) {
@@ -37,7 +42,7 @@ class SecuredController extends Controller
         Task::updateAll(['status' => Task::STATUS_EXPIRED],
             "date_end IS NOT NULL AND NOW() > date_end");
 
-        return $action;
+        return true;
     }
 
     /**
