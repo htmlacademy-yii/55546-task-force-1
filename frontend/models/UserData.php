@@ -3,6 +3,7 @@
 namespace app\models;
 
 use yii\db\ActiveRecord;
+use yii\helpers\Url;
 
 /**
  * Класс для работы с моделью данных пользователя
@@ -22,10 +23,10 @@ class UserData extends ActiveRecord
     {
         if (!empty($this->avatar)) {
             return preg_match('/^http/', $this->avatar) ? $this->avatar
-                : "/$this->avatar";
+                : Url::to("/$this->avatar");
         }
 
-        return '/img/user-photo.png';
+        return Url::to('/img/user-photo.png');
     }
 
     /**

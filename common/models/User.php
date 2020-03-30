@@ -17,6 +17,7 @@ use Yii;
 use yii\base\NotSupportedException;
 use yii\db\ActiveQuery;
 use yii\db\ActiveRecord;
+use yii\helpers\Url;
 use yii\web\IdentityInterface;
 
 /**
@@ -223,10 +224,10 @@ class User extends ActiveRecord implements IdentityInterface
     public static function getCorrectAvatar(string $avatar): string
     {
         if (!empty($avatar)) {
-            return preg_match('/^http/', $avatar) ? $avatar : "/$avatar";
+            return preg_match('/^http/', $avatar) ? $avatar : Url::to("/$avatar");
         }
 
-        return '/img/user-photo.png';
+        return Url::to('/img/user-photo.png');
     }
 
     /**
