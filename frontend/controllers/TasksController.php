@@ -183,17 +183,17 @@ class TasksController extends SecuredController
                     'executor_id' => $task->executor_id,
                 ]))->save();
 
+                if ($executor->userNotifications->is_task_actions) {
+                    NotificationHelper::taskComplete($executor, $task);
+                }
+                $transaction->commit();
+
                 $queryRating
                     = Yii::$app->db->createCommand("SELECT SUM(rating) as `rating`, COUNT(id) as `count` FROM review WHERE executor_id = :id",
                     [':id' => $executor->id])->queryOne();
                 $executor->userData->rating = round((($queryRating['rating']
                         + $model->rating) / ($queryRating['count'] + 1)), 1);
                 $executor->userData->save();
-
-                if ($executor->userNotifications->is_task_actions) {
-                    NotificationHelper::taskComplete($executor, $task);
-                }
-                $transaction->commit();
             } catch (\Exception $err) {
                 $transaction->rollBack();
             }
