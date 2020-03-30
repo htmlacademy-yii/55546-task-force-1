@@ -184,9 +184,10 @@ class TasksController extends SecuredController
                 ]))->save();
 
                 $queryRating
-                    = Yii::$app->db->createCommand("SELECT AVG(rating) as rating FROM review WHERE executor_id = :id",
+                    = Yii::$app->db->createCommand("SELECT SUM(rating) as `rating`, COUNT(id) as `count` FROM review WHERE executor_id = :id",
                     [':id' => $executor->id])->queryOne();
-                $executor->userData->rating = round($queryRating['rating'], 1);
+                $executor->userData->rating = round((($queryRating['rating']
+                        + $model->rating) / ($queryRating['count'] + 1)), 1);
                 $executor->userData->save();
 
                 if ($executor->userNotifications->is_task_actions) {
