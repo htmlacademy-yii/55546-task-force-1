@@ -239,7 +239,7 @@ class User extends ActiveRecord implements IdentityInterface
      */
     public static function getUserUrl(int $id): string
     {
-        return "/users/view/$id";
+        return Url::to("/users/view/$id");
     }
 
     /**
