@@ -5,6 +5,7 @@ namespace app\models;
 use common\models\User;
 use yii\db\ActiveQuery;
 use yii\db\ActiveRecord;
+use yii\web\ServerErrorHttpException;
 
 /**
  * Класс для работы с моделью отзывов
@@ -57,5 +58,21 @@ class Review extends ActiveRecord
             [['task_id', 'author_id', 'executor_id'], 'integer'],
             [['text'], 'string'],
         ];
+    }
+
+    /**
+     * Переопределение метода сохранения данных что бы при неудаче выбрасывалась ошибка
+     *
+     * @param bool $runValidation
+     * @param null $attributeNames
+     *
+     * @return bool|void
+     * @throws ServerErrorHttpException
+     */
+    public function save($runValidation = true, $attributeNames = null)
+    {
+        if (!parent::save($runValidation, $attributeNames)) {
+            throw new ServerErrorHttpException();
+        }
     }
 }
