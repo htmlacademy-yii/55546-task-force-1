@@ -186,7 +186,7 @@ class TasksController extends SecuredController
                 $queryRating
                     = Yii::$app->db->createCommand("SELECT SUM(rating) as `rating`, COUNT(id) as `count` FROM review WHERE executor_id = :id",
                     [':id' => $executor->id])->queryOne();
-                $executor->userData->rating = round((($queryRating['rating']
+                $executor->userData->rating = (string)round((($queryRating['rating']
                         + $model->rating) / ($queryRating['count'] + 1)), 1);
                 $executor->userData->save();
 
