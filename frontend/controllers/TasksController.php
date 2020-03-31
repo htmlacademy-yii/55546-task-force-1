@@ -10,6 +10,7 @@ use app\models\TaskFile;
 use app\models\TaskRespond;
 use common\models\User;
 use frontend\src\NotificationHelper\NotificationHelper;
+use PHPUnit\Framework\Error\Error;
 use Yii;
 use yii\bootstrap\ActiveForm;
 use yii\data\ActiveDataProvider;
@@ -186,7 +187,7 @@ class TasksController extends SecuredController
                 $queryRating
                     = Yii::$app->db->createCommand("SELECT SUM(rating) as `rating`, COUNT(id) as `count` FROM review WHERE executor_id = :id",
                     [':id' => $executor->id])->queryOne();
-                $executor->userData->rating = round((($queryRating['rating']
+                $executor->userData->rating = (string)round((($queryRating['rating']
                         + $model->rating) / ($queryRating['count'] + 1)), 1);
                 $executor->userData->save();
 
