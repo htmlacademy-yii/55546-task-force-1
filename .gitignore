@@ -10,3 +10,4 @@ vendor
 
 frontend/web/users-files/avatars/**/*
 frontend/web/users-files/works/**/*
+frontend/web/users-files/tasks/**/*

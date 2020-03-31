@@ -2,81 +2,75 @@
 
 namespace app\models;
 
-use Yii;
 use yii\db\ActiveRecord;
+use yii\helpers\Url;
 
 /**
- * This is the model class for table "user_data".
+ * Класс для работы с моделью данных пользователя
  *
- * @property int|null $user_id
- * @property string|null $name
- * @property string|null $description
- * @property int|null $age
- * @property string|null $address
- * @property string|null $skype
- * @property string|null $phone
- * @property string|null $other_messenger
- * @property string|null $avatar
- * @property int|null $rating
- * @property int|null $views
- * @property int|null $order_count
- * @property string|null $status
+ * Class UserData
+ *
+ * @package app\models
  */
 class UserData extends ActiveRecord
 {
     /**
-     * {@inheritdoc}
+     * Получение обработанной ссылки на автара данного пользователя
+     *
+     * @return string обработанная строка ссылки на аватар
      */
-    public static function tableName()
+    public function getAvatar(): string
+    {
+        if (!empty($this->avatar)) {
+            return preg_match('/^http/', $this->avatar) ? $this->avatar
+                : Url::to("/$this->avatar");
+        }
+
+        return Url::to('/img/user-photo.png');
+    }
+
+    /**
+     * Получение имени таблицы модели
+     *
+     * @return string имя таблицы модели
+     */
+    public static function tableName(): string
     {
         return 'user_data';
     }
 
     /**
-     * {@inheritdoc}
+     * Получение списка правил валидации для модели
+     *
+     * @return array список правил валидации для модели
      */
-    public function rules()
+    public function rules(): array
     {
         return [
-            [['description', 'age', 'address', 'skype', 'phone', 'other_messenger', 'avatar', 'rating', 'views', 'order_count', 'status'], 'safe'],
-            [['user_id', 'age', 'rating', 'views', 'order_count', 'status'], 'integer'],
-            [['description', 'address'], 'string'],
-            [['skype', 'phone', 'other_messenger', 'avatar'], 'string', 'max' => 255],
+            [
+                [
+                    'description',
+                    'skype',
+                    'phone',
+                    'other_messenger',
+                    'avatar',
+                    'rating',
+                    'views',
+                    'success_counter',
+                    'failing_counter',
+                ],
+                'safe',
+            ],
+            [
+                ['user_id', 'views', 'success_counter', 'failing_counter'],
+                'integer',
+            ],
+            ['description', 'string'],
+            [
+                ['skype', 'phone', 'other_messenger', 'avatar', 'rating'],
+                'string',
+                'max' => 255,
+            ],
         ];
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function attributeLabels()
-    {
-        return [
-            'user_id' => 'User ID',
-            'name' => 'Name',
-            'description' => 'Description',
-            'age' => 'Age',
-            'address' => 'Address',
-            'skype' => 'Skype',
-            'phone' => 'Phone',
-            'other_messenger' => 'Other Messenger',
-            'avatar' => 'Avatar',
-            'rating' => 'Rating',
-            'views' => 'Views',
-            'order_count' => 'Order Count',
-            'status' => 'Status',
-        ];
-    }
-
-    public function getCorrectAvatar()
-    {
-        return preg_match('/^http/', $this->avatar) ? $this->avatar : "/$this->avatar";
-    }
-
-    public function save($runValidation = true, $attributeNames = null): bool
-    {
-        if(!($result = parent::save($runValidation, $attributeNames))) {
-            throw new \Exception();
-        }
-        return $result;
     }
 }

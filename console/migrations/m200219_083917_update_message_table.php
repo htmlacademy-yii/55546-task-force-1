@@ -3,10 +3,17 @@
 use yii\db\Migration;
 
 /**
+ * Миграция для обновления таблицы сообщений message
+ *
  * Class m200219_083917_update_message_table
  */
 class m200219_083917_update_message_table extends Migration
 {
+    /**
+     * Обновляет структуру таблицы message
+     *
+     * @return bool|void
+     */
     public function safeUp()
     {
         $this->dropColumn('message', 'chat_id');
@@ -19,6 +26,11 @@ class m200219_083917_update_message_table extends Migration
         $this->addColumn('message', 'is_mine', $this->boolean());
     }
 
+    /**
+     * Возвращает раннюю структуру таблицы message
+     *
+     * @return bool|void
+     */
     public function safeDown()
     {
         $this->dropColumn('message', 'message');

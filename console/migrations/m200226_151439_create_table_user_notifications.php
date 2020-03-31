@@ -4,12 +4,17 @@ use yii\db\Migration;
 use common\models\User;
 
 /**
+ * Миграция для добалвления таблицы уведомлений пользователя user_notifications
+ *
  * Class m200226_151439_create_table_user_notifications
  */
 class m200226_151439_create_table_user_notifications extends Migration
 {
     /**
-     * {@inheritdoc}
+     * Создаёт таблицу user_notifications и инициализирует её данными для всех зарегистрированных пользователей
+     *
+     * @return bool|void
+     * @throws \yii\db\Exception
      */
     public function safeUp()
     {
@@ -27,7 +32,9 @@ class m200226_151439_create_table_user_notifications extends Migration
     }
 
     /**
-     * {@inheritdoc}
+     * Удаляет таблицу user_notifications
+     *
+     * @return bool|void
      */
     public function safeDown()
     {

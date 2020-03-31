@@ -1,18 +1,24 @@
 <?php
+
+use yii\helpers\Url;
 use yii\widgets\ActiveForm;
 use yii\helpers\Html;
+use app\models\Task;
+use yii\authclient\widgets\AuthChoice;
 
 $this->title = 'Главная страница сайта TaskForce';
 
-$fieldConfig = ['template' => "{label}{input}{error}", 'options' => ['tag' => false]];
+$fieldConfig = ['template' => "<p>{label}{input}{error}</p>"];
 ?>
 
 <div class="landing-container">
     <div class="landing-top">
         <h1>Работа для всех.<br>
             Найди исполнителя на любую задачу.</h1>
-        <p>Сломался кран на кухне? Надо отправить документы? Нет времени самому гулять с собакой?
-            У нас вы быстро найдёте исполнителя для любой жизненной ситуации?<br>
+        <p>Сломался кран на кухне? Надо отправить документы? Нет времени самому
+            гулять с собакой?
+            У нас вы быстро найдёте исполнителя для любой жизненной
+            ситуации?<br>
             Быстро, безопасно и с гарантией. Просто, как раз, два, три. </p>
         <?= Html::button('Создать аккаунт', ['class' => 'button']) ?>
     </div>
@@ -24,7 +30,7 @@ $fieldConfig = ['template' => "{label}{input}{error}", 'options' => ['tag' => fa
                     <h3>Публикация заявки</h3>
                     <p>Создайте новую заявку.</p>
                     <p>Опишите в ней все детали
-                        и  стоимость работы.</p>
+                        и стоимость работы.</p>
                 </div>
             </div>
             <div class="landing-instruction-step">
@@ -58,7 +64,7 @@ $fieldConfig = ['template' => "{label}{input}{error}", 'options' => ['tag' => fa
                 <h3>Исполнителям</h3>
                 <ul class="notice-card-list">
                     <li>Большой выбор заданий</li>
-                    <li>Работайте где  удобно</li>
+                    <li>Работайте где удобно</li>
                     <li>Свободный график</li>
                     <li>Удалённая работа</li>
                     <li>Гарантия оплаты</li>
@@ -81,23 +87,37 @@ $fieldConfig = ['template' => "{label}{input}{error}", 'options' => ['tag' => fa
             <h2>Последние задания на сайте</h2>
             <?php foreach ($tasks as $task): ?>
                 <div class="landing-task">
-                    <div class="landing-task-top task-<?= $task->category->code === 'translation' ? 'courier' : $task->category->code; ?>"></div>
+                    <?php if ($task->category): ?>
+                        <div
+                            class="landing-task-top task-<?= $task->category->code; ?>"></div>
+                    <?php endif; ?>
                     <div class="landing-task-description">
-                        <h3><?= Html::a($task->title, '#', ['class' => 'link-regular']) ?></h3>
-                        <p><?= $task->description; ?></p>
+                        <h3><?= Html::a(Html::encode($task->title ?? ''),
+                                $task->getCurrentTaskUrl(),
+                                ['class' => 'link-regular']) ?></h3>
+                        <p><?= Html::encode($task->description ?? ''); ?></p>
                     </div>
                     <div class="landing-task-info">
                         <div class="task-info-left">
-                            <p><?= Html::a($task->category->title, '#', ['class' => 'link-regular']) ?></p>
-                            <p><?= $task->date_start; ?> назад</p>
+                            <?php if ($task->category): ?>
+                                <p><?= Html::a(Html::encode($task->category->title),
+                                        Task::getUrlTasksByCategory($task->category->id),
+                                        ['class' => 'link-regular']) ?></p>
+                            <?php endif; ?>
+                            <p><?= $task->date_start
+                                    ? Yii::$app->formatter->asRelativeTime($task->date_start)
+                                    : ''; ?></p>
                         </div>
-                        <span><?= $task->price; ?> <b>₽</b></span>
+                        <?php if ($task->price): ?>
+                            <span><?= Html::encode($task->price); ?> <b>₽</b></span>
+                        <?php endif; ?>
                     </div>
                 </div>
             <?php endforeach; ?>
         </div>
         <div class="landing-bottom-container">
-            <?= Html::button('смотреть все задания', ['class' => 'button red-button']); ?>
+            <?= Html::a('смотреть все задания', Task::getBaseTasksUrl(),
+                ['class' => 'button red-button']); ?>
         </div>
     </div>
 </div>
@@ -105,27 +125,33 @@ $fieldConfig = ['template' => "{label}{input}{error}", 'options' => ['tag' => fa
 <section class="modal enter-form form-modal" id="enter-form">
     <h2>Вход на сайт</h2>
 
-    <?php $form = ActiveForm::begin(['enableAjaxValidation' => true, 'enableClientValidation' => true]); ?>
-        <p>
-            <?= $form->field($model, 'email', $fieldConfig)
-                ->input('email', ['class' => 'enter-form-email input input-middle', 'id' => 'enter-email'])
-                ->label(null, ['class' => 'form-modal-description'])
-                ->error(['id' => 'error-email']); ?>
-        </p>
-        <p>
-            <?= $form->field($model, 'password', $fieldConfig)
-                ->passwordInput(['class' => 'enter-form-email input input-middle', 'id' => 'enter-password'])
-                ->label(null, ['class' => 'form-modal-description'])
-                ->error(['id' => 'error-password']); ?>
-        </p>
-        <p>
-            <?= \yii\authclient\widgets\AuthChoice::widget([
-                'baseAuthUrl' => ['site/auth'],
-                'popupMode' => false,
-            ]); ?>
-        </p>
-        <?= Html::submitButton('Войти', ['id' => 'btn-login', 'class' => 'button']); ?>
+    <?php $form = ActiveForm::begin([
+        'enableClientValidation' => false,
+        'enableAjaxValidation' => true,
+        'validationUrl' => Url::to('/site/login-ajax-validation'),
+    ]); ?>
+    <?= $form->field($model, 'email', $fieldConfig)
+        ->input('email', [
+            'class' => 'enter-form-email input input-middle',
+            'id' => 'enter-email',
+        ])
+        ->label(null, ['class' => 'form-modal-description']); ?>
+    <?= $form->field($model, 'password', $fieldConfig)
+        ->passwordInput([
+            'class' => 'enter-form-email input input-middle',
+            'id' => 'enter-password',
+        ])
+        ->label(null, ['class' => 'form-modal-description']); ?>
+    <p>
+        <?= AuthChoice::widget([
+            'baseAuthUrl' => ['site/auth'],
+            'popupMode' => false,
+        ]); ?>
+    </p>
+    <?= Html::submitButton('Войти',
+        ['id' => 'btn-login', 'class' => 'button']); ?>
     <?php ActiveForm::end(); ?>
-    <?= Html::button('Закрыть', ['id' => 'close-modal', 'class' => 'form-modal-close']); ?>
+    <?= Html::button('Закрыть',
+        ['id' => 'close-modal', 'class' => 'form-modal-close']); ?>
 </section>
 <div class="overlay"></div>

@@ -1,24 +1,44 @@
 <?php
-use frontend\modules\api\components\RestMessagesUrlRule;
+
+use frontend\modules\v1\src\RestMessagesUrlRule;
 
 $params = array_merge(
-    require __DIR__ . '/../../common/config/params.php',
-    require __DIR__ . '/../../common/config/params-local.php',
-    require __DIR__ . '/params.php',
-    require __DIR__ . '/params-local.php'
+    require __DIR__.'/../../common/config/params.php',
+    require __DIR__.'/../../common/config/params-local.php',
+    require __DIR__.'/params.php',
+    require __DIR__.'/params-local.php'
 );
 
 return [
+    'timeZone' => 'UTC',
     'id' => 'app-frontend',
     'basePath' => dirname(__DIR__),
     'bootstrap' => ['log'],
     'controllerNamespace' => 'frontend\controllers',
     'modules' => [
-        'api' => [
-            'class' => 'frontend\modules\api\Module'
-        ]
+        'v1' => [
+            'class' => 'frontend\modules\v1\Module',
+        ],
     ],
     'components' => [
+        'assetManager' => [
+            'bundles' => (YII_ENV_PROD ? require __DIR__.'/assets-prod.php'
+                : []),
+        ],
+        'mailer' => [
+            'class' => 'yii\swiftmailer\Mailer',
+            'useFileTransport' => false,
+            'transport' => [
+                'class' => 'Swift_SmtpTransport',
+                'host' => 'smtp.mail.ru',
+                'port' => 465,
+                'encryption' => 'ssl',
+            ],
+        ],
+        'formatter' => [
+            'class' => 'yii\i18n\Formatter',
+            'language' => 'ru-RU',
+        ],
         'cache' => [
             'class' => 'yii\redis\Cache',
             'redis' => [
@@ -31,7 +51,7 @@ return [
             'csrfParam' => '_csrf-frontend',
             'parsers' => [
                 'application/json' => 'yii\web\JsonParser',
-            ]
+            ],
         ],
         'authClientCollection' => [
             'class' => 'yii\authclient\Collection',
@@ -47,7 +67,10 @@ return [
         'user' => [
             'identityClass' => 'common\models\User',
             'enableAutoLogin' => true,
-            'identityCookie' => ['name' => '_identity-frontend', 'httpOnly' => true],
+            'identityCookie' => [
+                'name' => '_identity-frontend',
+                'httpOnly' => true,
+            ],
         ],
         'session' => [
             // this is the name of the session cookie used for login on the frontend
@@ -66,19 +89,32 @@ return [
             'errorAction' => 'site/error',
         ],
         'urlManager' => [
-            'class' => 'frontend\components\TaskforceUrlManager\TaskforceUrlManager',
+            'class' => 'frontend\src\TaskforceUrlManager\TaskforceUrlManager',
             'enablePrettyUrl' => true,
             'showScriptName' => false,
             'rules' => [
                 'tasks/view/<id>' => 'tasks/view',
-                'tasks/decision/<status>/<id>/<taskId>' => 'tasks/decision',
+                'tasks/completion/<taskId>' => 'tasks/completion',
+                'tasks/respond/<taskId>' => 'tasks/respond',
+                'tasks/refusal/<taskId>' => 'tasks/refusal',
+                'tasks/cancel/<taskId>' => 'tasks/cancel',
+                'tasks/decision/<respondId>/<status>' => 'tasks/decision',
+                'users/view/<id>' => 'users/view',
+                [
+                    'class' => RestMessagesUrlRule::class,
+                    'pattern' => '/(?P<version>v\d+)\/messages\/(?P<task_id>\d+)$/',
+                    'routes' => [
+                        'GET' => '<version>/message',
+                        'POST' => '<version>/message/create',
+                    ],
+                ],
                 [
                     'class' => RestMessagesUrlRule::class,
                     'pattern' => '/api\/messages\/(?P<task_id>\d+)$/',
                     'routes' => [
-                        'GET' => 'api/message',
-                        'POST' => 'api/message/create',
-                    ]
+                        'GET' => 'v1/message',
+                        'POST' => 'v1/message/create',
+                    ],
                 ],
                 ['class' => 'yii\rest\UrlRule', 'controller' => 'api/message'],
             ],
@@ -86,16 +122,14 @@ return [
     ],
     'container' => [
         'definitions' => [
-            'frontend\controllers\ProfileController' => [
-                'avatarsPath' => 'users-files/avatars'
-            ]
+            'frontend\controllers\SettingsController' => [
+                'avatarsPath' => 'users-files/avatars',
+                'photosPath' => 'users-files/works',
+            ],
+            'frontend\controllers\TasksController' => [
+                'tasksPath' => 'users-files/tasks',
+            ],
         ],
-        'singletons' => [
-            'yandexMap' => [
-                'class' => 'frontend\components\YandexMap\YandexMap',
-                'apiKey' => 'e666f398-c983-4bde-8f14-e3fec900592a',
-            ]
-        ]
     ],
     'params' => $params,
 ];

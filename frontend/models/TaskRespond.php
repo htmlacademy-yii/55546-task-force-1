@@ -2,49 +2,43 @@
 
 namespace app\models;
 
-use frontend\components\DebugHelper;
-use Yii;
+use yii\db\ActiveQuery;
 use yii\db\ActiveRecord;
 use common\models\User;
+
 /**
- * This is the model class for table "task_respond".
+ * Класс для работы с моделью откликов к заданиям
  *
- * @property int|null $task_id
- * @property int|null $user_id
- * @property string|null $text
- * @property string|null $public_date
+ * Class TaskRespond
+ *
+ * @package app\models
  */
 class TaskRespond extends ActiveRecord
 {
+    /** @var string строка со статусом нового отклика */
     const STATUS_NEW = 'new';
+    /** @var string строка со статусом принятого отклика */
     const STATUS_ACCEPTED = 'accepted';
+    /** @var string строка со статусом отклонённого отклика */
     const STATUS_DENIED = 'denied';
 
-    public static function tableName()
-    {
-        return 'task_respond';
-    }
-
-    public function rules()
-    {
-        return [
-            [['task_id', 'user_id', 'price'], 'integer'],
-            [['text'], 'string'],
-        ];
-    }
-
-    public function attributeLabels()
-    {
-        return [
-            'task_id' => 'Task ID',
-            'user_id' => 'User ID',
-            'text' => 'Text',
-            'public_date' => 'Public Date',
-        ];
-    }
-
-    public function getUser()
+    /**
+     * Создание связи с пользователем
+     *
+     * @return ActiveQuery
+     */
+    public function getUser(): ActiveQuery
     {
         return $this->hasOne(User::class, ['id' => 'user_id']);
+    }
+
+    /**
+     * Получение имени таблицы модели
+     *
+     * @return string имя таблицы модели
+     */
+    public static function tableName(): string
+    {
+        return 'task_respond';
     }
 }

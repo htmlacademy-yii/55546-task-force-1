@@ -1,48 +1,54 @@
 <?php
+
 namespace app\models;
 
-use frontend\components\DebugHelper;
 use yii\base\Model;
 
+/**
+ * Класс для работы с моделью формы завершения задания
+ *
+ * Class TaskCompletionForm
+ *
+ * @package app\models
+ */
 class TaskCompletionForm extends Model
 {
+    /** @var string строка со статусом исполнения задания - возниклик проблемы */
     const STATUS_DIFFICULT = 'difficult';
+    /** @var string строка со статусом исполнения задания - нет проблемы */
     const STATUS_YES = 'yes';
 
+    /** @var string строка со статусом исполнения задания выбранным заказчиком */
     public $isCompletion;
+    /** @var string строка с рейтингом качества исполнения */
     public $rating;
+    /** @var string строка с описанием по поводу выполненного задания */
     public $text;
 
-    public function rules()
+    /**
+     * Получение списка правил валидации для модели
+     *
+     * @return array список правил валидации для модели
+     */
+    public function rules(): array
     {
         return [
             ['rating', 'required'],
-            ['rating', 'integer'],
+            ['rating', 'integer', 'min' => 1, 'max' => 5],
             [['isCompletion', 'text', 'rating'], 'safe'],
         ];
     }
 
-    public function attributeLabels()
+    /**
+     * Указание списка имён для атрибутов формы
+     *
+     * @return array список имён для атрибутов формы
+     */
+    public function attributeLabels(): array
     {
         return [
             'rating' => 'Оценка',
             'text' => 'Комментарий',
         ];
-    }
-
-    public function completionTask(int $taskId)
-    {
-        $task = Task::findOne($taskId);
-        $task->status = $this->isCompletion === self::STATUS_YES ? Task::STATUS_COMPLETED : Task::STATUS_FAILING;
-        $task->save();
-
-        $taskRespond = TaskRespond::find()->where("task_id = $taskId AND status = '" . TaskRespond::STATUS_ACCEPTED . "'")->one();
-        $rewiew = new Review();
-        $rewiew->text = $this->text;
-        $rewiew->rating = $this->rating;
-        $rewiew->task_id = $taskId;
-        $rewiew->author_id = $task->author_id;
-        $rewiew->executor_id = $taskRespond->user_id;
-        $rewiew->save();
     }
 }

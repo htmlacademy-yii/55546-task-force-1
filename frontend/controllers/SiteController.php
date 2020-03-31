@@ -1,56 +1,57 @@
 <?php
+
 namespace frontend\controllers;
 
+use yii\authclient\clients\VKontakte;
 use app\models\{Auth,
     City,
+    EventRibbon,
     SignupForm,
     Task,
-    MainLoginForm,
+    LoginForm,
     UserData,
     UserNotifications,
     UserSettings};
 use common\models\User;
-use frontend\components\DebugHelper\DebugHelper;
-use frontend\components\SqlAppGenerator\SqlAppGenerator;
-use frontend\components\UserInitHelper\UserInitHelper;
+use frontend\src\UserInitHelper\UserInitHelper;
 use Yii;
-use yii\authclient\AuthAction;
-use yii\base\InvalidArgumentException;
-use yii\widgets\ActiveForm;
-use yii\helpers\Url;
-use yii\web\BadRequestHttpException;
-use yii\filters\VerbFilter;
-use common\models\LoginForm;
-
-use frontend\models\{PasswordResetRequestForm, ResetPasswordForm, ContactForm, ResendVerificationEmailForm, VerifyEmailForm};
-use yii\helpers\ArrayHelper;
+use yii\filters\AccessControl;
 use yii\web\Response;
+use yii\widgets\ActiveForm;
 
 /**
- * Site controller
+ * Контроллер для работы с общими страницами сайта
+ *
+ * Class SiteController
+ *
+ * @package frontend\controllers
  */
 class SiteController extends SecuredController
 {
     /**
-     * {@inheritdoc}
+     * Определением фильтра
+     *
+     * @return array
+     * @throws \yii\db\Exception
      */
     public function behaviors()
     {
-        return ArrayHelper::merge([
+        return [
             'access' => [
-                'except' => ['index', 'signup', 'login', 'auth'],
+                'class' => AccessControl::class,
+                'only' => ['signup', 'login', 'auth', 'onAuthSuccess'],
+                'rules' => [
+                    [
+                        'allow' => true,
+                        'roles' => ['?'],
+                    ],
+                ],
             ],
-//            'verbs' => [
-//                'class' => VerbFilter::class,
-//                'actions' => [
-//                    'logout' => ['post'],
-//                ],
-//            ],
-        ], parent::behaviors());
+        ];
     }
 
     /**
-     * {@inheritdoc}
+     * @return array
      */
     public function actions()
     {
@@ -65,69 +66,72 @@ class SiteController extends SecuredController
             'auth' => [
                 'class' => 'yii\authclient\AuthAction',
                 'successCallback' => [$this, 'onAuthSuccess'],
-            ]
+            ],
         ];
     }
 
     /**
-     * Displays homepage.
+     * Действие для ajax установки в сессию активного города для фильтрации задач
      *
-     * @return mixed
+     * @param int $id идентификатор города
+     */
+    public function actionSetAjaxCity(int $id)
+    {
+        Yii::$app->session->set('city', $id);
+    }
+
+    /**
+     * Действие для ajax очистки просмотренных событий
+     */
+    public function actionClearEventRibbon()
+    {
+        if ($user = Yii::$app->user->identity) {
+            EventRibbon::deleteAll(['user_id' => $user->id]);
+        }
+    }
+
+    /**
+     * Действие для главной страницы стайта
+     *
+     * @return string шаблон с данными страницы
      */
     public function actionIndex()
     {
-        if (!Yii::$app->user->isGuest) {
-            return $this->redirect(Task::getBaseTasksUrl());
-        }
         $this->layout = 'landing';
 
-        $model = new MainLoginForm();
-        if(Yii::$app->request->isAjax) {
-            $user = $model->loginValidate(Yii::$app->request->post());
-            Yii::$app->response->format = Response::FORMAT_JSON;
-
-            if(empty($model->getErrors())) {
-                Yii::$app->user->login($user);
-                return $this->redirect(Task::getBaseTasksUrl());
-            }
-
-            return $model->getErrors();
-        }
-
         return $this->render('landing', [
-            'model' => $model,
-            'tasks' => Task::find()->with(['category'])->where(['status' => Task::STATUS_NEW])
+            'model' => new LoginForm(),
+            'tasks' => Task::find()->with(['category'])
+                ->where(['status' => Task::STATUS_NEW])
                 ->orderBy('date_start DESC')->limit(4)->all(),
         ]);
     }
 
     /**
-     * Logs in a user.
+     * Действие для ajax валидации формы авторизации
      *
-     * @return mixed
+     * @return array|Response
      */
-    public function actionLogin()
+    public function actionLoginAjaxValidation()
     {
-        if (!Yii::$app->user->isGuest) {
-            return $this->goHome();
-        }
+        if (Yii::$app->request->isAjax) {
+            Yii::$app->response->format = Response::FORMAT_JSON;
+            $model = new LoginForm();
+            $model->setAttributes(Yii::$app->request->post('LoginForm'));
+            if ($validate = ActiveForm::validate($model)) {
+                return $validate;
+            }
 
-        $model = new LoginForm();
-        if ($model->load(Yii::$app->request->post()) && $model->login()) {
-            return $this->goBack();
-        } else {
-            $model->password = '';
+            Yii::$app->user->login(User::findOne(['email' => $model->email]));
 
-            return $this->render('login', [
-                'model' => $model,
-            ]);
+            return $this->redirect(Task::getBaseTasksUrl());
         }
     }
 
     /**
-     * Logs out the current user.
+     * Действие для выхода пользователя из системы
      *
-     * @return mixed
+     * @return Response
      */
     public function actionLogout()
     {
@@ -137,58 +141,31 @@ class SiteController extends SecuredController
     }
 
     /**
-     * Displays contact page.
+     * Действие для регистрации нового пользователя
      *
-     * @return mixed
-     */
-    public function actionContact()
-    {
-        $model = new ContactForm();
-        if ($model->load(Yii::$app->request->post()) && $model->validate()) {
-            if ($model->sendEmail(Yii::$app->params['adminEmail'])) {
-                Yii::$app->session->setFlash('success', 'Thank you for contacting us. We will respond to you as soon as possible.');
-            } else {
-                Yii::$app->session->setFlash('error', 'There was an error sending your message.');
-            }
-
-            return $this->refresh();
-        } else {
-            return $this->render('contact', [
-                'model' => $model,
-            ]);
-        }
-    }
-
-    /**
-     * Displays about page.
-     *
-     * @return mixed
-     */
-    public function actionAbout()
-    {
-        return $this->render('about');
-    }
-
-    /**
-     * Signs user up.
-     *
-     * @return mixed
+     * @return string|Response шаблон с данными страницы
      */
     public function actionSignup()
     {
         $model = new SignupForm();
-        if(Yii::$app->request->isPost && $model->load(Yii::$app->request->post()) && $model->validate()) {
+        if (Yii::$app->request->isPost
+            && $model->load(Yii::$app->request->post())
+            && $model->validate()
+        ) {
             $transaction = Yii::$app->db->beginTransaction();
             try {
-                (new UserInitHelper(new User(), [
+                (new UserInitHelper(new User([
                     'login' => $model->login,
                     'email' => $model->email,
-                    'password' => $model->password,
+                    'password' => Yii::$app->getSecurity()
+                        ->generatePasswordHash($model->password),
                     'city_id' => $model->cityId,
-                ]))->initNotifications(new UserNotifications())
+                    'role' => User::ROLE_CLIENT,
+                ])))->initNotifications(new UserNotifications())
                     ->initSetting(new UserSettings())
-                    ->initUserData(new UserData(), User::STATUS_ACTIVE);
+                    ->initUserData(new UserData());
                 $transaction->commit();
+
                 return $this->goHome();
             } catch (\Exception $e) {
                 $transaction->rollBack();
@@ -197,132 +174,42 @@ class SiteController extends SecuredController
 
         return $this->render('signup', [
             'model' => $model,
-            'cities' => ArrayHelper::map(City::find()->asArray()->all(), 'id', 'name')
+            'cities' => City::getCitiesArray(),
         ]);
     }
 
     /**
-     * Requests password reset.
+     * Действие для авторизации пользователя с помощью API VK
      *
-     * @return mixed
-     */
-    public function actionRequestPasswordReset()
-    {
-        $model = new PasswordResetRequestForm();
-        if ($model->load(Yii::$app->request->post()) && $model->validate()) {
-            if ($model->sendEmail()) {
-                Yii::$app->session->setFlash('success', 'Check your email for further instructions.');
-
-                return $this->goHome();
-            } else {
-                Yii::$app->session->setFlash('error', 'Sorry, we are unable to reset password for the provided email address.');
-            }
-        }
-
-        return $this->render('requestPasswordResetToken', [
-            'model' => $model,
-        ]);
-    }
-
-    /**
-     * Resets password.
+     * @param VKontakte $client объект с данными пользователя из VK
      *
-     * @param string $token
-     * @return mixed
-     * @throws BadRequestHttpException
+     * @return Response
      */
-    public function actionResetPassword($token)
+    public function onAuthSuccess(VKontakte $client)
     {
-        try {
-            $model = new ResetPasswordForm($token);
-        } catch (InvalidArgumentException $e) {
-            throw new BadRequestHttpException($e->getMessage());
-        }
-
-        if ($model->load(Yii::$app->request->post()) && $model->validate() && $model->resetPassword()) {
-            Yii::$app->session->setFlash('success', 'New password saved.');
-
-            return $this->goHome();
-        }
-
-        return $this->render('resetPassword', [
-            'model' => $model,
-        ]);
-    }
-
-    /**
-     * Verify email address
-     *
-     * @param string $token
-     * @throws BadRequestHttpException
-     * @return yii\web\Response
-     */
-    public function actionVerifyEmail($token)
-    {
-        try {
-            $model = new VerifyEmailForm($token);
-        } catch (InvalidArgumentException $e) {
-            throw new BadRequestHttpException($e->getMessage());
-        }
-        if ($user = $model->verifyEmail()) {
-            if (Yii::$app->user->login($user)) {
-                Yii::$app->session->setFlash('success', 'Your email has been confirmed!');
-                return $this->goHome();
-            }
-        }
-
-        Yii::$app->session->setFlash('error', 'Sorry, we are unable to verify your account with provided token.');
-        return $this->goHome();
-    }
-
-    /**
-     * Resend verification email
-     *
-     * @return mixed
-     */
-    public function actionResendVerificationEmail()
-    {
-        $model = new ResendVerificationEmailForm();
-        if ($model->load(Yii::$app->request->post()) && $model->validate()) {
-            if ($model->sendEmail()) {
-                Yii::$app->session->setFlash('success', 'Check your email for further instructions.');
-                return $this->goHome();
-            }
-            Yii::$app->session->setFlash('error', 'Sorry, we are unable to resend verification email for the provided email address.');
-        }
-
-        return $this->render('resendVerificationEmail', [
-            'model' => $model
-        ]);
-    }
-
-    public function onAuthSuccess($client)
-    {
-        // если пользователь зарегистрирован, то и новая регистрация ему не нужна
-        if(!Yii::$app->user->isGuest) {
-            return $this->redirect(Task::getBaseTasksUrl());
-        }
-
         $clientId = $client->getId();
         $attributes = $client->getUserAttributes();
-
-        $auth = Auth::findOne(['source' => $clientId, 'source_id' => $attributes['id']]);
+        $auth = Auth::findOne([
+            'source' => $clientId,
+            'source_id' => $attributes['id'],
+        ]);
         $user = null;
-        if($auth) { // Пользователь гость, но уже имеет аккаунт через VK
+        if ($auth) {
             $user = $auth->user;
-        } else { // Пользователь гость, и ещё не имеет аккаунта VK
+        } else {
             $transaction = Yii::$app->db->beginTransaction();
             try {
-                $user = (new UserInitHelper(new User(), [
-                    'login' => $attributes['first_name'] . ' ' . $attributes['last_name'],
+                $user = (new UserInitHelper(new User([
+                    'login' => $attributes['first_name'].' '
+                        .$attributes['last_name'],
                     'email' => $attributes['email'],
                     'password' => Yii::$app->security->generateRandomString(6),
                     'city_id' => null,
-                ]))->initNotifications(new UserNotifications())
+                    'role' => User::ROLE_CLIENT,
+                ])))->initNotifications(new UserNotifications())
                     ->initSetting(new UserSettings())
-                    ->initUserData(new UserData(['avatar' => $attributes['photo']]), User::STATUS_ACTIVE)
+                    ->initUserData(new UserData(['avatar' => $attributes['photo']]))
                     ->user;
-
                 (new Auth([
                     'user_id' => $user->id,
                     'source' => $clientId,
@@ -333,8 +220,7 @@ class SiteController extends SecuredController
                 $transaction->rollBack();
             }
         }
-
-        if($user) {
+        if ($user) {
             Yii::$app->user->login($user);
         }
 

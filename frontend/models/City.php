@@ -2,48 +2,50 @@
 
 namespace app\models;
 
-use Yii;
 use yii\db\ActiveRecord;
+use yii\db\Query;
+use yii\helpers\ArrayHelper;
 
 /**
- * This is the model class for table "city".
+ * Класс для работы с моделью городов
  *
- * @property int $id
- * @property string|null $name
- * @property float|null $lat
- * @property float|null $long
+ * Class City
+ *
+ * @package app\models
  */
 class City extends ActiveRecord
 {
     /**
-     * {@inheritdoc}
+     * Получение списка всех городов отформатированных в массивы с парами id => title
+     *
+     * @return array массив со списком всех городов id => title
      */
-    public static function tableName()
+    public static function getCitiesArray(): array
+    {
+        return ArrayHelper::map((new Query())->from('city')
+            ->select(['id', 'name'])->all(), 'id', 'name');
+    }
+
+    /**
+     * Получение имени таблицы модели
+     *
+     * @return string имя таблицы модели
+     */
+    public static function tableName(): string
     {
         return 'city';
     }
 
     /**
-     * {@inheritdoc}
+     * Получение списка правил валидации для модели
+     *
+     * @return array список правил валидации для модели
      */
-    public function rules()
+    public function rules(): array
     {
         return [
             [['lat', 'long'], 'number'],
             [['name'], 'string', 'max' => 255],
-        ];
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function attributeLabels()
-    {
-        return [
-            'id' => 'ID',
-            'name' => 'Name',
-            'lat' => 'Lat',
-            'long' => 'Long',
         ];
     }
 }

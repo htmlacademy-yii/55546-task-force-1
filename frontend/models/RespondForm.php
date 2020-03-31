@@ -1,39 +1,52 @@
 <?php
+
 namespace app\models;
 
-use frontend\components\DebugHelper;
 use yii\base\Model;
 
+/**
+ * Класс для работы с моделью формы отклика к заданию
+ *
+ * Class RespondForm
+ *
+ * @package app\models
+ */
 class RespondForm extends Model
 {
+    /** @var integer число с ценой за работу */
     public $price;
+    /** @var string строка с описанием к отклику */
     public $text;
 
-    public function rules()
+    /**
+     * Получение списка правил валидации для модели
+     *
+     * @return array список правил валидации для модели
+     */
+    public function rules(): array
     {
         return [
             ['price', 'required', 'message' => 'Поле должно быть заполнено'],
-            ['price', 'integer', 'min' => 1, 'message' => 'Цена должна быть больше нуля'],
+            [
+                'price',
+                'integer',
+                'min' => 1,
+                'message' => 'Цена должна быть больше нуля',
+            ],
             ['text', 'string'],
         ];
     }
 
-    public function attributeLabels()
+    /**
+     * Указание списка имён для атрибутов формы
+     *
+     * @return array список имён для атрибутов формы
+     */
+    public function attributeLabels(): array
     {
         return [
             'price' => 'Ваша цена',
-            'text' => 'Комментарий'
+            'text' => 'Комментарий',
         ];
-    }
-
-    public function createRespond($userId, $taskId)
-    {
-        $taskRespond = new TaskRespond();
-        $taskRespond->user_id = $userId;
-        $taskRespond->task_id = $taskId;
-        $taskRespond->text = $this->text;
-        $taskRespond->price = $this->price;
-        $taskRespond->status = TaskRespond::STATUS_NEW;
-        $taskRespond->save();
     }
 }
