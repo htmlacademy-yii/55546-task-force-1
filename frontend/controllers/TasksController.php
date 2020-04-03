@@ -9,7 +9,7 @@ use app\models\TaskCreate;
 use app\models\TaskFile;
 use app\models\TaskRespond;
 use common\models\User;
-use frontend\src\NotificationHelper\NotificationHelper;
+use src\NotificationHelper\NotificationHelper;
 use Yii;
 use yii\bootstrap\ActiveForm;
 use yii\data\ActiveDataProvider;
@@ -75,9 +75,7 @@ class TasksController extends SecuredController
         if (Yii::$app->request->get('TasksFilter')) {
             $taskModel->load(Yii::$app->request->get());
         } elseif (!empty(Yii::$app->request->queryParams['filter'])) {
-            $filter
-                = ['TasksFilter' => Yii::$app->request->queryParams['filter']];
-            $taskModel->load($filter);
+            $taskModel->load(['TasksFilter' => Yii::$app->request->queryParams['filter']]);
         }
         $taskModel->applyFilters($tasks);
 
@@ -116,7 +114,7 @@ class TasksController extends SecuredController
         $task = Task::findOne($id);
         $user = Yii::$app->user->identity;
         if (!$task) {
-            throw new NotFoundHttpException("Страница не найдена!");
+            throw new NotFoundHttpException('Страница не найдена!');
         }
 
         return $this->render('view', [
@@ -132,6 +130,8 @@ class TasksController extends SecuredController
             ])->exists(),
             'respondModel' => new RespondForm(),
             'taskCompletionModel' => new TaskCompletionForm(),
+            'completionYes' => TaskCompletionForm::STATUS_YES,
+            'completionDifficult' => TaskCompletionForm::STATUS_DIFFICULT,
         ]);
     }
 

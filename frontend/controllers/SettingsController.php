@@ -6,7 +6,7 @@ use app\models\SettingsForm;
 use app\models\Category;
 use app\models\City;
 use common\models\User;
-use frontend\src\UserSettingsHelper\UserSettingsHelper;
+use src\UserSettingsHelper\UserSettingsHelper;
 use Yii;
 use yii\web\UploadedFile;
 

@@ -1,6 +1,6 @@
 <?php
 
-namespace frontend\src\NotificationHelper;
+namespace src\NotificationHelper;
 
 use app\models\EventRibbon;
 use Yii;
@@ -12,7 +12,7 @@ use yii\helpers\Html;
  *
  * Class NotificationHelper
  *
- * @package frontend\src\NotificationHelper
+ * @package src\NotificationHelper
  * */
 class NotificationHelper
 {

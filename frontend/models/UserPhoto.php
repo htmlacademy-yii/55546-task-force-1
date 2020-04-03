@@ -18,7 +18,7 @@ use yii\web\UnsupportedMediaTypeHttpException;
 class UserPhoto extends ActiveRecord
 {
     /** @var string строка с адресом директории для сохранения фотографии */
-    public $path = "";
+    public $path = '';
 
     /**
      * Сохранение списка фотографий пользователя в нужную директорию

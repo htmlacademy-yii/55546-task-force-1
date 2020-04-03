@@ -1,6 +1,6 @@
 <?php
 
-namespace frontend\src\UserInitHelper;
+namespace src\UserInitHelper;
 
 use yii\db\ActiveRecord;
 
@@ -9,10 +9,11 @@ use yii\db\ActiveRecord;
  *
  * Class UserInitHelper
  *
- * @package frontend\src\UserInitHelper
+ * @package src\UserInitHelper
  */
 class UserInitHelper
 {
+    /** @var ActiveRecord объект создаваемого пользователя  */
     public $user;
 
     /**

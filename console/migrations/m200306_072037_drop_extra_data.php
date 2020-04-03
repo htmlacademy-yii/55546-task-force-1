@@ -31,7 +31,7 @@ class m200306_072037_drop_extra_data extends Migration
             'id' => $this->primaryKey(),
             'user_id' => $this->integer()->notNull(),
             'task_id' => $this->integer()->notNull(),
-        ]);
+        ], 'CHARACTER SET utf8 COLLATE utf8_unicode_ci ENGINE=InnoDB');
         $this->addColumn('user', 'auth_key', $this->char(255));
     }
 }

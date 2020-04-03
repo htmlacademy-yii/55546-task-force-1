@@ -1,6 +1,6 @@
 <?php
 
-namespace frontend\src\YandexMap;
+namespace src\YandexMap;
 
 use GuzzleHttp\Client;
 use GuzzleHttp\Psr7\Response as GuzzleResponse;
@@ -12,7 +12,7 @@ use yii\web\Response;
  *
  * Class YandexMap
  *
- * @package frontend\src\YandexMap
+ * @package src\YandexMap
  */
 class YandexMap
 {
@@ -78,7 +78,7 @@ class YandexMap
         if ((int)$content->metaDataProperty->GeocoderResponseMetaData->found
             === 0
         ) {
-            return false;
+            return null;
         }
 
         return $content->featureMember[0]->GeoObject->Point->pos;
@@ -97,7 +97,7 @@ class YandexMap
         if ((int)$content->metaDataProperty->GeocoderResponseMetaData->found
             === 0
         ) {
-            return false;
+            return null;
         }
 
         return $content->featureMember[0]->GeoObject->metaDataProperty

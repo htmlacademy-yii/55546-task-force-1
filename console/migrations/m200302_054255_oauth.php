@@ -23,7 +23,7 @@ class m200302_054255_oauth extends Migration
             'user_id' => $this->integer()->notNull(),
             'source' => $this->integer()->notNull(),
             'source_id' => $this->integer()->notNull(),
-        ]);
+        ], 'CHARACTER SET utf8 COLLATE utf8_unicode_ci ENGINE=InnoDB');
     }
 
     /**

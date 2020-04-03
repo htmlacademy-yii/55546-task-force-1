@@ -1,6 +1,6 @@
 <?php
 
-namespace frontend\src\TaskforceUrlManager;
+namespace src\TaskforceUrlManager;
 
 use yii\web\UrlManager;
 
@@ -9,7 +9,7 @@ use yii\web\UrlManager;
  *
  * Class TaskforceUrlManager
  *
- * @package frontend\src\TaskforceUrlManager
+ * @package src\TaskforceUrlManager
  */
 class TaskforceUrlManager extends UrlManager
 {

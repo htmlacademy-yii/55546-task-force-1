@@ -5,7 +5,7 @@ namespace frontend\modules\v1\controllers;
 use app\models\Message;
 use app\models\Task;
 use common\models\User;
-use frontend\src\NotificationHelper\NotificationHelper;
+use src\NotificationHelper\NotificationHelper;
 use Yii;
 use yii\helpers\ArrayHelper;
 use yii\rest\ActiveController;

@@ -20,7 +20,7 @@ class m200306_111907_create_table_favorite_executor extends Migration
             'id' => $this->primaryKey(),
             'client_id' => $this->integer()->notNull(),
             'executor_id' => $this->integer()->notNull(),
-        ]);
+        ], 'CHARACTER SET utf8 COLLATE utf8_unicode_ci ENGINE=InnoDB');
     }
 
     /**
