@@ -16,10 +16,13 @@ class m200302_112719_update_user_tables extends Migration
      */
     public function safeUp()
     {
-        $this->alterColumn('user_photo', 'user_id', $this->integer()->notNull());
+        $this->alterColumn('user_photo', 'user_id',
+            $this->integer()->notNull());
         $this->alterColumn('user_data', 'user_id', $this->integer()->notNull());
-        $this->alterColumn('user_settings', 'user_id', $this->integer()->notNull());
-        $this->alterColumn('user_notifications', 'user_id', $this->integer()->notNull());
+        $this->alterColumn('user_settings', 'user_id',
+            $this->integer()->notNull());
+        $this->alterColumn('user_notifications', 'user_id',
+            $this->integer()->notNull());
     }
 
     /**

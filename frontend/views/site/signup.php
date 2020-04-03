@@ -29,8 +29,7 @@ $fieldConfig = [
         <span>Укажите город, чтобы находить подходящие задачи</span>
 
         <?= $form->field($model, 'password', $fieldConfig)
-            ->passwordInput(['class' => 'input textarea'])
-            ->label(null, ['class' => 'input-danger']); ?>
+            ->passwordInput(['class' => 'input textarea']); ?>
         <span>Длина пароля от 8 символов</span>
 
         <?= Html::submitButton('Cоздать аккаунт',

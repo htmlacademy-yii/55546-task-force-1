@@ -16,7 +16,8 @@ class m200306_072642_update_users_void_role extends Migration
      */
     public function safeUp()
     {
-        $this->update('user', ['role' => \common\models\User::ROLE_CLIENT], 'role IS NULL');
+        $this->update('user', ['role' => \common\models\User::ROLE_CLIENT],
+            'role IS NULL');
     }
 
     /**
@@ -25,6 +26,7 @@ class m200306_072642_update_users_void_role extends Migration
     public function safeDown()
     {
         echo "m200306_072642_update_users_void_role cannot be reverted.\n";
+
         return false;
     }
 }

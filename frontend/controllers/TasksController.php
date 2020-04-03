@@ -186,7 +186,8 @@ class TasksController extends SecuredController
                 $queryRating
                     = Yii::$app->db->createCommand("SELECT SUM(rating) as `rating`, COUNT(id) as `count` FROM review WHERE executor_id = :id",
                     [':id' => $executor->id])->queryOne();
-                $executor->userData->rating = (string)round((($queryRating['rating']
+                $executor->userData->rating
+                    = (string)round((($queryRating['rating']
                         + $model->rating) / ($queryRating['count'] + 1)), 1);
                 $executor->userData->save();
 
@@ -275,8 +276,8 @@ class TasksController extends SecuredController
     /**
      * Действие для обработки завершения задания
      *
-     * @param int    $respondId идентификатор отклика к заданию
-     * @param string $status    статус выполненности задания
+     * @param int $respondId идентификатор отклика к заданию
+     * @param string $status статус выполненности задания
      *
      * @return Response
      */

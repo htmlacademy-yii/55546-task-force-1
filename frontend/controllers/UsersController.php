@@ -79,6 +79,7 @@ class UsersController extends SecuredController
             'model' => $model,
             'dataProvider' => $provider,
             'categories' => Category::getCategoriesArray(),
+            'selectedSort' => $sort,
         ]);
     }
 

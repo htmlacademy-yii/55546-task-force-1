@@ -16,8 +16,10 @@ class m200319_082038_add_foreign_key_for_category_table extends Migration
      */
     public function safeUp()
     {
-        $this->addForeignKey('task-category-id','task','category_id','category','id','CASCADE');
-        $this->addForeignKey('user-specialization-category-id','user_specialization','category_id','category','id','CASCADE');
+        $this->addForeignKey('task-category-id', 'task', 'category_id',
+            'category', 'id', 'CASCADE');
+        $this->addForeignKey('user-specialization-category-id',
+            'user_specialization', 'category_id', 'category', 'id', 'CASCADE');
     }
 
     /**
@@ -27,7 +29,8 @@ class m200319_082038_add_foreign_key_for_category_table extends Migration
      */
     public function safeDown()
     {
-        $this->dropForeignKey('task-category-id','task');
-        $this->dropForeignKey('user-specialization-category-id','user_specialization');
+        $this->dropForeignKey('task-category-id', 'task');
+        $this->dropForeignKey('user-specialization-category-id',
+            'user_specialization');
     }
 }

@@ -260,7 +260,10 @@ TaskViewAsset::register($this);
     $form
         = ActiveForm::begin(['action' => Url::to("/tasks/completion/{$task->id}")]);
     echo $form->field($taskCompletionModel, 'isCompletion')
-        ->radioList([ $completionYes => 'Да', $completionDifficult => 'Возникли проблемы'],
+        ->radioList([
+            $completionYes => 'Да',
+            $completionDifficult => 'Возникли проблемы',
+        ],
             [
                 'item' => function ($index, $label, $name, $checked, $value) {
                     return "<input class='visually-hidden completion-input completion-input--$value' type='radio' 

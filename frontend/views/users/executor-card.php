@@ -23,13 +23,12 @@ $executor = $model;
                     ['class' => 'link-regular']); ?>
             </p>
 
-            <?php if ($executor['rating']): ?>
-                <?php for ($i = 0; $i < 5; $i++): ?>
-                    <span <?= $executor['rating'] > $i ? ''
-                        : 'class="star-disabled"'; ?>></span>
-                <?php endfor; ?>
-                <b><?= $executor['rating']; ?></b>
-            <?php endif; ?>
+            <?php $rating = $executor['rating'] ?? 0; ?>
+            <?php for ($i = 0; $i < 5; $i++): ?>
+                <span <?= $rating > $i ? ''
+                    : 'class="star-disabled"'; ?>></span>
+            <?php endfor; ?>
+            <b><?= $rating; ?></b>
             <p class="user__search-content"><?= Html::encode($executor['description']
                     ?? ''); ?></p>
         </div>

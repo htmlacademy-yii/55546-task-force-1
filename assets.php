@@ -4,8 +4,8 @@
  */
 
 // In the console environment, some path aliases may not exist. Please define these
-Yii::setAlias('@webroot', __DIR__ . '/frontend/web');
-Yii::setAlias('@web', __DIR__ . '/');
+Yii::setAlias('@webroot', __DIR__.'/frontend/web');
+Yii::setAlias('@web', __DIR__.'/');
 
 return [
     // Adjust command/callback for JavaScript files compressing:
