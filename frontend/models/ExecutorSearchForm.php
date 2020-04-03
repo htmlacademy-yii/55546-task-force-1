@@ -6,6 +6,7 @@ use common\models\User;
 use Yii;
 use yii\base\Model;
 use yii\db\Query;
+use yii\helpers\ArrayHelper;
 
 /**
  * Класс для работы с моделью формы поиска исполнителей
@@ -89,19 +90,16 @@ class ExecutorSearchForm extends Model
     /**
      * Применение сортировки к списку исполнителей
      *
-     * @param Query  $query ссылка на объект
-     * @param string $sort  строка с типом сортировки
+     * @param string $sort
+     *
+     * @return string
      */
-    public function applySort(Query &$query, string $sort): void
+    public function getSortQuery(string $sort): string
     {
-        if (empty($sort)) {
-            $query->orderBy('user.date_registration DESC');
-        } elseif ($sort === User::SORT_TYPE_RATING) {
-            $query->orderBy('user_data.rating DESC');
-        } elseif ($sort === User::SORT_TYPE_ORDERS) {
-            $query->orderBy('(SELECT COUNT(*) FROM task WHERE task.executor_id = user.id) DESC');
-        } elseif ($sort === User::SORT_TYPE_POPULARITY) {
-            $query->orderBy('user_data.views DESC');
-        }
+        return ArrayHelper::getValue([
+            User::SORT_TYPE_RATING => 'user_data.rating DESC',
+            User::SORT_TYPE_ORDERS => '(SELECT COUNT(*) FROM task WHERE task.executor_id = user.id) DESC',
+            User::SORT_TYPE_POPULARITY => 'user_data.views DESC',
+        ], $sort, 'user.date_registration DESC');
     }
 }

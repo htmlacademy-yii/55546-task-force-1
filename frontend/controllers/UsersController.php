@@ -59,7 +59,8 @@ class UsersController extends SecuredController
         ) {
             $model->applyFilters($query);
         }
-        $model->applySort($query, $sort);
+
+        $query->orderBy($model->getSortQuery($sort));
 
         $provider = new ActiveDataProvider([
             'query' => $query->groupBy([
@@ -104,7 +105,7 @@ class UsersController extends SecuredController
                 ->where(['executor_id' => $user->id])->count(),
             'completedTasksCount' => Task::find()
                 ->where(['executor_id' => $user->id])
-                ->andWhere(["!=", 'status', Task::STATUS_EXECUTION])
+                ->andWhere(['!=', 'status', Task::STATUS_EXECUTION])
                 ->count(),
             'isCustomer' => Task::find()->where([
                 'status' => Task::STATUS_EXECUTION,
@@ -134,8 +135,7 @@ class UsersController extends SecuredController
             'executor_id' => $userId,
         ];
 
-        $data = FavoriteExecutor::findOne($params);
-        if ($data) {
+        if ($data = FavoriteExecutor::findOne($params)) {
             $data->delete();
         } else {
             (new FavoriteExecutor($params))->save();

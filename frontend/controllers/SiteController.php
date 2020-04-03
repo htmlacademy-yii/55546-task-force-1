@@ -13,7 +13,7 @@ use app\models\{Auth,
     UserNotifications,
     UserSettings};
 use common\models\User;
-use frontend\src\UserInitHelper\UserInitHelper;
+use src\UserInitHelper\UserInitHelper;
 use Yii;
 use yii\filters\AccessControl;
 use yii\web\Response;

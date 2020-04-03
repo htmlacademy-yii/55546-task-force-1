@@ -1,5 +1,6 @@
 <?php
 
+use src\TaskforceUrlManager\TaskforceUrlManager;
 use frontend\modules\v1\src\RestMessagesUrlRule;
 
 $params = array_merge(
@@ -89,7 +90,7 @@ return [
             'errorAction' => 'site/error',
         ],
         'urlManager' => [
-            'class' => 'frontend\src\TaskforceUrlManager\TaskforceUrlManager',
+            'class' => TaskforceUrlManager::class,
             'enablePrettyUrl' => true,
             'showScriptName' => false,
             'rules' => [

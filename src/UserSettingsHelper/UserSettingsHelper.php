@@ -1,6 +1,6 @@
 <?php
 
-namespace frontend\src\UserSettingsHelper;
+namespace src\UserSettingsHelper;
 
 use app\models\UserPhoto;
 use app\models\UserSpecialization;
@@ -15,7 +15,7 @@ use yii\web\UploadedFile;
  *
  * Class UserSettingsHelper
  *
- * @package frontend\src\UserSettingsHelper
+ * @package src\UserSettingsHelper
  */
 class UserSettingsHelper
 {
