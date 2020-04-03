@@ -26,6 +26,7 @@ class m200307_105042_drop_task_table_column_is_telework extends Migration
      */
     public function safeDown()
     {
-        $this->addColumn('task', 'is_telework', $this->boolean()->defaultValue(false));
+        $this->addColumn('task', 'is_telework',
+            $this->boolean()->defaultValue(false));
     }
 }

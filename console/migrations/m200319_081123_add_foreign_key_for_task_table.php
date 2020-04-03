@@ -16,11 +16,16 @@ class m200319_081123_add_foreign_key_for_task_table extends Migration
      */
     public function safeUp()
     {
-        $this->addForeignKey('event-ribbon-task-id','event_ribbon','task_id','task','id','CASCADE');
-        $this->addForeignKey('message-task-id','message','task_id','task','id','CASCADE');
-        $this->addForeignKey('review-task-id','review','task_id','task','id','CASCADE');
-        $this->addForeignKey('task-file-task-id','task_file','task_id','task','id','CASCADE');
-        $this->addForeignKey('task-respond-task-id','task_respond','task_id','task','id','CASCADE');
+        $this->addForeignKey('event-ribbon-task-id', 'event_ribbon', 'task_id',
+            'task', 'id', 'CASCADE');
+        $this->addForeignKey('message-task-id', 'message', 'task_id', 'task',
+            'id', 'CASCADE');
+        $this->addForeignKey('review-task-id', 'review', 'task_id', 'task',
+            'id', 'CASCADE');
+        $this->addForeignKey('task-file-task-id', 'task_file', 'task_id',
+            'task', 'id', 'CASCADE');
+        $this->addForeignKey('task-respond-task-id', 'task_respond', 'task_id',
+            'task', 'id', 'CASCADE');
     }
 
     /**
@@ -30,10 +35,10 @@ class m200319_081123_add_foreign_key_for_task_table extends Migration
      */
     public function safeDown()
     {
-        $this->dropForeignKey('event-ribbon-task-id','event_ribbon');
-        $this->dropForeignKey('message-task-id','message');
-        $this->dropForeignKey('review-task-id','review');
-        $this->dropForeignKey('task-file-task-id','task_file');
-        $this->dropForeignKey('task-respond-task-id','task_respond');
+        $this->dropForeignKey('event-ribbon-task-id', 'event_ribbon');
+        $this->dropForeignKey('message-task-id', 'message');
+        $this->dropForeignKey('review-task-id', 'review');
+        $this->dropForeignKey('task-file-task-id', 'task_file');
+        $this->dropForeignKey('task-respond-task-id', 'task_respond');
     }
 }

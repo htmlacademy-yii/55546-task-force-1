@@ -12,15 +12,21 @@ $fieldConfig = ['options' => ['tag' => false]];
     <div class="user__search-link">
         <p>Сортировать по:</p>
         <ul class="user__search-list">
-            <li class="user__search-item user__search-item--current">
+            <li class="user__search-item <?= $selectedSort
+            && $selectedSort === User::SORT_TYPE_RATING
+                ? 'user__search-item--current' : '' ?>">
                 <?= Html::a('Рейтингу', "?sort=".User::SORT_TYPE_RATING,
                     ['class' => 'link-regular']); ?>
             </li>
-            <li class="user__search-item">
+            <li class="user__search-item <?= $selectedSort
+            && $selectedSort === User::SORT_TYPE_ORDERS
+                ? 'user__search-item--current' : '' ?>">
                 <?= Html::a('Числу заказов', "?sort=".User::SORT_TYPE_ORDERS,
                     ['class' => 'link-regular']); ?>
             </li>
-            <li class="user__search-item">
+            <li class="user__search-item <?= $selectedSort
+            && $selectedSort === User::SORT_TYPE_POPULARITY
+                ? 'user__search-item--current' : '' ?>">
                 <?= Html::a('Популярности', "?sort=".User::SORT_TYPE_POPULARITY,
                     ['class' => 'link-regular']); ?>
             </li>

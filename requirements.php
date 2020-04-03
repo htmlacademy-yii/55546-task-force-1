@@ -15,8 +15,8 @@
 //$frameworkPath = dirname(__FILE__) . '/vendor/yiisoft/yii2';
 if (!isset($frameworkPath)) {
     $searchPaths = array(
-        dirname(__FILE__) . '/vendor/yiisoft/yii2',
-        dirname(__FILE__) . '/../../vendor/yiisoft/yii2',
+        dirname(__FILE__).'/vendor/yiisoft/yii2',
+        dirname(__FILE__).'/../../vendor/yiisoft/yii2',
     );
     foreach ($searchPaths as $path) {
         if (is_dir($path)) {
@@ -27,9 +27,12 @@ if (!isset($frameworkPath)) {
 }
 if (!isset($frameworkPath) || !is_dir($frameworkPath)) {
     $message = "<h1>Error</h1>\n\n"
-        . "<p><strong>The path to yii framework seems to be incorrect.</strong></p>\n"
-        . '<p>You need to install Yii framework via composer or adjust the framework path in file <abbr title="' . __FILE__ . '">' . basename(__FILE__) . "</abbr>.</p>\n"
-        . '<p>Please refer to the <abbr title="' . dirname(dirname(dirname(__FILE__))) . "/README.md\">README</abbr> on how to install Yii.</p>\n";
+        ."<p><strong>The path to yii framework seems to be incorrect.</strong></p>\n"
+        .'<p>You need to install Yii framework via composer or adjust the framework path in file <abbr title="'
+        .__FILE__.'">'.basename(__FILE__)."</abbr>.</p>\n"
+        .'<p>Please refer to the <abbr title="'
+        .dirname(dirname(dirname(__FILE__)))
+        ."/README.md\">README</abbr> on how to install Yii.</p>\n";
     if (!empty($_SERVER['argv'])) {
         // do not print HTML when used in console mode
         echo strip_tags($message);
@@ -39,10 +42,12 @@ if (!isset($frameworkPath) || !is_dir($frameworkPath)) {
     exit(1);
 }
 
-require_once $frameworkPath . '/requirements/YiiRequirementChecker.php';
+require_once $frameworkPath.'/requirements/YiiRequirementChecker.php';
 $requirementsChecker = new YiiRequirementChecker();
 
-$gdMemo = $imagickMemo = 'Either GD PHP extension with FreeType support or ImageMagick PHP extension with PNG support is required for image CAPTCHA.';
+$gdMemo
+    = $imagickMemo
+    = 'Either GD PHP extension with FreeType support or ImageMagick PHP extension with PNG support is required for image CAPTCHA.';
 $gdOK = $imagickOK = false;
 
 if (extension_loaded('imagick')) {
@@ -51,7 +56,8 @@ if (extension_loaded('imagick')) {
     if (in_array('PNG', $imagickFormats)) {
         $imagickOK = true;
     } else {
-        $imagickMemo = 'Imagick extension should be installed with PNG support in order to be used for image CAPTCHA.';
+        $imagickMemo
+            = 'Imagick extension should be installed with PNG support in order to be used for image CAPTCHA.';
     }
 }
 
@@ -60,7 +66,8 @@ if (extension_loaded('gd')) {
     if (!empty($gdInfo['FreeType Support'])) {
         $gdOK = true;
     } else {
-        $gdMemo = 'GD extension should be installed with FreeType support in order to be used for image CAPTCHA.';
+        $gdMemo
+            = 'GD extension should be installed with FreeType support in order to be used for image CAPTCHA.';
     }
 }
 
@@ -100,9 +107,12 @@ $requirements = array(
     array(
         'name' => 'Memcache extension',
         'mandatory' => false,
-        'condition' => extension_loaded('memcache') || extension_loaded('memcached'),
+        'condition' => extension_loaded('memcache')
+            || extension_loaded('memcached'),
         'by' => '<a href="http://www.yiiframework.com/doc-2.0/yii-caching-memcache.html">MemCache</a>',
-        'memo' => extension_loaded('memcached') ? 'To use memcached set <a href="http://www.yiiframework.com/doc-2.0/yii-caching-memcache.html#$useMemcached-detail">MemCache::useMemcached</a> to <code>true</code>.' : ''
+        'memo' => extension_loaded('memcached')
+            ? 'To use memcached set <a href="http://www.yiiframework.com/doc-2.0/yii-caching-memcache.html#$useMemcached-detail">MemCache::useMemcached</a> to <code>true</code>.'
+            : '',
     ),
     array(
         'name' => 'APC extension',

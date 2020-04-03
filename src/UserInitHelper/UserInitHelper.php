@@ -13,7 +13,7 @@ use yii\db\ActiveRecord;
  */
 class UserInitHelper
 {
-    /** @var ActiveRecord объект создаваемого пользователя  */
+    /** @var ActiveRecord объект создаваемого пользователя */
     public $user;
 
     /**

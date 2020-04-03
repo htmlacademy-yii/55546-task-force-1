@@ -16,7 +16,8 @@ class m200319_124036_add_foreign_key_for_user_table extends Migration
      */
     public function safeUp()
     {
-        $this->addForeignKey('auth-user-id','auth','user_id','user','id','CASCADE');
+        $this->addForeignKey('auth-user-id', 'auth', 'user_id', 'user', 'id',
+            'CASCADE');
     }
 
     /**
@@ -26,6 +27,6 @@ class m200319_124036_add_foreign_key_for_user_table extends Migration
      */
     public function safeDown()
     {
-        $this->dropForeignKey('auth-user-id','auth');
+        $this->dropForeignKey('auth-user-id', 'auth');
     }
 }

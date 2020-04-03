@@ -224,7 +224,8 @@ class User extends ActiveRecord implements IdentityInterface
     public static function getCorrectAvatar(string $avatar): string
     {
         if (!empty($avatar)) {
-            return preg_match('/^http/', $avatar) ? $avatar : Url::to("/$avatar");
+            return preg_match('/^http/', $avatar) ? $avatar
+                : Url::to("/$avatar");
         }
 
         return Url::to('/img/user-photo.png');
