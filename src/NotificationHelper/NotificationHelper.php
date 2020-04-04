@@ -33,7 +33,8 @@ class NotificationHelper
                 .Html::encode($task->title),
             'messageMail' => "<p>Был оставлен новый отклик к вашему заданию "
                 .Html::a(Html::encode($task->title),
-                    Yii::$app->params['siteUrl']."/tasks/view/$task->id").".</p>",
+                    Yii::$app->params['siteUrl']."/tasks/view/$task->id")
+                .".</p>",
         ]);
     }
 
@@ -75,7 +76,8 @@ class NotificationHelper
             'titleMail' => "Задание ".Html::encode($task->title)." завершено",
             'messageMail' => "<p>Заказчик завершил взятое вами задание "
                 .Html::a(Html::encode($task->title),
-                    Yii::$app->params['siteUrl']."/tasks/view/$task->id").".</p>",
+                    Yii::$app->params['siteUrl']."/tasks/view/$task->id")
+                .".</p>",
         ]);
     }
 
@@ -96,7 +98,8 @@ class NotificationHelper
                 .Html::encode($task->title),
             'messageMail' => "<p>Исполнитель отказался от задания "
                 .Html::a(Html::encode($task->title),
-                    Yii::$app->params['siteUrl']."/tasks/view/$task->id").".</p>",
+                    Yii::$app->params['siteUrl']."/tasks/view/$task->id")
+                .".</p>",
         ]);
     }
 
