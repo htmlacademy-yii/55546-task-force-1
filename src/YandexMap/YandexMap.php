@@ -69,9 +69,9 @@ class YandexMap
      *
      * @param string $geocode - строка с названием или координатами нужной локации
      *
-     * @return string - строка с координатами найденной локации
-     **/
-    public function getPosition(string $geocode): string
+     * @return |null
+     */
+    public function getPosition(string $geocode)
     {
         $content = json_decode($this->getDataMap($geocode))
             ->response->GeoObjectCollection;
@@ -85,12 +85,14 @@ class YandexMap
     }
 
     /**
-     * @param float $lat  - дробное число со значением широты
+     * Получение локации по координатам
+     *
+     * @param float $lat - дробное число со значением широты
      * @param float $long - дробное число со значением долготы
      *
-     * @return \stdClass - объект с данными найденной локации
-     **/
-    public function getAddressByPositions(float $lat, float $long): \stdClass
+     * @return |null
+     */
+    public function getAddressByPositions(float $lat, float $long)
     {
         $content = json_decode($this->getDataMap("$long $lat"))
             ->response->GeoObjectCollection;
