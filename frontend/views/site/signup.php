@@ -6,15 +6,18 @@ use yii\bootstrap\ActiveForm;
 $this->title = 'Регистрация аккаунта';
 $this->params['breadcrumbs'][] = $this->title;
 $fieldConfig = [
-    'template' => "{label}\n{input}",
+    'template' => "{label}\n{input}\n{error}",
     'options' => ['tag' => false],
 ];
 ?>
 <section class="registration__user">
     <h1>Регистрация аккаунта</h1>
     <div class="registration-wrapper">
-        <?php $form
-            = ActiveForm::begin(['options' => ['class' => 'registration__user-form form-create']]) ?>
+        <?php $form = ActiveForm::begin([
+            'enableClientValidation' => false,
+            'enableAjaxValidation' => false,
+            'options' => ['class' => 'registration__user-form form-create'],
+        ]) ?>
         <?= $form->field($model, 'email', $fieldConfig)
             ->textarea(['class' => 'input textarea', 'rows' => 1]); ?>
         <span>Введите валидный адрес электронной почты</span>
