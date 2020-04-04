@@ -75,7 +75,10 @@ class SignupForm extends Model
         ];
     }
 
-    public function checkCity()
+    /**
+     * Валидатор для проверки существование указанного города в базе данных сайта
+     */
+    public function checkCity(): void
     {
         if (!City::findOne((int)$this->cityId)) {
             $this->addError('cityId',
