@@ -56,6 +56,7 @@ class SignupForm extends Model
 
             ['cityId', 'required'],
             ['cityId', 'integer'],
+            ['cityId', 'checkCity'],
         ];
     }
 
@@ -72,5 +73,16 @@ class SignupForm extends Model
             'cityId' => 'Город проживания',
             'password' => 'Пароль',
         ];
+    }
+
+    /**
+     * Валидатор для проверки существование указанного города в базе данных сайта
+     */
+    public function checkCity(): void
+    {
+        if (!City::findOne((int)$this->cityId)) {
+            $this->addError('cityId',
+                'Указанный город не найден в нашей базе данных');
+        }
     }
 }
