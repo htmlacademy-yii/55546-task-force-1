@@ -28,10 +28,13 @@ class LoginForm extends Model
     public function rules(): array
     {
         return [
-            ['email', 'required', 'message' => 'Поле должно быть заполнено'],
+            [
+                ['email', 'password'],
+                'required',
+                'message' => 'Поле должно быть заполнено',
+            ],
             ['email', 'email'],
-            ['email', 'exist', 'targetClass' => 'common\models\User'],
-            ['password', 'required'],
+            ['email', 'exist', 'targetClass' => User::class],
             ['password', 'checkPassword'],
         ];
     }
@@ -59,7 +62,7 @@ class LoginForm extends Model
             || !Yii::$app->getSecurity()
                 ->validatePassword($this->password, $user->password)
         ) {
-            $this->addError('password', "Не верный пароль");
+            $this->addError('password', 'Не верный пароль');
         }
     }
 }

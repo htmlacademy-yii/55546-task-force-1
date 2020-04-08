@@ -2,6 +2,7 @@
 
 namespace app\models;
 
+use common\models\User;
 use yii\db\ActiveRecord;
 use yii\helpers\Url;
 
@@ -47,23 +48,16 @@ class UserData extends ActiveRecord
     public function rules(): array
     {
         return [
-            [
-                [
-                    'description',
-                    'skype',
-                    'phone',
-                    'other_messenger',
-                    'avatar',
-                    'rating',
-                    'views',
-                    'success_counter',
-                    'failing_counter',
-                ],
-                'safe',
-            ],
+            ['user_id', 'required'],
             [
                 ['user_id', 'views', 'success_counter', 'failing_counter'],
                 'integer',
+            ],
+            [
+                'user_id',
+                'exist',
+                'targetClass' => User::class,
+                'targetAttribute' => 'id',
             ],
             ['description', 'string'],
             [

@@ -5,6 +5,7 @@ namespace app\models;
 use common\models\User;
 use Yii;
 use yii\base\Model;
+use yii\db\ActiveRecord;
 use yii\db\Query;
 use yii\helpers\ArrayHelper;
 
@@ -23,6 +24,24 @@ class ExecutorSearchForm extends Model
     public $additionally = [];
     /** @var string строка с названием задачи */
     public $name;
+
+    /** @var string строка c типом поля - сейчас свободен */
+    const ADDITIONALLY_NOW_FREE = 'now-free';
+    /** @var string строка c типом поля - сейчас онлайн */
+    const ADDITIONALLY_NOW_ONLINE = 'now-online';
+    /** @var string строка c типом поля - есть отзывы */
+    const ADDITIONALLY_REVIEWS = 'there-are-reviews';
+    /** @var string строка c типом поля - в избранном */
+    const ADDITIONALLY_FAVORITES = 'in-favorites';
+
+    /** @var array массиво со списком типов полей */
+    const ADDITIONALLY_LIST
+        = [
+            self::ADDITIONALLY_NOW_FREE => 'Сейчас свободен',
+            self::ADDITIONALLY_NOW_ONLINE => 'Сейчас онлайн',
+            self::ADDITIONALLY_REVIEWS => 'Есть отзывы',
+            self::ADDITIONALLY_FAVORITES => 'В избранном',
+        ];
 
     /**
      * Указание списка имён для атрибутов формы
@@ -44,7 +63,42 @@ class ExecutorSearchForm extends Model
     public function rules(): array
     {
         return [
-            [['categories', 'additionally', 'name'], 'safe'],
+            [
+                'categories',
+                'filter',
+                'filter' => function ($categories) {
+                    return $categories ? array_map(function ($item) {
+                        return (int)$item;
+                    }, $categories) : [];
+                },
+            ],
+            [
+                'categories',
+                'exist',
+                'targetClass' => Category::class,
+                'targetAttribute' => 'id',
+                'allowArray' => true,
+                'message' => 'Одна или несколько из выбранных вами специализаций не найдена',
+            ],
+            [
+                'additionally',
+                'filter',
+                'filter' => function ($additionally) {
+                    return !empty($additionally) ? $additionally : [];
+                },
+            ],
+            [
+                'additionally',
+                'in',
+                'range' => [
+                    self::ADDITIONALLY_NOW_FREE,
+                    self::ADDITIONALLY_NOW_ONLINE,
+                    self::ADDITIONALLY_REVIEWS,
+                    self::ADDITIONALLY_FAVORITES,
+                ],
+                'allowArray' => true,
+            ],
+            ['name', 'string', 'length' => [0, 255]],
         ];
     }
 
@@ -62,28 +116,23 @@ class ExecutorSearchForm extends Model
         }
 
         if (!empty($this->categories)) {
-            $categories = array_map(function ($item) {
-                return (int)$item;
-            }, $this->categories);
             $query->andWhere("(SELECT COUNT(*) FROM user_specialization us 
                 WHERE us.user_id = user.id AND us.category_id IN (".implode(',',
-                    $categories)."))");
+                    $this->categories)."))");
         }
 
-        if ($this->additionally) {
-            if (in_array('now-free', $this->additionally)) {
-                $query->andWhere("(SELECT COUNT(*) FROM task WHERE task.executor_id = user.id AND task.status = :status) = 0",
-                    [':status' => Task::STATUS_EXECUTION]);
-            }
-            if (in_array('now-online', $this->additionally)) {
-                $query->andWhere("user.last_activity > CURRENT_TIMESTAMP() - INTERVAL 30 minute");
-            }
-            if (in_array('there-are-reviews', $this->additionally)) {
-                $query->andWhere("(SELECT COUNT(*) FROM review WHERE review.executor_id = user.id) > 0");
-            }
-            if (in_array('in-favorites', $this->additionally)) {
-                $query->andWhere(['user.id' => Yii::$app->user->identity->favoriteExecutorsId]);
-            }
+        if (in_array(self::ADDITIONALLY_NOW_FREE, $this->additionally)) {
+            $query->andWhere("(SELECT COUNT(*) FROM task WHERE task.executor_id = user.id AND task.status = :status) = 0",
+                [':status' => Task::STATUS_EXECUTION]);
+        }
+        if (in_array(self::ADDITIONALLY_NOW_ONLINE, $this->additionally)) {
+            $query->andWhere("user.last_activity > CURRENT_TIMESTAMP() - INTERVAL 30 minute");
+        }
+        if (in_array(self::ADDITIONALLY_REVIEWS, $this->additionally)) {
+            $query->andWhere("(SELECT COUNT(*) FROM review WHERE review.executor_id = user.id) > 0");
+        }
+        if (in_array(self::ADDITIONALLY_FAVORITES, $this->additionally)) {
+            $query->andWhere(['user.id' => Yii::$app->user->identity->favoriteExecutorsId]);
         }
     }
 
@@ -101,5 +150,20 @@ class ExecutorSearchForm extends Model
             User::SORT_TYPE_ORDERS => '(SELECT COUNT(*) FROM task WHERE task.executor_id = user.id) DESC',
             User::SORT_TYPE_POPULARITY => 'user_data.views DESC',
         ], $sort, 'user.date_registration DESC');
+    }
+
+    /**
+     * Применение сортировки к списку исполнителей
+     *
+     * @param ActiveRecord $usersQuery
+     * @param string       $sort
+     */
+    public function applySort(ActiveRecord &$usersQuery, string $sort): void
+    {
+        $usersQuery->orderBy(ArrayHelper::getValue([
+            User::SORT_TYPE_RATING => 'user_data.rating DESC',
+            User::SORT_TYPE_ORDERS => '(SELECT COUNT(*) FROM task WHERE task.executor_id = user.id) DESC',
+            User::SORT_TYPE_POPULARITY => 'user_data.views DESC',
+        ], $sort, 'user.date_registration DESC'));
     }
 }

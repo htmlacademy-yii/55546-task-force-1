@@ -196,24 +196,34 @@ class Task extends ActiveRecord
     public function rules(): array
     {
         return [
+            [['title', 'description', 'category_id', 'author_id'], 'required'],
+            [['author_id', 'category_id', 'executor_id'], 'integer'],
             [
-                [
-                    'title',
-                    'description',
-                    'category_id',
-                    'author_id',
-                    'price',
-                    'executor_id',
-                    'date_start',
-                    'date_end',
-                    'status',
-                ],
-                'safe',
+                ['author_id', 'executor_id'],
+                'exist',
+                'targetClass' => User::class,
+                'targetAttribute' => 'id',
             ],
-            [['title', 'description', 'category_id'], 'required'],
-            [['author_id', 'category_id', 'price', 'executor_id'], 'integer'],
+            [
+                'category_id',
+                'exist',
+                'targetClass' => Category::class,
+                'targetAttribute' => 'id',
+            ],
+            ['price', 'integer', 'min' => 1],
             [['description'], 'string'],
-            [['title', 'status'], 'string', 'max' => 255],
+            ['title', 'string', 'max' => 255],
+            ['status', 'in', 'range' => self::getStatusList()],
+            [
+                'date_start',
+                'match',
+                'pattern' => '/^\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$/',
+            ],
+            [
+                'date_end',
+                'match',
+                'pattern' => '/^\d{4}-\d{2}-\d{2}$/',
+            ],
         ];
     }
 }

@@ -34,4 +34,23 @@ class Auth extends ActiveRecord
     {
         return 'auth';
     }
+
+    /**
+     * Получение списка правил валидации для модели
+     *
+     * @return array список правил валидации для модели
+     */
+    public function rules(): array
+    {
+        return [
+            [['user_id', 'source', 'source_id'], 'required'],
+            [['user_id', 'source', 'source_id'], 'integer'],
+            [
+                'user_id',
+                'exist',
+                'targetClass' => User::class,
+                'targetAttribute' => 'id',
+            ],
+        ];
+    }
 }

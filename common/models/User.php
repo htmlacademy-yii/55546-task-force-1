@@ -29,6 +29,15 @@ use yii\web\IdentityInterface;
  */
 class User extends ActiveRecord implements IdentityInterface
 {
+//    /** @var string строка с именем пользователя */
+//    public $login;
+//    /** @var string строка с почтовым ящиком пользователя */
+//    public $email;
+//    /** @var string строка с идентификатором города пользователя */
+//    public $cityId;
+//    /** @var string строка с паролем пользователя */
+//    public $password;
+
     /** @var integer статус неактивного пользователя */
     const STATUS_INACTIVE = 9;
     /** @var integer статус активного пользователя */
@@ -45,6 +54,13 @@ class User extends ActiveRecord implements IdentityInterface
     const SORT_TYPE_ORDERS = 'orders';
     /** @var string тип сортировки по популярности */
     const SORT_TYPE_POPULARITY = 'popularity';
+
+    /** @var array массиво со списком типов сортировки */
+    const SORT_TYPE_LIST = [
+        self::SORT_TYPE_RATING => 'Рейтингу',
+        self::SORT_TYPE_ORDERS => 'Числу заказов',
+        self::SORT_TYPE_POPULARITY => 'Популярности',
+    ];
 
     /**
      * Метод для получения строки с ссылкой на страницу текущего пользователя
@@ -272,24 +288,38 @@ class User extends ActiveRecord implements IdentityInterface
     public function rules(): array
     {
         return [
-            ['login', 'trim'],
-            ['login', 'required'],
+            [['login', 'email', 'password', 'city_id', 'role'], 'required'],
+            [['login', 'email'], 'trim'],
             ['login', 'string', 'min' => 2, 'max' => 255],
-
-            ['email', 'trim'],
-            ['email', 'required'],
+            [
+                'login',
+                'unique',
+                'message' => 'Данное имя уже занято',
+            ],
             ['email', 'email'],
             ['email', 'string', 'max' => 255],
             [
                 'email',
                 'unique',
-                'message' => 'This email address has already been taken.',
+                'message' => 'Данный email уже используется',
             ],
-
-            ['password', 'required'],
             ['password', 'string', 'min' => 6],
-
-            ['name', 'safe'],
+            ['city_id', 'filter', 'filter' => function($cityId) {
+                return (int)$cityId;
+            }],
+            ['city_id', 'integer'],
+            [
+                'city_id',
+                'exist',
+                'targetClass' => City::class,
+                'targetAttribute' => 'id',
+                'message' => 'Указанный город не найден в нашей базе данных',
+            ],
+            [
+                'role',
+                'in',
+                'range' => [self::ROLE_CLIENT, self::ROLE_EXECUTOR],
+            ],
         ];
     }
 

@@ -2,6 +2,7 @@
 
 namespace app\models;
 
+use common\models\User;
 use Yii;
 use yii\db\ActiveRecord;
 use yii\validators\FileValidator;
@@ -19,6 +20,22 @@ class UserPhoto extends ActiveRecord
 {
     /** @var string строка с адресом директории для сохранения фотографии */
     public $path = '';
+
+    public function validatePhotos()
+    {
+        if (count($files) > 6) {
+            throw new UnsupportedMediaTypeHttpException('Не более 6 файлов');
+        }
+        foreach ($files as $file) {
+            if (!(new FileValidator([
+                'skipOnEmpty' => false,
+                'extensions' => 'png, jpg',
+            ]))->validate($file)
+            ) {
+                throw new UnsupportedMediaTypeHttpException('Не допустимый формат файла');
+            }
+        }
+    }
 
     /**
      * Сохранение списка фотографий пользователя в нужную директорию
@@ -74,8 +91,15 @@ class UserPhoto extends ActiveRecord
     public function rules(): array
     {
         return [
-            [['user_id'], 'integer'],
-            [['photo'], 'string', 'max' => 255],
+            [['user_id', 'photo'], 'required'],
+            ['user_id', 'integer'],
+            [
+                'user_id',
+                'exist',
+                'targetClass' => User::class,
+                'targetAttribute' => 'id',
+            ],
+            ['photo', 'string', 'max' => 255],
         ];
     }
 }

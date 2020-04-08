@@ -38,11 +38,9 @@ $executor = $model;
         <?php endif; ?>
     </div>
 
-    <?php if ($executor['specializations']): ?>
+    <?php if ($executor['specializations'] && $specializations = json_decode($executor['specializations'])): ?>
         <div class="link-specialization user__search-link--bottom">
-            <?php foreach (
-                json_decode($executor['specializations']) as $specialization
-            ): ?>
+            <?php foreach ($specializations as $specialization): ?>
                 <?= Html::a(Html::encode($specialization->title),
                     Task::getUrlTasksByCategory((int)$specialization->id),
                     ['class' => 'link-regular']); ?>

@@ -44,6 +44,7 @@ class City extends ActiveRecord
     public function rules(): array
     {
         return [
+            [['name', 'lat', 'long'], 'required'],
             [['lat', 'long'], 'number'],
             [['name'], 'string', 'max' => 255],
         ];

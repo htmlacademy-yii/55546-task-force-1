@@ -2,6 +2,7 @@
 
 namespace app\models;
 
+use common\models\User;
 use yii\db\ActiveRecord;
 
 /**
@@ -49,7 +50,14 @@ class UserNotifications extends ActiveRecord
     public function rules(): array
     {
         return [
+            ['user_id', 'required'],
             ['user_id', 'integer'],
+            [
+                'user_id',
+                'exist',
+                'targetClass' => User::class,
+                'targetAttribute' => 'id',
+            ],
             [['is_new_message', 'is_task_actions', 'is_new_review'], 'boolean'],
         ];
     }

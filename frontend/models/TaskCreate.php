@@ -2,6 +2,7 @@
 
 namespace app\models;
 
+use DateTime;
 use Yii;
 use yii\base\Model;
 
@@ -28,6 +29,8 @@ class TaskCreate extends Model
     public $price;
     /** @var string строка с датой завершения */
     public $dateEnd;
+    /** @var string число timestamp с датой завершения */
+    public $timestampDateEnd;
     /** @var string строка с координатами широты */
     public $latitude;
     /** @var string строка с координатами долготы */
@@ -39,23 +42,14 @@ class TaskCreate extends Model
      * Получение списка правил валидации для модели
      *
      * @return array список правил валидации для модели
+     * @throws \Exception
      */
     public function rules(): array
     {
+        $today = new DateTime();
+
         return [
-            [
-                [
-                    'title',
-                    'description',
-                    'categoryId',
-                    'location',
-                    'price',
-                    'dateEnd',
-                    'cityId',
-                    'files',
-                ],
-                'safe',
-            ],
+            ['files', 'safe',],
             [['title', 'description'], 'trim'],
             [
                 ['title', 'description', 'categoryId'],
@@ -69,10 +63,16 @@ class TaskCreate extends Model
                 'integer',
                 'message' => 'Это поле может быть только целым числом',
             ],
-            ['categoryId', 'checkCategory'],
+            [
+                'categoryId',
+                'exist',
+                'targetClass' => Category::class,
+                'targetAttribute' => 'id',
+                'message' => 'sdf',
+            ],
             [['description', 'location'], 'string'],
-            ['location', 'checkCity'],
-            ['location', 'checkLocation'],
+            ['location', 'validateCity'],
+            ['location', 'validateLocation'],
             [
                 'price',
                 'number',
@@ -85,8 +85,15 @@ class TaskCreate extends Model
                 'pattern' => '/^\d{4}-\d{2}-\d{2}$/',
                 'message' => 'Не корректный формат даты',
             ],
-            ['dateEnd', 'checkDate'],
-            ['cityId', 'checkCity'],
+            [
+                'dateEnd',
+                'date',
+                'format' => 'php:Y-m-d',
+                'timestampAttribute' => 'timestampDateEnd',
+                'min' => $today->getTimestamp(),
+                'minString' => $today->format('Y-m-d'),
+                'tooSmall' => '{attribute} должен быть больше текущей даты {min}.',
+            ],
         ];
     }
 
@@ -109,38 +116,20 @@ class TaskCreate extends Model
     }
 
     /**
-     * Валидатор для проверки существование указанной категории в базе данных сайта
-     */
-    public function checkCategory(): void
-    {
-        if (!Category::findOne((int)$this->categoryId)) {
-            $this->addError('categoryId', 'Указанной категории не существует');
-        }
-    }
-
-    /**
      * Валидатор для проверки существование указанного города в базе данных сайта
      */
-    public function checkCity(): void
+    public function validateCity(): void
     {
-        $city = City::findOne(['name' => explode(',', $this->location)[0]]);
-        if (!$city) {
-            $this->addError('location',
-                'Указанный город не найден в нашей базе данных');
-        } else {
+        if ($city = City::findOne([
+            'name' => explode(',', $this->location)[0],
+        ])
+        ) {
             $this->cityId = $city->id;
-        }
-    }
 
-    /**
-     * Валидатор для проверки даты завершения задания
-     */
-    public function checkDate(): void
-    {
-        if (time() > strtotime($this->dateEnd)) {
-            $this->addError('dateEnd',
-                'Дата завершение задачи должна быть после текущей');
+            return;
         }
+        $this->addError('location',
+            'Указанный город не найден в нашей базе данных');
     }
 
     /**
@@ -149,19 +138,22 @@ class TaskCreate extends Model
      * @throws \yii\base\InvalidConfigException
      * @throws \yii\di\NotInstantiableException
      */
-    public function checkLocation(): void
+    public function validateLocation(): void
     {
         if (!empty($this->location)) {
-            $geocode = Yii::$container->get('yandexMap')
-                ->getPosition($this->location);
-
-            if (!$geocode) {
-                $this->addError('location', 'Указанная локация не определена');
-            } else {
-                $geocode = explode(' ', $geocode);
-                $this->longitude = $geocode[0];
-                $this->latitude = $geocode[1];
-            }
+            return;
         }
+
+        $geocode = Yii::$container->get('yandexMap')
+            ->getPosition($this->location);
+
+        if (!$geocode) {
+            $this->addError('location', 'Указанная локация не определена');
+
+            return;
+        }
+        $geocode = explode(' ', $geocode);
+        $this->longitude = $geocode[0];
+        $this->latitude = $geocode[1];
     }
 }

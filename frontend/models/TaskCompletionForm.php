@@ -33,9 +33,21 @@ class TaskCompletionForm extends Model
     public function rules(): array
     {
         return [
-            ['rating', 'required'],
+            [['rating', 'isCompletion'], 'required'],
+            [
+                'rating',
+                'filter',
+                'filter' => function ($rating) {
+                    return (int)$rating;
+                },
+            ],
             ['rating', 'integer', 'min' => 1, 'max' => 5],
-            [['isCompletion', 'text', 'rating'], 'safe'],
+            [
+                'isCompletion',
+                'in',
+                'range' => [self::STATUS_YES, self::STATUS_DIFFICULT],
+            ],
+            ['text', 'string'],
         ];
     }
 

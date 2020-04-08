@@ -3,14 +3,12 @@
 use frontend\assets\TaskViewAsset;
 use frontend\assets\YandexMapAsset;
 use yii\helpers\Html;
-use yii\bootstrap\ActiveForm;
 use app\models\TaskRespond;
 use app\models\Task;
 use yii\helpers\Url;
 
 $this->title = "Задание: $task->title";
 
-$fieldConfig = ['template' => '<p>{label}{input}{error}</p>'];
 $respondsCount = count($task->responds);
 
 YandexMapAsset::register($this);
@@ -175,54 +173,11 @@ TaskViewAsset::register($this);
 </section>
 
 <section class="connect-desk">
-    <?php if ($executor && $isAuthor): ?>
-        <div class="connect-desk__profile-mini">
-            <div class="profile-mini__wrapper">
-                <h3>Исполнитель</h3>
-                <div class="profile-mini__top">
-                    <img src="<?= $executor->userData->getAvatar(); ?>"
-                         width="62" height="62" alt="Аватар заказчика">
-                    <div class="profile-mini__name five-stars__rate">
-                        <p><?= Html::encode($executor->login); ?></p>
-                        <?php for ($i = 0; $i < 5; $i++): ?>
-                            <span <?= $executor->userData->rating > $i ? ''
-                                : 'class="star-disabled"'; ?>></span>
-                        <?php endfor; ?>
-                        <b><?= $executor->userData->rating; ?></b>
-                    </div>
-                </div>
-
-                <p class="info-customer">
-                    <span><?= $executor->reviewsCount; ?> отзывов</span>
-                    <span
-                        class="last-"><?= $executor->ordersCount; ?> заказов</span>
-                </p>
-                <?= Html::a('Смотреть профиль', $executor->getCurrentUserUrl(),
-                    ['class' => 'link-regular']) ?>
-            </div>
-        </div>
-    <?php else: ?>
-        <div class="connect-desk__profile-mini">
-            <div class="profile-mini__wrapper">
-                <h3>Заказчик</h3>
-                <div class="profile-mini__top">
-                    <img src="<?= $task->author->userData->getAvatar(); ?>"
-                         width="62" height="62" alt="Аватар заказчика">
-                    <div class="profile-mini__name five-stars__rate">
-                        <p><?= Html::encode($task->author->login); ?></p>
-                    </div>
-                </div>
-                <p class="info-customer">
-                    <span><?= count($task->author->tasks); ?> заданий</span>
-                    <span
-                        class="last-"><?= Yii::$app->formatter->asRelativeTime($task->author->date_registration); ?> на сайте</span>
-                </p>
-                <?= Html::a('Смотреть профиль',
-                    $task->author->getCurrentUserUrl(),
-                    ['class' => 'link-regular']) ?>
-            </div>
-        </div>
-    <?php endif; ?>
+    <?= $this->render('user', [
+        'user' => $executor && $isAuthor ? $executor : $task->author,
+        'isExecutor' => $isExecutor,
+    ]);
+    ?>
 
     <?php if ($task->executor_id && ($isAuthor || $isSelectedExecutor)): ?>
         <div id="chat-container">
@@ -231,94 +186,16 @@ TaskViewAsset::register($this);
     <?php endif; ?>
 </section>
 
-<section class="modal response-form form-modal" id="response-form">
-    <h2>Отклик на задание</h2>
-    <?php $form = ActiveForm::begin([
-        'action' => Url::to("/tasks/respond/{$task->id}"),
-        'enableClientValidation' => false,
-        'enableAjaxValidation' => true,
-        'validationUrl' => Url::to('/tasks/respond-ajax-validation'),
-    ]); ?>
-    <?= $form->field($respondModel, 'price', $fieldConfig)
-        ->textInput(['class' => 'response-form-payment input input-middle input-money'])
-        ->label(null, ['class' => 'form-modal-description']); ?>
-    <?= $form->field($respondModel, 'text', $fieldConfig)
-        ->textarea([
-            'class' => 'input textarea',
-            'rows' => 4,
-            'placeholder' => 'Place your text',
-        ])
-        ->label(null, ['class' => 'form-modal-description']); ?>
-    <?= Html::submitButton('Отправить', ['class' => 'button modal-button']); ?>
-    <?php ActiveForm::end(); ?>
-    <?= Html::button('Закрыть', ['class' => 'form-modal-close']); ?>
-</section>
-<section class="modal completion-form form-modal" id="complete-form">
-    <h2>Завершение задания</h2>
-    <p class="form-modal-description">Задание выполнено?</p>
-    <?php
-    $form
-        = ActiveForm::begin(['action' => Url::to("/tasks/completion/{$task->id}")]);
-    echo $form->field($taskCompletionModel, 'isCompletion')
-        ->radioList([
-            $completionYes => 'Да',
-            $completionDifficult => 'Возникли проблемы',
-        ],
-            [
-                'item' => function ($index, $label, $name, $checked, $value) {
-                    return "<input class='visually-hidden completion-input completion-input--$value' type='radio' 
-                    id='completion-radio--$value' name='$name' value='$value'>
-                <label class='completion-label completion-label--$value' for='completion-radio--$value'>$label</label>";
-                },
-            ])->label(false);
-    ?>
-    <?= $form->field($taskCompletionModel, 'text', $fieldConfig)
-        ->textarea([
-            'class' => 'input textarea',
-            'rows' => 4,
-            'placeholder' => 'Place your text',
-        ]); ?>
-    <p class="form-modal-description">
-        Оценка
-    <div class="feedback-card__top--name completion-form-star">
-        <span class="star-disabled"></span>
-        <span class="star-disabled"></span>
-        <span class="star-disabled"></span>
-        <span class="star-disabled"></span>
-        <span class="star-disabled"></span>
-    </div>
-    </p>
-    <?php
-    echo $form->field($taskCompletionModel, 'rating',
-        ['template' => '{input}', 'options' => ['tag' => false]])
-        ->hiddenInput(['id' => 'rating']);
-    echo Html::submitButton('Отправить', ['class' => 'button modal-button']);
-    ActiveForm::end();
-    echo Html::button('Закрыть', ['class' => 'form-modal-close']);
-    ?>
-</section>
-<section class="modal form-modal refusal-form" id="refuse-form">
-    <h2>Отказ от задания</h2>
-    <p>
-        Вы собираетесь отказаться от выполнения задания.
-        Это действие приведёт к снижению вашего рейтинга.
-        Вы уверены?
-    </p>
-    <?php
-    ActiveForm::begin([
-        'action' => Url::to("/tasks/refusal/{$task->id}"),
-        'enableClientValidation' => false,
-    ]);
-    echo Html::button('Отмена',
-        ['class' => 'button__form-modal button', 'id' => 'close-modal']);
-    echo Html::submitButton('Отказаться', [
-        'class' => 'button__form-modal refusal-button button',
-        'name' => 'refusal-btn',
-        'value' => 'refusal-btn',
-    ]);
-    ActiveForm::end();
-    echo Html::button('Закрыть', ['class' => 'form-modal-close']);
-    ?>
-</section>
+<?= $this->render('respond-modal-form', [
+    'task' => $task,
+    'respondModel' => $respondModel,
+]); ?>
+<?= $this->render('completion-modal-form', [
+    'task' => $task,
+    'taskCompletionModel' => $taskCompletionModel,
+    'completionYes' => $completionYes,
+    'completionDifficult' => $completionDifficult,
+]); ?>
+<?= $this->render('refusal-modal-form', ['task' => $task]); ?>
 
 <div class="overlay"></div>

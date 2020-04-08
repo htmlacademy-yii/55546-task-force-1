@@ -56,6 +56,7 @@ class UsersController extends SecuredController
         $model = new ExecutorSearchForm();
         if (Yii::$app->request->get('ExecutorSearchForm')
             && $model->load(Yii::$app->request->get())
+            && $model->validate()
         ) {
             $model->applyFilters($query);
         }
@@ -77,9 +78,13 @@ class UsersController extends SecuredController
 
         return $this->render('index', [
             'model' => $model,
+            'selectedSort' => $sort,
+            'additionallyList' => ExecutorSearchForm::ADDITIONALLY_LIST,
+            'sortList' => User::SORT_TYPE_LIST,
+
             'dataProvider' => $provider,
             'categories' => Category::getCategoriesArray(),
-            'selectedSort' => $sort,
+
         ]);
     }
 

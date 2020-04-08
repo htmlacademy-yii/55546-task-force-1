@@ -2,6 +2,7 @@
 
 namespace app\models;
 
+use common\models\User;
 use yii\base\Model;
 
 /**
@@ -17,7 +18,7 @@ class SignupForm extends Model
     public $login;
     /** @var string строка с почтовым ящиком пользователя */
     public $email;
-    /** @var string строка с идентификатором пользователя */
+    /** @var string строка с идентификатором города пользователя */
     public $cityId;
     /** @var string строка с паролем пользователя */
     public $password;
@@ -30,33 +31,32 @@ class SignupForm extends Model
     public function rules(): array
     {
         return [
-            ['login', 'trim'],
-            ['login', 'required'],
+            [['login', 'email', 'password', 'cityId'], 'required'],
+            [['login', 'email'], 'trim'],
             ['login', 'string', 'min' => 2, 'max' => 255],
             [
                 'login',
                 'unique',
-                'targetClass' => '\common\models\User',
-                'message' => 'This login has already been taken.',
+                'targetClass' => User::class,
+                'message' => 'Данное имя уже занято',
             ],
-
-            ['email', 'trim'],
-            ['email', 'required'],
             ['email', 'email'],
             ['email', 'string', 'max' => 255],
             [
                 'email',
                 'unique',
-                'targetClass' => '\common\models\User',
-                'message' => 'This email address has already been taken.',
+                'targetClass' => User::class,
+                'message' => 'Данный email уже используется',
             ],
-
-            ['password', 'required'],
             ['password', 'string', 'min' => 6],
-
-            ['cityId', 'required'],
             ['cityId', 'integer'],
-            ['cityId', 'checkCity'],
+            [
+                'cityId',
+                'exist',
+                'targetClass' => City::class,
+                'targetAttribute' => 'id',
+                'message' => 'Указанный город не найден в нашей базе данных',
+            ],
         ];
     }
 
@@ -73,16 +73,5 @@ class SignupForm extends Model
             'cityId' => 'Город проживания',
             'password' => 'Пароль',
         ];
-    }
-
-    /**
-     * Валидатор для проверки существование указанного города в базе данных сайта
-     */
-    public function checkCity(): void
-    {
-        if (!City::findOne((int)$this->cityId)) {
-            $this->addError('cityId',
-                'Указанный город не найден в нашей базе данных');
-        }
     }
 }

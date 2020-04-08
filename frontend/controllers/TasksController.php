@@ -77,7 +77,10 @@ class TasksController extends SecuredController
         } elseif (!empty(Yii::$app->request->queryParams['filter'])) {
             $taskModel->load(['TasksFilter' => Yii::$app->request->queryParams['filter']]);
         }
-        $taskModel->applyFilters($tasks);
+
+        if ($taskModel->validate()) {
+            $taskModel->applyFilters($tasks);
+        }
 
         $provider = new ActiveDataProvider([
             'query' => $tasks->with(['category', 'author']),
@@ -163,6 +166,7 @@ class TasksController extends SecuredController
         $model = new TaskCompletionForm();
         if ($model->load(Yii::$app->request->post()) && $model->validate()) {
             $task = Task::findOne($taskId);
+
             $transaction = Yii::$app->db->beginTransaction();
             try {
                 $executor = User::findOne((int)$task->executor_id);

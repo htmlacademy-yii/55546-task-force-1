@@ -73,36 +73,36 @@ class YandexMap
      */
     public function getPosition(string $geocode)
     {
-        $content = json_decode($this->getDataMap($geocode))
-            ->response->GeoObjectCollection;
-        if ((int)$content->metaDataProperty->GeocoderResponseMetaData->found
+        $content = json_decode($this->getDataMap($geocode));
+        if (!$content
+            || (int)$content->response->GeoObjectCollection->metaDataProperty->GeocoderResponseMetaData->found
             === 0
         ) {
             return null;
         }
 
-        return $content->featureMember[0]->GeoObject->Point->pos;
+        return $content->response->GeoObjectCollection->featureMember[0]->GeoObject->Point->pos;
     }
 
     /**
      * Получение локации по координатам
      *
-     * @param float $lat - дробное число со значением широты
+     * @param float $lat  - дробное число со значением широты
      * @param float $long - дробное число со значением долготы
      *
      * @return |null
      */
     public function getAddressByPositions(float $lat, float $long)
     {
-        $content = json_decode($this->getDataMap("$long $lat"))
-            ->response->GeoObjectCollection;
-        if ((int)$content->metaDataProperty->GeocoderResponseMetaData->found
+        $content = json_decode($this->getDataMap("$long $lat"));
+        if (!$content
+            || (int)$content->response->GeoObjectCollection->metaDataProperty->GeocoderResponseMetaData->found
             === 0
         ) {
             return null;
         }
 
-        return $content->featureMember[0]->GeoObject->metaDataProperty
+        return $content->response->GeoObjectCollection->featureMember[0]->GeoObject->metaDataProperty
             ->GeocoderMetaData->AddressDetails->Country;
     }
 }
