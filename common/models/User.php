@@ -29,15 +29,6 @@ use yii\web\IdentityInterface;
  */
 class User extends ActiveRecord implements IdentityInterface
 {
-//    /** @var string строка с именем пользователя */
-//    public $login;
-//    /** @var string строка с почтовым ящиком пользователя */
-//    public $email;
-//    /** @var string строка с идентификатором города пользователя */
-//    public $cityId;
-//    /** @var string строка с паролем пользователя */
-//    public $password;
-
     /** @var integer статус неактивного пользователя */
     const STATUS_INACTIVE = 9;
     /** @var integer статус активного пользователя */
