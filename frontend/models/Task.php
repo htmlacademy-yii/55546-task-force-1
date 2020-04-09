@@ -6,7 +6,10 @@ use Yii;
 use yii\db\ActiveQuery;
 use yii\db\ActiveRecord;
 use common\models\User;
+use yii\helpers\FileHelper;
 use yii\helpers\Url;
+use yii\validators\RangeValidator;
+use yii\web\UploadedFile;
 
 /**
  * Класс для работы с моделью заданий
@@ -29,6 +32,52 @@ class Task extends ActiveRecord
     const STATUS_FAILING = 'failing';
     /** @var string строка со статусом просроченного задания */
     const STATUS_EXPIRED = 'expired';
+
+    /**
+     * Сохранение файлов для указанного задания
+     *
+     * @param UploadedFile $files список файлов к заданию
+     *
+     * @param string       $path  адрес директории для хранения файлов
+     *
+     * @throws \yii\base\ErrorException
+     * @throws \yii\db\Exception
+     * @throws \yii\web\ServerErrorHttpException
+     */
+    public function setFiles($files, string $path): void
+    {
+        $pathTaskDir = "$path/$this->id";
+        if (file_exists($pathTaskDir)) {
+            FileHelper::removeDirectory($pathTaskDir);
+        }
+        mkdir($pathTaskDir);
+        (new TaskFile(['path' => $pathTaskDir]))->setFiles($this->id, $files);
+    }
+
+    /**
+     * Получение статусов заданий которые должны быть видны на странице данной категории
+     *
+     * @param string $category строка с категорией
+     *
+     * @return array|null
+     */
+    public static function getStatusByCategory(string $category)
+    {
+        if (!empty($category)
+            && !(new RangeValidator(['range' => self::getStatusList()]))->validate($category)
+        ) {
+            return null;
+        }
+
+        $status = self::getStatusList();
+        if (!empty($category)) {
+            $status = ($category === self::STATUS_CANCELED
+                || $category === self::STATUS_FAILING) ?
+                [self::STATUS_CANCELED, self::STATUS_FAILING] : [$category];
+        }
+
+        return $status;
+    }
 
     /**
      * Получение данных локации задания через яндекс карты
@@ -222,8 +271,17 @@ class Task extends ActiveRecord
             [
                 'date_end',
                 'match',
-                'pattern' => '/^\d{4}-\d{2}-\d{2}$/',
+                'pattern' => '/^\d{4}-\d{2}-\d{2}( \d{2}:\d{2}:\d{2}$)?$/',
             ],
         ];
+    }
+
+    /**
+     * Устанавливает статус текущего задания - отмененно
+     */
+    public function actionCancel()
+    {
+        $this->status = self::STATUS_CANCELED;
+        $this->save();
     }
 }

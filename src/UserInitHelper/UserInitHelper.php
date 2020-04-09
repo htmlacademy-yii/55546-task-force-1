@@ -2,6 +2,11 @@
 
 namespace src\UserInitHelper;
 
+use app\models\UserData;
+use app\models\UserNotifications;
+use app\models\UserSettings;
+use common\models\User;
+use Yii;
 use yii\db\ActiveRecord;
 
 /**
@@ -44,7 +49,6 @@ class UserInitHelper
             'phone' => '',
             'other_messenger' => '',
             'avatar' => $uData->avatar ?? '',
-            'rating' => '0',
             'views' => 0,
             'order_count' => 0,
         ];

@@ -61,7 +61,7 @@ class UserData extends ActiveRecord
             ],
             ['description', 'string'],
             [
-                ['skype', 'phone', 'other_messenger', 'avatar', 'rating'],
+                ['skype', 'phone', 'other_messenger', 'avatar'],
                 'string',
                 'max' => 255,
             ],

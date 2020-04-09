@@ -1,7 +1,19 @@
 <?php
 
+use yii\log\FileTarget;
+use yii\web\JsonParser;
+use yii\swiftmailer\Mailer;
+use yii\rest\UrlRule;
+use frontend\controllers\TasksController;
+use frontend\controllers\SettingsController;
+use common\models\User;
+use yii\authclient\clients\VKontakte;
+use yii\authclient\Collection;
+use yii\redis\Cache;
+use yii\i18n\Formatter;
 use src\TaskforceUrlManager\TaskforceUrlManager;
 use frontend\modules\v1\src\RestMessagesUrlRule;
+use frontend\modules\v1\Module;
 
 $params = array_merge(
     require __DIR__.'/../../common/config/params.php',
@@ -18,7 +30,7 @@ return [
     'controllerNamespace' => 'frontend\controllers',
     'modules' => [
         'v1' => [
-            'class' => 'frontend\modules\v1\Module',
+            'class' => Module::class,
         ],
     ],
     'components' => [
@@ -27,7 +39,7 @@ return [
                 : []),
         ],
         'mailer' => [
-            'class' => 'yii\swiftmailer\Mailer',
+            'class' => Mailer::class,
             'useFileTransport' => false,
             'transport' => [
                 'class' => 'Swift_SmtpTransport',
@@ -37,11 +49,11 @@ return [
             ],
         ],
         'formatter' => [
-            'class' => 'yii\i18n\Formatter',
+            'class' => Formatter::class,
             'language' => 'ru-RU',
         ],
         'cache' => [
-            'class' => 'yii\redis\Cache',
+            'class' => Cache::class,
             'redis' => [
                 'hostname' => 'localhost',
                 'port' => 6379,
@@ -51,14 +63,14 @@ return [
         'request' => [
             'csrfParam' => '_csrf-frontend',
             'parsers' => [
-                'application/json' => 'yii\web\JsonParser',
+                'application/json' => JsonParser::class,
             ],
         ],
         'authClientCollection' => [
-            'class' => 'yii\authclient\Collection',
+            'class' => Collection::class,
             'clients' => [
                 'vkontakte' => [
-                    'class' => 'yii\authclient\clients\VKontakte',
+                    'class' => VKontakte::class,
                     'clientId' => '7338231',
                     'clientSecret' => 'a19mVwHIMAC2frErrefh',
                     'scope' => 'email',
@@ -66,7 +78,7 @@ return [
             ],
         ],
         'user' => [
-            'identityClass' => 'common\models\User',
+            'identityClass' => User::class,
             'enableAutoLogin' => true,
             'identityCookie' => [
                 'name' => '_identity-frontend',
@@ -74,14 +86,13 @@ return [
             ],
         ],
         'session' => [
-            // this is the name of the session cookie used for login on the frontend
             'name' => 'advanced-frontend',
         ],
         'log' => [
             'traceLevel' => YII_DEBUG ? 3 : 0,
             'targets' => [
                 [
-                    'class' => 'yii\log\FileTarget',
+                    'class' => FileTarget::class,
                     'levels' => ['error', 'warning'],
                 ],
             ],
@@ -117,17 +128,17 @@ return [
                         'POST' => 'v1/message/create',
                     ],
                 ],
-                ['class' => 'yii\rest\UrlRule', 'controller' => 'api/message'],
+                ['class' => UrlRule::class, 'controller' => 'api/message'],
             ],
         ],
     ],
     'container' => [
         'definitions' => [
-            'frontend\controllers\SettingsController' => [
+            SettingsController::class => [
                 'avatarsPath' => 'users-files/avatars',
                 'photosPath' => 'users-files/works',
             ],
-            'frontend\controllers\TasksController' => [
+            TasksController::class => [
                 'tasksPath' => 'users-files/tasks',
             ],
         ],

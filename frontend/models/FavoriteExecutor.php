@@ -42,4 +42,27 @@ class FavoriteExecutor extends ActiveRecord
             ],
         ];
     }
+
+    /**
+     * Метод для переключения добавления/удаления исполнителя
+     * в избранное к указанному клиенту
+     *
+     * @param int $clientId число идентификатор клиента
+     * @param int $executorId число идентификатор исполнителя
+     *
+     * @throws \Throwable
+     * @throws \yii\db\StaleObjectException
+     */
+    public static function toggleUserFavorite(
+        int $clientId,
+        int $executorId
+    ): void {
+        $params = ['client_id' => $clientId, 'executor_id' => $executorId];
+
+        if ($data = self::findOne($params)) {
+            $data->delete();
+        } else {
+            (new self($params))->save();
+        }
+    }
 }

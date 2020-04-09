@@ -6,7 +6,6 @@ use app\models\RespondForm;
 use app\models\Review;
 use app\models\TaskCompletionForm;
 use app\models\TaskCreate;
-use app\models\TaskFile;
 use app\models\TaskRespond;
 use common\models\User;
 use src\NotificationHelper\NotificationHelper;
@@ -15,7 +14,6 @@ use yii\bootstrap\ActiveForm;
 use yii\data\ActiveDataProvider;
 use app\models\Task;
 use app\models\Category;
-use yii\helpers\FileHelper;
 use yii\web\NotFoundHttpException;
 use app\models\TasksFilter;
 use yii\web\Response;
@@ -122,11 +120,9 @@ class TasksController extends SecuredController
 
         return $this->render('view', [
             'task' => $task,
-            'taskLocation' => $task->getLocation(),
             'isAuthor' => $user->id === $task->author_id,
             'isExecutor' => $user->role === User::ROLE_EXECUTOR,
             'isSelectedExecutor' => $task->executor_id === $user->id,
-            'executor' => $task->executor,
             'isRespond' => TaskRespond::find()->where([
                 'task_id' => $task->id,
                 'user_id' => $user->id,
@@ -186,14 +182,6 @@ class TasksController extends SecuredController
                     'author_id' => $task->author_id,
                     'executor_id' => $task->executor_id,
                 ]))->save();
-
-                $queryRating
-                    = Yii::$app->db->createCommand("SELECT SUM(rating) as `rating`, COUNT(id) as `count` FROM review WHERE executor_id = :id",
-                    [':id' => $executor->id])->queryOne();
-                $executor->userData->rating
-                    = (string)round((($queryRating['rating']
-                        + $model->rating) / ($queryRating['count'] + 1)), 1);
-                $executor->userData->save();
 
                 if ($executor->userNotifications->is_task_actions) {
                     NotificationHelper::taskComplete($executor, $task);
@@ -280,8 +268,8 @@ class TasksController extends SecuredController
     /**
      * Действие для обработки завершения задания
      *
-     * @param int $respondId идентификатор отклика к заданию
-     * @param string $status статус выполненности задания
+     * @param int    $respondId идентификатор отклика к заданию
+     * @param string $status    статус выполненности задания
      *
      * @return Response
      */
@@ -330,8 +318,7 @@ class TasksController extends SecuredController
             return;
         }
 
-        $task->status = Task::STATUS_CANCELED;
-        $task->save();
+        $task->actionCancel();
 
         return $this->redirect(Task::getBaseTasksUrl());
     }
@@ -367,20 +354,15 @@ class TasksController extends SecuredController
                 'longitude' => $model->longitude,
                 'date_end' => $model->dateEnd,
                 'city_id' => $model->cityId,
-                'date_start' => date("Y-m-d h:i:s"),
+                'date_start' => date('Y-m-d h:i:s'),
                 'status' => Task::STATUS_NEW,
             ]);
             $task->save();
 
             if ($model->files) {
-                $pathTaskDir = "$this->tasksPath/$task->id";
-                if (file_exists($pathTaskDir)) {
-                    FileHelper::removeDirectory($pathTaskDir);
-                }
-                mkdir($pathTaskDir);
-                (new TaskFile(['path' => $pathTaskDir]))->setFiles($task->id,
-                    $model->files);
+                $task->setFiles($model->files, $this->tasksPath);
             }
+
             $this->redirect(Task::getBaseTasksUrl());
         }
 
@@ -402,9 +384,12 @@ class TasksController extends SecuredController
     public function actionAjaxGetYandexPlace(string $place = '')
     {
         Yii::$app->response->format = Response::FORMAT_JSON;
-
-        return json_decode(Yii::$container->get('yandexMap')
+        if ($content = json_decode(Yii::$container->get('yandexMap')
             ->getDataMap($place))
-            ->response->GeoObjectCollection->featureMember;
+        ) {
+            return $content->response->GeoObjectCollection->featureMember;
+        }
+
+        return null;
     }
 }

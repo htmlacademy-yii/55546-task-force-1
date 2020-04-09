@@ -16,14 +16,14 @@ use app\models\Task;
                 <?php endif; ?>
                 <div class="profile-mini__name five-stars__rate">
                     <?php for ($i = 0; $i < 5; $i++): ?>
-                        <span <?= $user->userData->rating > $i ? ''
+                        <span <?= $user->rating > $i ? ''
                             : 'class="star-disabled"'; ?>></span>
                     <?php endfor; ?>
-                    <b><?= $user->userData->rating; ?></b>
+                    <b><?= $user->rating; ?></b>
                 </div>
-                <b class="done-task">Выполнил <?= $completedTasksCount ?? 0; ?>
+                <b class="done-task">Выполнил <?= $user->completedTasksCount ?? 0; ?>
                     заказов</b>
-                <b class="done-review">Получил <?= $reviewsCount ?? 0; ?>
+                <b class="done-review">Получил <?= $user->reviewsCount ?? 0; ?>
                     отзывов</b>
             </div>
             <div
@@ -42,7 +42,7 @@ use app\models\Task;
             <div class="user__card-info">
                 <h3 class="content-view__h3">Специализации</h3>
                 <div class="link-specialization">
-                    <?php foreach ($user->specializations as $specialization):
+                    <?php foreach ($user->userSpecializations as $specialization):
                         ?>
                         <?= Html::a(Html::encode($specialization->title),
                         Task::getUrlTasksByCategory($specialization->id),

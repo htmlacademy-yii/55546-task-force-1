@@ -40,7 +40,7 @@ class SecuredController extends Controller
         }
 
         Task::updateAll(['status' => Task::STATUS_EXPIRED],
-            "date_end IS NOT NULL AND NOW() > date_end");
+            'date_end IS NOT NULL AND NOW() > date_end');
 
         return true;
     }

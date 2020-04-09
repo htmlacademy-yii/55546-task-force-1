@@ -5,6 +5,7 @@ use yii\widgets\ActiveForm;
 use yii\widgets\ListView;
 
 $fieldConfig = ['options' => ['tag' => false]];
+
 ?>
 
 <section class="user__search">
@@ -38,7 +39,8 @@ $fieldConfig = ['options' => ['tag' => false]];
             'nextPageLabel' => '_',
             'prevPageLabel' => '_',
         ],
-    ]); ?>
+    ]);
+    ?>
 </section>
 <section class="search-task">
     <div class="search-task__wrapper">

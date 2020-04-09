@@ -3,6 +3,9 @@
 namespace app\models;
 
 use common\models\User;
+use src\UserInitHelper\UserInitHelper;
+use Yii;
+use yii\authclient\clients\VKontakte;
 use yii\db\ActiveQuery;
 use yii\db\ActiveRecord;
 
@@ -44,7 +47,7 @@ class Auth extends ActiveRecord
     {
         return [
             [['user_id', 'source', 'source_id'], 'required'],
-            [['user_id', 'source', 'source_id'], 'integer'],
+            [['user_id', 'source_id'], 'integer'],
             [
                 'user_id',
                 'exist',
@@ -52,5 +55,45 @@ class Auth extends ActiveRecord
                 'targetAttribute' => 'id',
             ],
         ];
+    }
+
+    public static function onAuthVKontakte(VKontakte $client)
+    {
+        $clientId = $client->getId();
+        $attributes = $client->getUserAttributes();
+        if ($auth = self::findOne([
+            'source' => $clientId,
+            'source_id' => $attributes['id'],
+        ])
+        ) {
+            return $auth->user;
+        }
+
+        $user = null;
+        $transaction = Yii::$app->db->beginTransaction();
+        try {
+            $user = (new UserInitHelper(new User([
+                'login' => $attributes['first_name'].' '
+                    .$attributes['last_name'],
+                'email' => $attributes['email'],
+                'password' => Yii::$app->security->generateRandomString(6),
+                'city_id' => null,
+                'role' => User::ROLE_CLIENT,
+            ])))->initNotifications(new UserNotifications())
+                ->initSetting(new UserSettings())
+                ->initUserData(new UserData(['avatar' => $attributes['photo']]))
+                ->user;
+            (new self([
+                'user_id' => $user->id,
+                'source' => $clientId,
+                'source_id' => $attributes['id'],
+            ]))->save();
+
+            $transaction->commit();
+        } catch (\Exception $err) {
+            $transaction->rollBack();
+        }
+
+        return $user;
     }
 }

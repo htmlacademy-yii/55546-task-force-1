@@ -8,7 +8,7 @@ $currentItemClass = 'menu_toggle__item--current';
 
 <section class="menu-toggle">
     <ul class="menu-toggle__list">
-        <li class="menu-toggle__item menu-toggle__item--completed <?= $status
+        <li class="menu-toggle__item menu-toggle__item--completed <?= $category
         === Task::STATUS_COMPLETED ? $currentItemClass : '' ?>">
             <div class="menu-toggle__svg-wrapper">
                 <svg width="20" height="20" viewBox="0 0 20 20" fill="none"
@@ -18,9 +18,9 @@ $currentItemClass = 'menu_toggle__item--current';
                 </svg>
             </div>
             <?= Html::a('Завершённые',
-                "my-list?status=".Task::STATUS_COMPLETED); ?>
+                "my-list?category=".Task::STATUS_COMPLETED); ?>
         </li>
-        <li class="menu-toggle__item menu-toggle__item--new <?= $status
+        <li class="menu-toggle__item menu-toggle__item--new <?= $category
         === Task::STATUS_NEW ? $currentItemClass : '' ?>">
             <div class="menu-toggle__svg-wrapper">
                 <svg width="24" height="24" viewBox="0 0 24 24" fill="none"
@@ -56,9 +56,9 @@ $currentItemClass = 'menu_toggle__item--current';
                         fill="white"/>
                 </svg>
             </div>
-            <?= Html::a('Новые', "my-list?status=".Task::STATUS_NEW); ?>
+            <?= Html::a('Новые', "my-list?category=".Task::STATUS_NEW); ?>
         </li>
-        <li class="menu-toggle__item menu-toggle__item--active <?= $status
+        <li class="menu-toggle__item menu-toggle__item--active <?= $category
         === Task::STATUS_EXECUTION ? $currentItemClass : '' ?>">
             <div class="menu-toggle__svg-wrapper">
                 <svg width="21" height="19" viewBox="0 0 21 19" fill="none"
@@ -69,9 +69,9 @@ $currentItemClass = 'menu_toggle__item--current';
                 </svg>
             </div>
             <?= Html::a('Активные',
-                "my-list?status=".Task::STATUS_EXECUTION); ?>
+                "my-list?category=".Task::STATUS_EXECUTION); ?>
         </li>
-        <li class="menu-toggle__item menu-toggle__item--canceled <?= $status
+        <li class="menu-toggle__item menu-toggle__item--canceled <?= $category
         === Task::STATUS_CANCELED ? $currentItemClass : '' ?>">
             <div class="menu-toggle__svg-wrapper">
                 <svg width="20" height="20" viewBox="0 0 20 20" fill="none"
@@ -82,9 +82,9 @@ $currentItemClass = 'menu_toggle__item--current';
                 </svg>
             </div>
             <?= Html::a('Отменённые',
-                "my-list?status=".Task::STATUS_CANCELED); ?>
+                "my-list?category=".Task::STATUS_CANCELED); ?>
         </li>
-        <li class="menu-toggle__item menu-toggle__item--hidden <?= $status
+        <li class="menu-toggle__item menu-toggle__item--hidden <?= $category
         === Task::STATUS_EXPIRED ? $currentItemClass : '' ?>">
             <div class="menu-toggle__svg-wrapper">
                 <svg width="24" height="24" viewBox="0 0 24 24" fill="none"
@@ -97,7 +97,7 @@ $currentItemClass = 'menu_toggle__item--current';
                 </svg>
             </div>
             <?= Html::a('Просроченные',
-                "my-list?status=".Task::STATUS_EXPIRED); ?>
+                "my-list?category=".Task::STATUS_EXPIRED); ?>
         </li>
     </ul>
 </section>

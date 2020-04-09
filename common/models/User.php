@@ -13,6 +13,7 @@ use app\models\UserNotifications;
 use app\models\UserPhoto;
 use app\models\UserSettings;
 use app\models\UserSpecialization;
+use src\UserInitHelper\UserInitHelper;
 use Yii;
 use yii\base\NotSupportedException;
 use yii\db\ActiveQuery;
@@ -47,11 +48,12 @@ class User extends ActiveRecord implements IdentityInterface
     const SORT_TYPE_POPULARITY = 'popularity';
 
     /** @var array массиво со списком типов сортировки */
-    const SORT_TYPE_LIST = [
-        self::SORT_TYPE_RATING => 'Рейтингу',
-        self::SORT_TYPE_ORDERS => 'Числу заказов',
-        self::SORT_TYPE_POPULARITY => 'Популярности',
-    ];
+    const SORT_TYPE_LIST
+        = [
+            self::SORT_TYPE_RATING => 'Рейтингу',
+            self::SORT_TYPE_ORDERS => 'Числу заказов',
+            self::SORT_TYPE_POPULARITY => 'Популярности',
+        ];
 
     /**
      * Метод для получения строки с ссылкой на страницу текущего пользователя
@@ -74,6 +76,50 @@ class User extends ActiveRecord implements IdentityInterface
     }
 
     /**
+     * Метод для получения информации, находится ли данный исполнитель
+     * в списке избранного у указанного клиента
+     *
+     * @param int $executorId число с идентификатором исполнителя
+     *
+     * @return bool лоическое значение, находится ли данный исполнитель в списке избранного
+     */
+    public function getIsFavorite(int $executorId): bool
+    {
+        return FavoriteExecutor::find()->where([
+            'client_id' => $this->id,
+            'executor_id' => $executorId,
+        ])->exists();
+    }
+
+    /**
+     * Метод для получения рейтинга исполнителя
+     *
+     * @return float рейтинга исполнителя
+     */
+    public function getRating(): float
+    {
+        return round(Review::find()->where(['executor_id' => $this->id])
+            ->average('rating'), 1);
+    }
+
+    /**
+     * Метод для получения информации, является ли данный клиент заказчиком у
+     * у указанного клиента
+     *
+     * @param int $executorId число с идентификатором исполнителя
+     *
+     * @return bool лоическое значение, является ли данный клиент заказчиком у исполнителя
+     */
+    public function getIsCustomer(int $executorId): bool
+    {
+        return Task::find()->where([
+            'status' => Task::STATUS_EXECUTION,
+            'executor_id' => $executorId,
+            'author_id' => $this->id,
+        ])->exists();
+    }
+
+    /**
      * Создание связи со списком событий для данного пользователя
      *
      * @return ActiveQuery список событий для данного пользователя
@@ -81,6 +127,19 @@ class User extends ActiveRecord implements IdentityInterface
     public function getEvents(): ActiveQuery
     {
         return $this->hasMany(EventRibbon::class, ['user_id' => 'id']);
+    }
+
+    /**
+     * Метод для получения количества выполненных заданий данным исполнителем
+     *
+     * @return int количество выполненных заданий
+     */
+    public function getCompletedTasksCount(): int
+    {
+        return Task::find()
+            ->where(['executor_id' => $this->id])
+            ->andWhere(['!=', 'status', Task::STATUS_EXECUTION])
+            ->count();
     }
 
     /**
@@ -166,13 +225,15 @@ class User extends ActiveRecord implements IdentityInterface
     }
 
     /**
-     * Получение списка специализаций для данного пользователя
+     * Создание связи со списком специализаций данного пользователя
      *
-     * @return array список специализаций для данного пользователя
+     * @return ActiveQuery
+     * @throws \yii\base\InvalidConfigException
      */
-    public function getSpecializations(): array
+    public function getUserSpecializations(): ActiveQuery
     {
-        return Category::findAll($this->getSpecializationsId());
+        return $this->hasMany(Category::class, ['id' => 'category_id'])
+            ->viaTable('user_specialization', ['user_id' => 'id']);
     }
 
     /**
@@ -222,23 +283,6 @@ class User extends ActiveRecord implements IdentityInterface
     }
 
     /**
-     * Общий метод для обработки ссылки на автара пользователя
-     *
-     * @param string $avatar необработанная строка ссылки на аватар
-     *
-     * @return string обработанная строка ссылки на аватар
-     */
-    public static function getCorrectAvatar(string $avatar): string
-    {
-        if (!empty($avatar)) {
-            return preg_match('/^http/', $avatar) ? $avatar
-                : Url::to("/$avatar");
-        }
-
-        return Url::to('/img/user-photo.png');
-    }
-
-    /**
      * Метод для получения строки с ссылкой на страницу нужного пользователя
      *
      * @param int $id идентификатор нужного пользователя
@@ -248,17 +292,6 @@ class User extends ActiveRecord implements IdentityInterface
     public static function getUserUrl(int $id): string
     {
         return Url::to("/users/view/$id");
-    }
-
-    /**
-     * Generates password hash from password and sets it to the model
-     *
-     * @param string $password
-     */
-    public function setPassword(string $password): void
-    {
-        $this->password_hash
-            = Yii::$app->security->generatePasswordHash($password);
     }
 
     /**
@@ -279,7 +312,7 @@ class User extends ActiveRecord implements IdentityInterface
     public function rules(): array
     {
         return [
-            [['login', 'email', 'password', 'city_id', 'role'], 'required'],
+            [['login', 'email', 'password', 'role'], 'required'],
             [['login', 'email'], 'trim'],
             ['login', 'string', 'min' => 2, 'max' => 255],
             [
@@ -295,9 +328,6 @@ class User extends ActiveRecord implements IdentityInterface
                 'message' => 'Данный email уже используется',
             ],
             ['password', 'string', 'min' => 6],
-            ['city_id', 'filter', 'filter' => function($cityId) {
-                return (int)$cityId;
-            }],
             ['city_id', 'integer'],
             [
                 'city_id',
@@ -440,5 +470,33 @@ class User extends ActiveRecord implements IdentityInterface
     public function removePasswordResetToken(): void
     {
         $this->password_reset_token = null;
+    }
+
+
+    /**
+     * Создание нового пользователя в базе данных
+     *
+     * @param array $data данные нового пользователя
+     *
+     * @return bool результат создания, успех или неудача
+     */
+    public static function createUser(array $data): bool
+    {
+        $data['role'] = self::ROLE_CLIENT;
+
+        $transaction = Yii::$app->db->beginTransaction();
+        try {
+            (new UserInitHelper(new self($data)))
+                ->initNotifications(new UserNotifications())
+                ->initSetting(new UserSettings())
+                ->initUserData(new UserData());
+            $transaction->commit();
+
+            return true;
+        } catch (\Exception $e) {
+            $transaction->rollBack();
+        }
+
+        return false;
     }
 }

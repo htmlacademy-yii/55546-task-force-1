@@ -5,8 +5,6 @@ namespace frontend\controllers;
 use common\models\User;
 use Yii;
 use app\models\Task;
-use yii\base\ErrorException;
-use yii\validators\RangeValidator;
 use yii\web\NotFoundHttpException;
 
 /**
@@ -21,43 +19,26 @@ class MyListController extends SecuredController
     /**
      * Действие для страницы списка заданий пользователя
      *
-     * @param string $status строка статуса по которому будут фильтроваться задания
+     * @param string $category строка статуса по которому будут фильтроваться задания
      *
      * @return string
-     * @throws ErrorException
      * @throws NotFoundHttpException
+     * @throws \yii\base\InvalidConfigException
+     * @throws \yii\di\NotInstantiableException
      */
-    public function actionIndex(string $status = '')
+    public function actionIndex(string $category = '')
     {
-        if (!empty($status)
-            && !(new RangeValidator(['range' => Task::getStatusList()]))->validate($status)
-        ) {
-            throw new NotFoundHttpException("Страница не найдена!");
+        if (!$status = Task::getStatusByCategory($category)) {
+            throw new NotFoundHttpException('Страница не найдена!');
         }
 
         $user = Yii::$app->user;
-        $statusTasks = Task::getStatusList();
-        if (!empty($status)) {
-            $statusTasks = ($status === Task::STATUS_CANCELED
-                || $status === Task::STATUS_FAILING) ?
-                [Task::STATUS_CANCELED, Task::STATUS_FAILING] : $status;
-        }
+        $tasks = Task::findAll([
+            $user->identity->role === User::ROLE_CLIENT ? 'author_id'
+                : 'executor_id' => $user->id,
+            'status' => $status,
+        ]);
 
-        $tasks = [];
-        if ($user->identity->role === User::ROLE_CLIENT) {
-            $tasks = Task::findAll([
-                'author_id' => $user->id,
-                'status' => $statusTasks,
-            ]);
-        } elseif ($user->identity->role === User::ROLE_EXECUTOR) {
-            $tasks = Task::findAll([
-                'executor_id' => $user->id,
-                'status' => $statusTasks,
-            ]);
-        } else {
-            throw new ErrorException('Роль пользователя не определена');
-        }
-
-        return $this->render('index', compact('tasks', 'status'));
+        return $this->render('index', compact('tasks', 'category'));
     }
 }

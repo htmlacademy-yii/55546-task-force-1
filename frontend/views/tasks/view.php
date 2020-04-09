@@ -69,7 +69,7 @@ TaskViewAsset::register($this);
                         <?php endif; ?>
                     </div>
                     <div class="content-view__address">
-                        <?php if ($taskLocation): ?>
+                        <?php if ($task->getLocation()): ?>
                             <span class="address__town">
                                 <?= Html::encode($task->location->AddressLine ??
                                     ''); ?>
@@ -82,34 +82,29 @@ TaskViewAsset::register($this);
         </div>
         <div class="content-view__action-buttons">
             <?php
-            if ($task->status === Task::STATUS_NEW
-                || $task->status === Task::STATUS_EXECUTION
-            ) {
-                if ($isAuthor) {
-                    if ($task->status === Task::STATUS_EXECUTION) {
-                        echo Html::button('Завершить', [
-                            'class' => 'button button__big-color request-button open-modal',
-                            'data-for' => 'complete-form',
-                        ]);
-                    } else {
-                        echo Html::a('Отмена', "/tasks/cancel/$task->id", [
-                            'class' => 'button button__big-color refusal-button open-modal',
-                            'data-for' => 'canceled-form',
-                        ]);
-                    }
-                } elseif ($isExecutor) {
-                    if ($isRespond && $isSelectedExecutor) {
-                        echo Html::button('Отказаться', [
-                            'class' => 'button button__big-color refusal-button open-modal',
-                            'data-for' => 'refuse-form',
-                        ]);
-                    } elseif (!$isRespond) {
-                        echo Html::button('Откликнуться', [
-                            'class' => 'button button__big-color response-button open-modal',
-                            'data-for' => 'response-form',
-                        ]);
-                    }
-                }
+            if ($isAuthor && $task->status === Task::STATUS_EXECUTION) {
+                echo Html::button('Завершить', [
+                    'class' => 'button button__big-color request-button open-modal',
+                    'data-for' => 'complete-form',
+                ]);
+            }
+            if ($isAuthor && $task->status === Task::STATUS_NEW) {
+                echo Html::a('Отмена', "/tasks/cancel/$task->id", [
+                    'class' => 'button button__big-color refusal-button open-modal',
+                    'data-for' => 'canceled-form',
+                ]);
+            }
+            if ($isExecutor && $isRespond && $isSelectedExecutor) {
+                echo Html::button('Отказаться', [
+                    'class' => 'button button__big-color refusal-button open-modal',
+                    'data-for' => 'refuse-form',
+                ]);
+            }
+            if ($isExecutor && !$isRespond) {
+                echo Html::button('Откликнуться', [
+                    'class' => 'button button__big-color response-button open-modal',
+                    'data-for' => 'response-form',
+                ]);
             }
             ?>
         </div>
@@ -131,11 +126,11 @@ TaskViewAsset::register($this);
                                             $respond->user->getCurrentUserUrl(),
                                             ['class' => 'link-regular']); ?></p>
                                     <?php for ($i = 1; $i <= 5; $i++): ?>
-                                        <span <?= ($respond->user->userData->rating
+                                        <span <?= ($respond->user->rating
                                             >= $i) ? ''
                                             : 'class="star-disabled"'; ?>></span>
                                     <?php endfor; ?>
-                                    <b><?= $respond->user->userData->rating; ?></b>
+                                    <b><?= $respond->user->rating; ?></b>
                                 </div>
                                 <span
                                     class="new-task__time"><?= Yii::$app->formatter->asRelativeTime($respond->public_date); ?></span>
@@ -174,8 +169,8 @@ TaskViewAsset::register($this);
 
 <section class="connect-desk">
     <?= $this->render('user', [
-        'user' => $executor && $isAuthor ? $executor : $task->author,
-        'isExecutor' => $isExecutor,
+        'user' => $isAuthor && $task->executor ? $task->executor : $task->author,
+        'isShowExecutor' => $isAuthor && $task->executor,
     ]);
     ?>
 

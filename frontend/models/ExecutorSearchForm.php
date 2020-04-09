@@ -5,8 +5,7 @@ namespace app\models;
 use common\models\User;
 use Yii;
 use yii\base\Model;
-use yii\db\ActiveRecord;
-use yii\db\Query;
+use yii\db\ActiveQuery;
 use yii\helpers\ArrayHelper;
 
 /**
@@ -67,9 +66,10 @@ class ExecutorSearchForm extends Model
                 'categories',
                 'filter',
                 'filter' => function ($categories) {
-                    return $categories ? array_map(function ($item) {
-                        return (int)$item;
-                    }, $categories) : [];
+                    return implode(',',
+                        ($categories ? array_map(function ($item) {
+                            return (int)$item;
+                        }, $categories) : []));
                 },
             ],
             [
@@ -105,9 +105,9 @@ class ExecutorSearchForm extends Model
     /**
      * Применение фильтра для списка исполнителей
      *
-     * @param Query $query ссылка на объект
+     * @param ActiveQuery $query ссылка на объект
      */
-    public function applyFilters(Query &$query): void
+    public function applyFilters(ActiveQuery &$query): void
     {
         if (!empty($this->name)) {
             $query->andWhere(['like', 'user.login', $this->name]);
@@ -117,19 +117,18 @@ class ExecutorSearchForm extends Model
 
         if (!empty($this->categories)) {
             $query->andWhere("(SELECT COUNT(*) FROM user_specialization us 
-                WHERE us.user_id = user.id AND us.category_id IN (".implode(',',
-                    $this->categories)."))");
+                WHERE us.user_id = user.id AND us.category_id IN ($this->categories))");
         }
 
         if (in_array(self::ADDITIONALLY_NOW_FREE, $this->additionally)) {
-            $query->andWhere("(SELECT COUNT(*) FROM task WHERE task.executor_id = user.id AND task.status = :status) = 0",
+            $query->andWhere('(SELECT COUNT(*) FROM task WHERE task.executor_id = user.id AND task.status = :status) = 0',
                 [':status' => Task::STATUS_EXECUTION]);
         }
         if (in_array(self::ADDITIONALLY_NOW_ONLINE, $this->additionally)) {
-            $query->andWhere("user.last_activity > CURRENT_TIMESTAMP() - INTERVAL 30 minute");
+            $query->andWhere('user.last_activity > CURRENT_TIMESTAMP() - INTERVAL 30 minute');
         }
         if (in_array(self::ADDITIONALLY_REVIEWS, $this->additionally)) {
-            $query->andWhere("(SELECT COUNT(*) FROM review WHERE review.executor_id = user.id) > 0");
+            $query->andWhere('(SELECT COUNT(*) FROM review WHERE review.executor_id = user.id) > 0');
         }
         if (in_array(self::ADDITIONALLY_FAVORITES, $this->additionally)) {
             $query->andWhere(['user.id' => Yii::$app->user->identity->favoriteExecutorsId]);
@@ -139,29 +138,13 @@ class ExecutorSearchForm extends Model
     /**
      * Применение сортировки к списку исполнителей
      *
-     * @param string $sort
-     *
-     * @return string
+     * @param ActiveQuery $usersQuery
+     * @param string      $sort
      */
-    public function getSortQuery(string $sort): string
-    {
-        return ArrayHelper::getValue([
-            User::SORT_TYPE_RATING => 'user_data.rating DESC',
-            User::SORT_TYPE_ORDERS => '(SELECT COUNT(*) FROM task WHERE task.executor_id = user.id) DESC',
-            User::SORT_TYPE_POPULARITY => 'user_data.views DESC',
-        ], $sort, 'user.date_registration DESC');
-    }
-
-    /**
-     * Применение сортировки к списку исполнителей
-     *
-     * @param ActiveRecord $usersQuery
-     * @param string       $sort
-     */
-    public function applySort(ActiveRecord &$usersQuery, string $sort): void
+    public function applySort(ActiveQuery &$usersQuery, string $sort): void
     {
         $usersQuery->orderBy(ArrayHelper::getValue([
-            User::SORT_TYPE_RATING => 'user_data.rating DESC',
+            User::SORT_TYPE_RATING => '(SELECT AVG(rating) FROM review WHERE review.executor_id = user.id) DESC',
             User::SORT_TYPE_ORDERS => '(SELECT COUNT(*) FROM task WHERE task.executor_id = user.id) DESC',
             User::SORT_TYPE_POPULARITY => 'user_data.views DESC',
         ], $sort, 'user.date_registration DESC'));

@@ -8,12 +8,8 @@ use app\models\{Auth,
     EventRibbon,
     SignupForm,
     Task,
-    LoginForm,
-    UserData,
-    UserNotifications,
-    UserSettings};
+    LoginForm};
 use common\models\User;
-use src\UserInitHelper\UserInitHelper;
 use Yii;
 use yii\filters\AccessControl;
 use yii\web\Response;
@@ -144,6 +140,7 @@ class SiteController extends SecuredController
      * Действие для регистрации нового пользователя
      *
      * @return string|Response шаблон с данными страницы
+     * @throws \yii\base\Exception
      */
     public function actionSignup()
     {
@@ -151,25 +148,15 @@ class SiteController extends SecuredController
         if (Yii::$app->request->isPost
             && $model->load(Yii::$app->request->post())
             && $model->validate()
+            && User::createUser([
+                'login' => $model->login,
+                'email' => $model->email,
+                'password' => Yii::$app->getSecurity()
+                    ->generatePasswordHash($model->password),
+                'city_id' => $model->cityId,
+            ])
         ) {
-            $transaction = Yii::$app->db->beginTransaction();
-            try {
-                (new UserInitHelper(new User([
-                    'login' => $model->login,
-                    'email' => $model->email,
-                    'password' => Yii::$app->getSecurity()
-                        ->generatePasswordHash($model->password),
-                    'city_id' => $model->cityId,
-                    'role' => User::ROLE_CLIENT,
-                ])))->initNotifications(new UserNotifications())
-                    ->initSetting(new UserSettings())
-                    ->initUserData(new UserData());
-                $transaction->commit();
-
-                return $this->goHome();
-            } catch (\Exception $e) {
-                $transaction->rollBack();
-            }
+            return $this->goHome();
         }
 
         return $this->render('signup', [
@@ -187,40 +174,7 @@ class SiteController extends SecuredController
      */
     public function onAuthSuccess(VKontakte $client)
     {
-        $clientId = $client->getId();
-        $attributes = $client->getUserAttributes();
-        $auth = Auth::findOne([
-            'source' => $clientId,
-            'source_id' => $attributes['id'],
-        ]);
-        $user = null;
-        if ($auth) {
-            $user = $auth->user;
-        } else {
-            $transaction = Yii::$app->db->beginTransaction();
-            try {
-                $user = (new UserInitHelper(new User([
-                    'login' => $attributes['first_name'].' '
-                        .$attributes['last_name'],
-                    'email' => $attributes['email'],
-                    'password' => Yii::$app->security->generateRandomString(6),
-                    'city_id' => null,
-                    'role' => User::ROLE_CLIENT,
-                ])))->initNotifications(new UserNotifications())
-                    ->initSetting(new UserSettings())
-                    ->initUserData(new UserData(['avatar' => $attributes['photo']]))
-                    ->user;
-                (new Auth([
-                    'user_id' => $user->id,
-                    'source' => $clientId,
-                    'source_id' => $attributes['id'],
-                ]))->save();
-                $transaction->commit();
-            } catch (\Exception $err) {
-                $transaction->rollBack();
-            }
-        }
-        if ($user) {
+        if ($user = Auth::onAuthVKontakte($client)) {
             Yii::$app->user->login($user);
         }
 
