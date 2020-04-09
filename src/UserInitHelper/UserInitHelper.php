@@ -2,11 +2,6 @@
 
 namespace src\UserInitHelper;
 
-use app\models\UserData;
-use app\models\UserNotifications;
-use app\models\UserSettings;
-use common\models\User;
-use Yii;
 use yii\db\ActiveRecord;
 
 /**
