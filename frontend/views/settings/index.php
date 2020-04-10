@@ -1,6 +1,7 @@
 <?php
 
 use frontend\assets\ProfileAsset;
+use frontend\widgets\DropzoneWidget;
 use yii\widgets\ActiveForm;
 use yii\helpers\Html;
 
@@ -117,7 +118,9 @@ ProfileAsset::register($this);
 
         <h3 class="div-line">Фото работ</h3>
         <div class="account__redaction-section-wrapper account__redaction">
-            <span class="dropzone">Выбрать фотографии</span>
+            <?= $form->field($model, 'files')->widget(DropzoneWidget::class, [
+                'text' => 'Выбрать фотографии',
+            ])->label(false); ?>
         </div>
 
         <h3 class="div-line">Контакты</h3>

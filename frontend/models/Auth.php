@@ -57,6 +57,13 @@ class Auth extends ActiveRecord
         ];
     }
 
+    /**
+     * Метод для авторизации через социальную сеть VKontakte
+     *
+     * @param VKontakte $client пользовательские данные от VKontakte
+     *
+     * @return mixed|ActiveRecord|null объект нового пользователя
+     */
     public static function onAuthVKontakte(VKontakte $client)
     {
         $clientId = $client->getId();

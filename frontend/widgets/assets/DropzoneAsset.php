@@ -1,27 +1,22 @@
 <?php
 
-namespace frontend\assets;
+namespace frontend\widgets\assets;
 
-use frontend\widgets\assets\DropzoneAsset;
 use yii\web\AssetBundle;
 
 /**
- * Ассет для страницы c настройками пользователя
+ * Ассет для виджета DropzoneWidget
  *
- * Class ProfileAsset
+ * Class DropzoneAsset
  *
- * @package frontend\assets
+ * @package frontend\widgets\assets
  */
-class ProfileAsset extends AssetBundle
+class DropzoneAsset extends AssetBundle
 {
     /** @var string строка с адресом базового пути */
     public $basePath = '@webroot';
     /** @var string строка с адресом базового пути */
     public $baseUrl = '@web';
     /** @var array массив со списком скриптов */
-    public $js = ['js/profile-init.js'];
-
-    public $depends = [
-        DropzoneAsset::class
-    ];
+    public $js = ['js/dropzone.js'];
 }
