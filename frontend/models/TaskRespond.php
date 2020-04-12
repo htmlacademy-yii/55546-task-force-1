@@ -16,11 +16,35 @@ use common\models\User;
 class TaskRespond extends ActiveRecord
 {
     /** @var string строка со статусом нового отклика */
-    const STATUS_NEW = 'new';
+    public const STATUS_NEW = 'new';
     /** @var string строка со статусом принятого отклика */
-    const STATUS_ACCEPTED = 'accepted';
+    private const STATUS_ACCEPTED = 'accepted';
     /** @var string строка со статусом отклонённого отклика */
-    const STATUS_DENIED = 'denied';
+    private const STATUS_DENIED = 'denied';
+
+    /**
+     * Устанавливает статус отклику на задание - принят, или отклонён
+     *
+     * @param string $status статус отклика на задание
+     */
+    public function setStatusAccepted(string $status): void
+    {
+        $this->status = $status === self::STATUS_ACCEPTED
+            ? self::STATUS_ACCEPTED : self::STATUS_DENIED;
+        $this->save();
+    }
+
+    /**
+     * Проверка, принят отклик исполнителя к заданию, или нет
+     *
+     * @param string $status статус с ответом автора задания
+     *
+     * @return bool результат проверки, принят ли отклик исполнителя
+     */
+    public function getIsAccepted(string $status): bool
+    {
+        return $status === self::STATUS_ACCEPTED;
+    }
 
     /**
      * Создание связи с пользователем

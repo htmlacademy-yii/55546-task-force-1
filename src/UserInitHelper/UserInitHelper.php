@@ -2,7 +2,12 @@
 
 namespace src\UserInitHelper;
 
+use app\models\UserData;
+use app\models\UserNotifications;
+use app\models\UserSettings;
+use common\models\User;
 use yii\db\ActiveRecord;
+use yii\helpers\ArrayHelper;
 
 /**
  * Класс для создания нового пользователя с необходимыми связанными записями
@@ -14,75 +19,78 @@ use yii\db\ActiveRecord;
 class UserInitHelper
 {
     /** @var ActiveRecord объект создаваемого пользователя */
-    public $user;
+    private $user;
 
     /**
      * UserInitHelper constructor.
      *
-     * @param ActiveRecord $user - Объект для нового создаваемого пользователя
-     *
+     * @param array $data массив с данными для создания нового пользователя
      */
-    public function __construct(ActiveRecord $user)
+    public function __construct(array $data)
     {
-        $this->user = $user;
+        $this->user = new User($data);
         $this->user->save();
     }
 
     /**
-     * @param ActiveRecord $uData - объект для связанной с пользователем записи данных пользователя
+     * Возвращает созданый объект с новым пользователем
+     *
+     * @return User объект с новым пользователем
+     */
+    public function getUser(): User
+    {
+        return $this->user;
+    }
+
+    /**
+     * @param array $data массив с данными для дополнительной информации по пользователю
      *
      * @return UserInitHelper - текущий объект
      */
-    public function initUserData(ActiveRecord $uData): UserInitHelper
+    public function initUserData(array $data = []): UserInitHelper
     {
-        $uData->attributes = [
+        (new UserData(ArrayHelper::merge([
             'user_id' => $this->user->id,
             'description' => '',
-            'age' => '',
-            'address' => '',
-            'skype' => '',
-            'phone' => '',
             'other_messenger' => '',
-            'avatar' => $uData->avatar ?? '',
+            'avatar' => '',
             'views' => 0,
-            'order_count' => 0,
-        ];
-        $uData->save();
+            'success_counter' => 0,
+            'failing_counter' => 0,
+        ], $data)))->save();
 
         return $this;
     }
 
     /**
-     * @param ActiveRecord $uNotifications - объект для связанной с пользователем записи уведомлений пользователя
+     * @param array $data массив с данными настроек уведомлений пользователя
      *
      * @return UserInitHelper - текущий объект
      */
-    public function initNotifications(ActiveRecord $uNotifications
-    ): UserInitHelper {
-        $uNotifications->attributes = [
+    public function initNotifications(array $data = []): UserInitHelper
+    {
+        (new UserNotifications(ArrayHelper::merge([
             'user_id' => $this->user->id,
             'is_new_message' => 0,
             'is_task_actions' => 0,
             'is_new_review' => 0,
-        ];
-        $uNotifications->save();
+        ], $data)))->save();
 
         return $this;
     }
 
     /**
-     * @param ActiveRecord $uSettings - объект для связанной с пользователем записи настроек пользователя
+     * @param array $data массив с данными настроек пользователя
      *
      * @return UserInitHelper - текущий объект
      */
-    public function initSetting(ActiveRecord $uSettings): UserInitHelper
+    public function initSettings(array $data = []): UserInitHelper
     {
-        $uSettings->attributes = [
+        (new UserSettings(ArrayHelper::merge([
             'user_id' => $this->user->id,
             'is_hidden_contacts' => 0,
             'is_hidden_profile' => 0,
-        ];
-        $uSettings->save();
+        ], $data)))->save();
 
         return $this;
     }

@@ -2,12 +2,12 @@
 
 namespace src\UserSettingsHelper;
 
+use app\models\SettingsForm;
 use app\models\UserPhoto;
 use app\models\UserSpecialization;
+use common\models\User;
 use Yii;
-use yii\base\Model;
 use yii\helpers\FileHelper;
-use yii\web\IdentityInterface;
 use yii\web\UploadedFile;
 
 /**
@@ -24,10 +24,10 @@ class UserSettingsHelper
      *
      * UserSettingsHelper constructor.
      *
-     * @param Model             $model объект модели формы с валиднами данными
-     * @param IdentityInterface $user  объект текущего пользователя
+     * @param SettingsForm $model объект модели формы с валиднами данными
+     * @param User         $user  объект текущего пользователя
      */
-    public function __construct(Model $model, IdentityInterface $user)
+    public function __construct(SettingsForm $model, User $user)
     {
         $this->model = $model;
         $this->user = $user;
@@ -43,7 +43,6 @@ class UserSettingsHelper
      * @throws \yii\base\Exception
      * @throws \yii\db\Exception
      * @throws \yii\web\ServerErrorHttpException
-     * @throws \yii\web\UnsupportedMediaTypeHttpException
      */
     public function updateFileWorks(string $dir): UserSettingsHelper
     {
@@ -171,19 +170,14 @@ class UserSettingsHelper
     /**
      * Обновление роли пользователя
      *
-     * @param string $roleClient   строка с ролько клиент
-     * @param string $roleExecutor строка с ролько исполнителя
-     *
      * @return UserSettingsHelper текущий экземпляр класса помошника
      */
-    public function updateUserRole(
-        string $roleClient,
-        string $roleExecutor
-    ): UserSettingsHelper {
+    public function updateUserRole(): UserSettingsHelper
+    {
         $specializations = is_array($this->model->specializations)
             ? $this->model->specializations : [];
-        $this->user->role = empty($specializations) ? $roleClient
-            : $roleExecutor;
+        $this->user->role = empty($specializations) ? User::ROLE_CLIENT
+            : User::ROLE_EXECUTOR;
         $this->user->save();
 
         return $this;

@@ -17,15 +17,15 @@ use yii\helpers\ArrayHelper;
 class EventRibbon extends ActiveRecord
 {
     /** @var string строка со статусом нового отлика на задание */
-    const TYPE_NEW_TASK_RESPOND = 'new-task-respond';
+    public const TYPE_NEW_TASK_RESPOND = 'new-task-respond';
     /** @var string строка со статусом нового сообщения */
-    const TYPE_NEW_CHAT_MESSAGE = 'new-chat-message';
+    public const TYPE_NEW_CHAT_MESSAGE = 'new-chat-message';
     /** @var string строка со статусом отенённого задания */
-    const TYPE_TASK_DENIAL = 'task-denial';
+    public const TYPE_TASK_DENIAL = 'task-denial';
     /** @var string строка со статусом начала задания */
-    const TYPE_TASK_START = 'task-start';
+    public const TYPE_TASK_START = 'task-start';
     /** @var string строка со статусом завершения задания */
-    const TYPE_TASK_COMPLETE = 'task-complete';
+    public const TYPE_TASK_COMPLETE = 'task-complete';
 
     /**
      * Получение строки с описанием события в соответствии с его типом

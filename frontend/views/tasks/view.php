@@ -65,7 +65,7 @@ TaskViewAsset::register($this);
                         <?php else: ?>
                             <?= Html::a('<img src="/img/map.jpg" width="361" height="292"
                                              alt="Москва, Новый арбат, 23 к. 1">',
-                                "#") ?>
+                                '#') ?>
                         <?php endif; ?>
                     </div>
                     <div class="content-view__address">
@@ -94,13 +94,15 @@ TaskViewAsset::register($this);
                     'data-for' => 'canceled-form',
                 ]);
             }
-            if ($isExecutor && $isRespond && $isSelectedExecutor) {
+            if ($user->getIsExecutor() && $task->getIsUserRespond($user->id)
+                && $task->getIsSelectedExecutor($user->id)
+            ) {
                 echo Html::button('Отказаться', [
                     'class' => 'button button__big-color refusal-button open-modal',
                     'data-for' => 'refuse-form',
                 ]);
             }
-            if ($isExecutor && !$isRespond) {
+            if ($user->getIsExecutor() && !$task->getIsUserRespond($user->id)) {
                 echo Html::button('Откликнуться', [
                     'class' => 'button button__big-color response-button open-modal',
                     'data-for' => 'response-form',
@@ -169,12 +171,16 @@ TaskViewAsset::register($this);
 
 <section class="connect-desk">
     <?= $this->render('user', [
-        'user' => $isAuthor && $task->executor ? $task->executor : $task->author,
+        'user' => $isAuthor && $task->executor ? $task->executor
+            : $task->author,
         'isShowExecutor' => $isAuthor && $task->executor,
     ]);
     ?>
 
-    <?php if ($task->executor_id && ($isAuthor || $isSelectedExecutor)): ?>
+    <?php if ($task->executor_id
+        && ($isAuthor
+            || $task->getIsSelectedExecutor($user->id))
+    ): ?>
         <div id="chat-container">
             <chat class="connect-desk__chat" task="<?= $task->id; ?>"></chat>
         </div>

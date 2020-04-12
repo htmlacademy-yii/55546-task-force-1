@@ -62,9 +62,9 @@ class Auth extends ActiveRecord
      *
      * @param VKontakte $client пользовательские данные от VKontakte
      *
-     * @return mixed|ActiveRecord|null объект нового пользователя
+     * @return User|null объект нового пользователя
      */
-    public static function onAuthVKontakte(VKontakte $client)
+    public static function onAuthVKontakte(VKontakte $client): ?User
     {
         $clientId = $client->getId();
         $attributes = $client->getUserAttributes();
@@ -79,17 +79,17 @@ class Auth extends ActiveRecord
         $user = null;
         $transaction = Yii::$app->db->beginTransaction();
         try {
-            $user = (new UserInitHelper(new User([
+            $user = (new UserInitHelper([
                 'login' => $attributes['first_name'].' '
                     .$attributes['last_name'],
                 'email' => $attributes['email'],
                 'password' => Yii::$app->security->generateRandomString(6),
                 'city_id' => null,
                 'role' => User::ROLE_CLIENT,
-            ])))->initNotifications(new UserNotifications())
-                ->initSetting(new UserSettings())
-                ->initUserData(new UserData(['avatar' => $attributes['photo']]))
-                ->user;
+            ]))->initNotifications()
+                ->initSettings()
+                ->initUserData(['avatar' => $attributes['photo']])
+                ->getUser();
             (new self([
                 'user_id' => $user->id,
                 'source' => $clientId,

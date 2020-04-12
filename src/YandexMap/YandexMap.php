@@ -4,6 +4,7 @@ namespace src\YandexMap;
 
 use GuzzleHttp\Client;
 use GuzzleHttp\Psr7\Response as GuzzleResponse;
+use StdClass;
 use Yii;
 use yii\web\Response;
 
@@ -16,20 +17,20 @@ use yii\web\Response;
  */
 class YandexMap
 {
-    /** @var string адрес запроса */
-    const URL = 'https://geocode-maps.yandex.ru/1.x/';
-
     /** @var string ключ пользователя */
     public $apiKey;
 
+    /** @var string адрес запроса */
+    private const URL = 'https://geocode-maps.yandex.ru/1.x/';
+
     /** @var string язык ответа */
-    public $lang = 'ru_RU';
+    private $lang = 'ru_RU';
 
     /** @var string формат ответа */
-    public $format = Response::FORMAT_JSON;
+    private $format = Response::FORMAT_JSON;
 
     /** @var integer время существования записи в кэше */
-    public $cacheLifeTime = 86400;
+    private $cacheLifeTime = 86400;
 
     /**
      * Запрос к серверу яндекс карт с целью получить свписок необходимых координат и локаций
@@ -69,9 +70,9 @@ class YandexMap
      *
      * @param string $geocode - строка с названием или координатами нужной локации
      *
-     * @return |null
+     * @return string|null
      */
-    public function getPosition(string $geocode)
+    public function getPosition(string $geocode): ?string
     {
         $content = json_decode($this->getDataMap($geocode));
         if (!$content
@@ -80,6 +81,8 @@ class YandexMap
         ) {
             return null;
         }
+
+        var_dump($content->response->GeoObjectCollection);
 
         return $content->response->GeoObjectCollection->featureMember[0]->GeoObject->Point->pos;
     }
@@ -90,9 +93,9 @@ class YandexMap
      * @param float $lat  - дробное число со значением широты
      * @param float $long - дробное число со значением долготы
      *
-     * @return |null
+     * @return StdClass|null
      */
-    public function getAddressByPositions(float $lat, float $long)
+    public function getAddressByPositions(float $lat, float $long): ?StdClass
     {
         $content = json_decode($this->getDataMap("$long $lat"));
         if (!$content

@@ -16,7 +16,7 @@ use yii\db\ActiveQuery;
 class TasksFilter extends Model
 {
     /** @var array массив со списком категорий */
-    public $category = [];
+    public $categories = [];
     /** @var string строка с флагом - без исполнителя */
     public $isNoExecutor;
     /** @var string строка с флагом - удалённая работа */
@@ -27,13 +27,13 @@ class TasksFilter extends Model
     public $time;
 
     /** @var string строка с периодом за всё время */
-    const PERIOD_ALL = 'all';
+    private const PERIOD_ALL = 'all';
     /** @var string строка с периодом за день */
-    const PERIOD_DAY = 'day';
+    private const PERIOD_DAY = 'day';
     /** @var string строка с периодом за неделю */
-    const PERIOD_WEEK = 'week';
+    private const PERIOD_WEEK = 'week';
     /** @var string строка с периодом за месяц */
-    const PERIOD_MONTH = 'month';
+    private const PERIOD_MONTH = 'month';
 
     /** @var array массив со списком всех доступных периодов */
     const PERIOD_LIST
@@ -54,16 +54,16 @@ class TasksFilter extends Model
         return [
             [['isNoExecutor', 'isTelework'], 'boolean'],
             [
-                'category',
+                'categories',
                 'filter',
-                'filter' => function ($category) {
-                    return $category ? array_map(function ($item) {
+                'filter' => function ($categories) {
+                    return $categories ? array_map(function ($item) {
                         return (int)$item;
-                    }, $category) : [];
+                    }, $categories) : [];
                 },
             ],
             [
-                'category',
+                'categories',
                 'exist',
                 'targetClass' => Category::class,
                 'targetAttribute' => 'id',
@@ -91,7 +91,7 @@ class TasksFilter extends Model
     public function attributeLabels(): array
     {
         return [
-            'category' => 'Категори',
+            'categories' => 'Категори',
             'isNoExecutor' => 'Без исполнителя',
             'isTelework' => 'Удаленная работа',
             'title' => 'Поиск по названию',
@@ -106,8 +106,8 @@ class TasksFilter extends Model
      */
     public function applyFilters(ActiveQuery &$taskQuery): void
     {
-        if (!empty($this->category)) {
-            $taskQuery->andWhere(['category_id' => $this->category]);
+        if (!empty($this->categories)) {
+            $taskQuery->andWhere(['category_id' => $this->categories]);
         }
 
         if ($this->isNoExecutor) {

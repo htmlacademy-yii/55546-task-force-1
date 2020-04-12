@@ -40,10 +40,11 @@ $executor = $model;
 
     <?php if ($executor->userSpecializations): ?>
         <div class="link-specialization user__search-link--bottom">
-            <?php foreach ($executor->userSpecializations as $specialization): ?>
+            <?php foreach ($executor->userSpecializations as $specialization):
+                ?>
                 <?= Html::a(Html::encode($specialization->title),
-                    Task::getUrlTasksByCategory((int)$specialization->id),
-                    ['class' => 'link-regular']); ?>
+                Task::getUrlTasksByCategory((int)$specialization->id),
+                ['class' => 'link-regular']); ?>
             <?php endforeach; ?>
         </div>
     <?php endif; ?>

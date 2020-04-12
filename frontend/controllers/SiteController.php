@@ -14,6 +14,9 @@ use Yii;
 use yii\filters\AccessControl;
 use yii\web\Response;
 use yii\widgets\ActiveForm;
+use yii\web\ErrorAction;
+use yii\captcha\CaptchaAction;
+use yii\authclient\AuthAction;
 
 /**
  * Контроллер для работы с общими страницами сайта
@@ -28,9 +31,8 @@ class SiteController extends SecuredController
      * Определением фильтра
      *
      * @return array
-     * @throws \yii\db\Exception
      */
-    public function behaviors()
+    public function behaviors(): array
     {
         return [
             'access' => [
@@ -49,18 +51,18 @@ class SiteController extends SecuredController
     /**
      * @return array
      */
-    public function actions()
+    public function actions(): array
     {
         return [
             'error' => [
-                'class' => 'yii\web\ErrorAction',
+                'class' => ErrorAction::class,
             ],
             'captcha' => [
-                'class' => 'yii\captcha\CaptchaAction',
+                'class' => CaptchaAction::class,
                 'fixedVerifyCode' => YII_ENV_TEST ? 'testme' : null,
             ],
             'auth' => [
-                'class' => 'yii\authclient\AuthAction',
+                'class' => AuthAction::class,
                 'successCallback' => [$this, 'onAuthSuccess'],
             ],
         ];
@@ -71,7 +73,7 @@ class SiteController extends SecuredController
      *
      * @param int $id идентификатор города
      */
-    public function actionSetAjaxCity(int $id)
+    public function actionSetAjaxCity(int $id): void
     {
         Yii::$app->session->set('city', $id);
     }
@@ -79,7 +81,7 @@ class SiteController extends SecuredController
     /**
      * Действие для ajax очистки просмотренных событий
      */
-    public function actionClearEventRibbon()
+    public function actionClearEventRibbon(): void
     {
         if ($user = Yii::$app->user->identity) {
             EventRibbon::deleteAll(['user_id' => $user->id]);
@@ -91,7 +93,7 @@ class SiteController extends SecuredController
      *
      * @return string шаблон с данными страницы
      */
-    public function actionIndex()
+    public function actionIndex(): string
     {
         $this->layout = 'landing';
 
@@ -106,9 +108,9 @@ class SiteController extends SecuredController
     /**
      * Действие для ajax валидации формы авторизации
      *
-     * @return array|Response
+     * @return array|null
      */
-    public function actionLoginAjaxValidation()
+    public function actionLoginAjaxValidation(): ?array
     {
         if (Yii::$app->request->isAjax) {
             Yii::$app->response->format = Response::FORMAT_JSON;
@@ -120,8 +122,10 @@ class SiteController extends SecuredController
 
             Yii::$app->user->login(User::findOne(['email' => $model->email]));
 
-            return $this->redirect(Task::getBaseTasksUrl());
+            $this->redirect(Task::getBaseTasksUrl());
         }
+
+        return null;
     }
 
     /**
@@ -129,7 +133,7 @@ class SiteController extends SecuredController
      *
      * @return Response
      */
-    public function actionLogout()
+    public function actionLogout(): Response
     {
         Yii::$app->user->logout();
 
@@ -139,24 +143,17 @@ class SiteController extends SecuredController
     /**
      * Действие для регистрации нового пользователя
      *
-     * @return string|Response шаблон с данными страницы
-     * @throws \yii\base\Exception
+     * @return string шаблон с данными страницы
      */
-    public function actionSignup()
+    public function actionSignup(): string
     {
         $model = new SignupForm();
         if (Yii::$app->request->isPost
             && $model->load(Yii::$app->request->post())
             && $model->validate()
-            && User::createUser([
-                'login' => $model->login,
-                'email' => $model->email,
-                'password' => Yii::$app->getSecurity()
-                    ->generatePasswordHash($model->password),
-                'city_id' => $model->cityId,
-            ])
+            && User::createUser($model)
         ) {
-            return $this->goHome();
+            $this->goHome();
         }
 
         return $this->render('signup', [
@@ -172,7 +169,7 @@ class SiteController extends SecuredController
      *
      * @return Response
      */
-    public function onAuthSuccess(VKontakte $client)
+    public function onAuthSuccess(VKontakte $client): Response
     {
         if ($user = Auth::onAuthVKontakte($client)) {
             Yii::$app->user->login($user);

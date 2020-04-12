@@ -21,7 +21,8 @@ class ProfileAsset extends AssetBundle
     /** @var array массив со списком скриптов */
     public $js = ['js/profile-init.js'];
 
-    public $depends = [
-        DropzoneAsset::class
-    ];
+    public $depends
+        = [
+            DropzoneAsset::class,
+        ];
 }

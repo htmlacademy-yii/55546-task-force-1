@@ -47,7 +47,7 @@ $fieldConfig = [
         ]); ?>
         <fieldset class="search-task__categories">
             <legend>Категории</legend>
-            <?= $form->field($taskModel, 'category')
+            <?= $form->field($taskModel, 'categories')
                 ->checkboxList($categories, [
                     'item' => function ($_index, $label, $name, $checked, $id) {
                         $checked = $checked ? 'checked' : '';

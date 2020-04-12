@@ -20,27 +20,47 @@ class ExecutorSearchForm extends Model
     /** @var array массив со списком категорий */
     public $categories = [];
     /** @var array массив со списком дополнительных фильтров */
-    public $additionally = [];
+    public $additionallyList = [];
     /** @var string строка с названием задачи */
     public $name;
 
     /** @var string строка c типом поля - сейчас свободен */
-    const ADDITIONALLY_NOW_FREE = 'now-free';
+    private const ADDITIONALLY_NOW_FREE = 'now-free';
     /** @var string строка c типом поля - сейчас онлайн */
-    const ADDITIONALLY_NOW_ONLINE = 'now-online';
+    private const ADDITIONALLY_NOW_ONLINE = 'now-online';
     /** @var string строка c типом поля - есть отзывы */
-    const ADDITIONALLY_REVIEWS = 'there-are-reviews';
+    private const ADDITIONALLY_REVIEWS = 'there-are-reviews';
     /** @var string строка c типом поля - в избранном */
-    const ADDITIONALLY_FAVORITES = 'in-favorites';
+    private const ADDITIONALLY_FAVORITES = 'in-favorites';
 
     /** @var array массиво со списком типов полей */
-    const ADDITIONALLY_LIST
+    public const ADDITIONALLY_LIST
         = [
             self::ADDITIONALLY_NOW_FREE => 'Сейчас свободен',
             self::ADDITIONALLY_NOW_ONLINE => 'Сейчас онлайн',
             self::ADDITIONALLY_REVIEWS => 'Есть отзывы',
             self::ADDITIONALLY_FAVORITES => 'В избранном',
         ];
+
+    /**
+     * Проверяет, отмечена ли категория с указанным идентификатором
+     *
+     * @param int $categoryId идентификатор категории
+     *
+     * @return string строка со значеним, отмечена категория, или нет
+     */
+    public function getIsCheckCategory(int $categoryId): string
+    {
+        if (empty($this->categories)) {
+            return '';
+        }
+
+        $categories = array_map(function ($item) {
+            return (int)$item;
+        }, explode(',', $this->categories));
+
+        return in_array($categoryId, $categories, true) ? 'checked' : '';
+    }
 
     /**
      * Указание списка имён для атрибутов формы
@@ -81,14 +101,14 @@ class ExecutorSearchForm extends Model
                 'message' => 'Одна или несколько из выбранных вами специализаций не найдена',
             ],
             [
-                'additionally',
+                'additionallyList',
                 'filter',
-                'filter' => function ($additionally) {
-                    return !empty($additionally) ? $additionally : [];
+                'filter' => function ($additionallyList) {
+                    return !empty($additionallyList) ? $additionallyList : [];
                 },
             ],
             [
-                'additionally',
+                'additionallyList',
                 'in',
                 'range' => [
                     self::ADDITIONALLY_NOW_FREE,
@@ -120,17 +140,24 @@ class ExecutorSearchForm extends Model
                 WHERE us.user_id = user.id AND us.category_id IN ($this->categories))");
         }
 
-        if (in_array(self::ADDITIONALLY_NOW_FREE, $this->additionally)) {
+        if (in_array(self::ADDITIONALLY_NOW_FREE, $this->additionallyList, true)
+        ) {
             $query->andWhere('(SELECT COUNT(*) FROM task WHERE task.executor_id = user.id AND task.status = :status) = 0',
                 [':status' => Task::STATUS_EXECUTION]);
         }
-        if (in_array(self::ADDITIONALLY_NOW_ONLINE, $this->additionally)) {
+        if (in_array(self::ADDITIONALLY_NOW_ONLINE, $this->additionallyList,
+            true)
+        ) {
             $query->andWhere('user.last_activity > CURRENT_TIMESTAMP() - INTERVAL 30 minute');
         }
-        if (in_array(self::ADDITIONALLY_REVIEWS, $this->additionally)) {
+        if (in_array(self::ADDITIONALLY_REVIEWS, $this->additionallyList,
+            true)
+        ) {
             $query->andWhere('(SELECT COUNT(*) FROM review WHERE review.executor_id = user.id) > 0');
         }
-        if (in_array(self::ADDITIONALLY_FAVORITES, $this->additionally)) {
+        if (in_array(self::ADDITIONALLY_FAVORITES, $this->additionallyList,
+            true)
+        ) {
             $query->andWhere(['user.id' => Yii::$app->user->identity->favoriteExecutorsId]);
         }
     }
@@ -138,12 +165,12 @@ class ExecutorSearchForm extends Model
     /**
      * Применение сортировки к списку исполнителей
      *
-     * @param ActiveQuery $usersQuery
+     * @param ActiveQuery $query
      * @param string      $sort
      */
-    public function applySort(ActiveQuery &$usersQuery, string $sort): void
+    public function applySort(ActiveQuery &$query, string $sort): void
     {
-        $usersQuery->orderBy(ArrayHelper::getValue([
+        $query->orderBy(ArrayHelper::getValue([
             User::SORT_TYPE_RATING => '(SELECT AVG(rating) FROM review WHERE review.executor_id = user.id) DESC',
             User::SORT_TYPE_ORDERS => '(SELECT COUNT(*) FROM task WHERE task.executor_id = user.id) DESC',
             User::SORT_TYPE_POPULARITY => 'user_data.views DESC',

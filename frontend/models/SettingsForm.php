@@ -69,13 +69,7 @@ class SettingsForm extends Model
                 'message' => 'Ошибка при сохранении файлов',
             ],
             [
-                'notifications',
-                'in',
-                'range' => [true, false],
-                'allowArray' => true,
-            ],
-            [
-                'settings',
+                ['notifications', 'settings'],
                 'in',
                 'range' => [true, false],
                 'allowArray' => true,

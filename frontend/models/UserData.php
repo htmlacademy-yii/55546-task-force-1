@@ -60,8 +60,10 @@ class UserData extends ActiveRecord
                 'targetAttribute' => 'id',
             ],
             ['description', 'string'],
+            ['phone', 'string', 'length' => [11, 11]],
+            ['skype', 'match', 'pattern' => '/^[0-9a-zA-Z]{3,}$/'],
             [
-                ['skype', 'phone', 'other_messenger', 'avatar'],
+                ['other_messenger', 'avatar'],
                 'string',
                 'max' => 255,
             ],

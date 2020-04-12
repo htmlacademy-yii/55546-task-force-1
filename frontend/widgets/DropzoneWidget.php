@@ -6,7 +6,7 @@ use Yii;
 use yii\widgets\InputWidget;
 
 /**
- * Виджет для работы со плагином dropzone
+ * Виджет для работы с плагином dropzone
  *
  * Class DropzoneWidget
  *
@@ -25,7 +25,7 @@ class DropzoneWidget extends InputWidget
     public function run()
     {
         if ($this->model->hasErrors('files')) {
-            Yii::$app->session->set('fileErrors',
+            Yii::$app->session->set('filesErrors',
                 $this->model->getErrors('files'));
         } elseif (Yii::$app->session->has('filesErrors')) {
             $this->model->addErrors([

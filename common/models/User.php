@@ -7,6 +7,7 @@ use app\models\City;
 use app\models\EventRibbon;
 use app\models\FavoriteExecutor;
 use app\models\Review;
+use app\models\SignupForm;
 use app\models\Task;
 use app\models\UserData;
 use app\models\UserNotifications;
@@ -31,24 +32,24 @@ use yii\web\IdentityInterface;
 class User extends ActiveRecord implements IdentityInterface
 {
     /** @var integer статус неактивного пользователя */
-    const STATUS_INACTIVE = 9;
+    public const STATUS_INACTIVE = 9;
     /** @var integer статус активного пользователя */
-    const STATUS_ACTIVE = 10;
+    public const STATUS_ACTIVE = 10;
 
     /** @var string роль пользовтеля клиента */
-    const ROLE_CLIENT = 'client';
+    public const ROLE_CLIENT = 'client';
     /** @var string роль пользовтеля исполнителя */
-    const ROLE_EXECUTOR = 'executor';
+    public const ROLE_EXECUTOR = 'executor';
 
     /** @var string тип сортировки по рейтингу */
-    const SORT_TYPE_RATING = 'rating';
+    public const SORT_TYPE_RATING = 'rating';
     /** @var string тип сортировки по заказам */
-    const SORT_TYPE_ORDERS = 'orders';
+    public const SORT_TYPE_ORDERS = 'orders';
     /** @var string тип сортировки по популярности */
-    const SORT_TYPE_POPULARITY = 'popularity';
+    public const SORT_TYPE_POPULARITY = 'popularity';
 
     /** @var array массиво со списком типов сортировки */
-    const SORT_TYPE_LIST
+    public const SORT_TYPE_LIST
         = [
             self::SORT_TYPE_RATING => 'Рейтингу',
             self::SORT_TYPE_ORDERS => 'Числу заказов',
@@ -73,6 +74,16 @@ class User extends ActiveRecord implements IdentityInterface
     public function getFavoriteUrl(): string
     {
         return "/users/select-favorite?userId={$this->id}";
+    }
+
+    /**
+     * Проверка, является ли пользователь исполнителем
+     *
+     * @return bool лоическое значение, является ли пользователь исполнителем
+     */
+    public function getIsExecutor(): bool
+    {
+        return $this->role === self::ROLE_EXECUTOR;
     }
 
     /**
@@ -472,24 +483,50 @@ class User extends ActiveRecord implements IdentityInterface
         $this->password_reset_token = null;
     }
 
+    /**
+     * Обновляет счетчики заданий, в соответствии со статусом их выполненности
+     *
+     * @param bool $result результат выволненнения задания
+     */
+    public function updateTaskCounter(bool $result): void
+    {
+        $this->userData->updateCounters([$result ? 'success_counter' : 'failing_counter' => 1]);
+    }
+
+    /**
+     * Обновляет время последней активности пользователя
+     *
+     * @throws \yii\db\Exception
+     */
+    public function updateLastActivity(): void
+    {
+        Yii::$app->db->createCommand("UPDATE user SET last_activity = NOW() WHERE id = :id",
+            [':id' => $this->id])->execute();
+    }
 
     /**
      * Создание нового пользователя в базе данных
      *
-     * @param array $data данные нового пользователя
+     * @param SignupForm $model модель с данными нового пользователя
      *
      * @return bool результат создания, успех или неудача
      */
-    public static function createUser(array $data): bool
+    public static function createUser(SignupForm $model): bool
     {
-        $data['role'] = self::ROLE_CLIENT;
-
         $transaction = Yii::$app->db->beginTransaction();
         try {
-            (new UserInitHelper(new self($data)))
-                ->initNotifications(new UserNotifications())
-                ->initSetting(new UserSettings())
-                ->initUserData(new UserData());
+            (new UserInitHelper([
+                'login' => $model->login,
+                'email' => $model->email,
+                'password' => Yii::$app->getSecurity()
+                    ->generatePasswordHash($model->password),
+                'city_id' => $model->cityId,
+                'role' => self::ROLE_CLIENT,
+            ]))
+                ->initNotifications()
+                ->initSettings()
+                ->initUserData();
+
             $transaction->commit();
 
             return true;

@@ -47,7 +47,7 @@ class FavoriteExecutor extends ActiveRecord
      * Метод для переключения добавления/удаления исполнителя
      * в избранное к указанному клиенту
      *
-     * @param int $clientId число идентификатор клиента
+     * @param int $clientId   число идентификатор клиента
      * @param int $executorId число идентификатор исполнителя
      *
      * @throws \Throwable

@@ -3,8 +3,9 @@
 namespace src\NotificationHelper;
 
 use app\models\EventRibbon;
+use app\models\Task;
+use common\models\User;
 use Yii;
-use yii\db\ActiveRecord;
 use yii\helpers\Html;
 
 /**
@@ -19,12 +20,12 @@ class NotificationHelper
     /**
      * Создание нового уведомления для действия - отклик на задание.
      *
-     * @param ActiveRecord $authorTask - объект создателя задачи
-     * @param ActiveRecord $task       - объект задачи
-     * */
+     * @param User $authorTask - объект создателя задачи
+     * @param Task $task       - объект задачи
+     */
     public static function taskRespond(
-        ActiveRecord $authorTask,
-        ActiveRecord $task
+        User $authorTask,
+        Task $task
     ): void {
         self::send($authorTask, $task, [
             'type' => EventRibbon::TYPE_NEW_TASK_RESPOND,
@@ -41,12 +42,12 @@ class NotificationHelper
     /**
      * Создание нового уведомления для действия - начало задания.
      *
-     * @param ActiveRecord $executorTask - объект исполнителя задачи
-     * @param ActiveRecord $task         - объект задачи
-     * */
+     * @param User $executorTask - объект исполнителя задачи
+     * @param Task $task         - объект задачи
+     */
     public static function taskStart(
-        ActiveRecord $executorTask,
-        ActiveRecord $task
+        User $executorTask,
+        Task $task
     ): void {
         self::send($executorTask, $task, [
             'type' => EventRibbon::TYPE_TASK_START,
@@ -63,12 +64,12 @@ class NotificationHelper
     /**
      * Создание нового уведомления для действия - завершение задания.
      *
-     * @param ActiveRecord $executorTask - объект исполнителя задачи
-     * @param ActiveRecord $task         - объект задачи
-     * */
+     * @param User $executorTask - объект исполнителя задачи
+     * @param Task $task         - объект задачи
+     */
     public static function taskComplete(
-        ActiveRecord $executorTask,
-        ActiveRecord $task
+        User $executorTask,
+        Task $task
     ): void {
         self::send($executorTask, $task, [
             'type' => EventRibbon::TYPE_TASK_COMPLETE,
@@ -84,12 +85,12 @@ class NotificationHelper
     /**
      * Создание нового уведомления для действия - отказ от задания.
      *
-     * @param ActiveRecord $executorTask - объект исполнителя задачи
-     * @param ActiveRecord $task         - объект задачи
-     * */
+     * @param User $executorTask - объект исполнителя задачи
+     * @param Task $task         - объект задачи
+     */
     public static function taskDenial(
-        ActiveRecord $executorTask,
-        ActiveRecord $task
+        User $executorTask,
+        Task $task
     ): void {
         self::send($executorTask, $task, [
             'type' => EventRibbon::TYPE_TASK_DENIAL,
@@ -106,12 +107,12 @@ class NotificationHelper
     /**
      * Создание нового уведомления для действия - новое сообщение в чате.
      *
-     * @param ActiveRecord $user - объект пользователя в чате
-     * @param ActiveRecord $task - объект задачи
-     * */
+     * @param User $user - объект пользователя в чате
+     * @param Task $task - объект задачи
+     */
     public static function taskMessage(
-        ActiveRecord $user,
-        ActiveRecord $task
+        User $user,
+        Task $task
     ): void {
         self::send($user, $task, [
             'type' => EventRibbon::TYPE_NEW_CHAT_MESSAGE,
@@ -127,13 +128,13 @@ class NotificationHelper
     /**
      * Создание нового уведомления для действия - новое сообщение в чате.
      *
-     * @param ActiveRecord $user - объект пользователя для которого нужно создать уведомление
-     * @param ActiveRecord $task - объект задачи с которой связано уведомление
-     * @param array        $data - объект с даннми для конкретного уведомления
-     * */
+     * @param User  $user объект пользователя для которого нужно создать уведомление
+     * @param Task  $task объект задачи с которой связано уведомление
+     * @param array $data объект с даннми для конкретного уведомления
+     */
     private static function send(
-        ActiveRecord $user,
-        ActiveRecord $task,
+        User $user,
+        Task $task,
         array $data
     ): void {
         (new EventRibbon([

@@ -1,7 +1,17 @@
 <?php
-/**
- * Configuration file for the "yii asset" console command
- */
+
+use yii\web\AssetBundle;
+use frontend\assets\TaskCreateAsset;
+use frontend\assets\TaskViewAsset;
+use frontend\assets\YandexMapAsset;
+use frontend\assets\AppAsset;
+use yii\web\YiiAsset;
+use yii\web\JqueryAsset;
+use frontend\assets\LandingAsset;
+use yii\authclient\widgets\AuthChoiceStyleAsset;
+use yii\widgets\ActiveFormAsset;
+use frontend\assets\ProfileAsset;
+use frontend\widgets\assets\DropzoneAsset;
 
 // In the console environment, some path aliases may not exist. Please define these
 Yii::setAlias('@webroot', __DIR__.'/frontend/web');
@@ -16,70 +26,73 @@ return [
     'deleteSource' => false,
     // The list of asset bundles to compress:
     'bundles' => [
-        'frontend\assets\AppAsset',
-        'yii\web\YiiAsset',
-        'yii\web\JqueryAsset',
-        'frontend\assets\LandingAsset',
-        'yii\authclient\widgets\AuthChoiceStyleAsset',
-        'yii\widgets\ActiveFormAsset',
-        'frontend\assets\ProfileAsset',
-        'frontend\assets\TaskCreateAsset',
-        'frontend\assets\TaskViewAsset',
-        'frontend\assets\YandexMapAsset',
+        AppAsset::class,
+        YiiAsset::class,
+        JqueryAsset::class,
+        LandingAsset::class,
+        AuthChoiceStyleAsset::class,
+        ActiveFormAsset::class,
+        ProfileAsset::class,
+        DropzoneAsset::class,
+        TaskCreateAsset::class,
+        TaskViewAsset::class,
+        YandexMapAsset::class,
     ],
     // Asset bundle for compression output:
     'targets' => [
         'common' => [
-            'class' => 'yii\web\AssetBundle',
+            'class' => AssetBundle::class,
             'basePath' => '@webroot/assets',
             'baseUrl' => '@web/assets',
             'js' => 'js/all-{hash}.js',
             'css' => 'css/all-{hash}.css',
             'depends' => [
-                'frontend\assets\AppAsset',
-                'yii\web\YiiAsset',
-                'yii\web\JqueryAsset',
+                AppAsset::class,
+                YiiAsset::class,
+                JqueryAsset::class,
+                ActiveFormAsset::class
             ],
         ],
         'landing' => [
-            'class' => 'yii\web\AssetBundle',
+            'class' => AssetBundle::class,
             'basePath' => '@webroot/assets',
             'baseUrl' => '@web/assets',
             'js' => 'js/landing-{hash}.js',
             'css' => 'css/landing-{hash}.css',
             'depends' => [
-                'frontend\assets\LandingAsset',
-                'yii\authclient\widgets\AuthChoiceStyleAsset',
+                LandingAsset::class,
+                AuthChoiceStyleAsset::class,
             ],
         ],
         'profile' => [
-            'class' => 'yii\web\AssetBundle',
+            'class' => AssetBundle::class,
             'basePath' => '@webroot/assets',
             'baseUrl' => '@web/assets',
             'js' => 'js/profile-{hash}.js',
             'css' => 'css/profile-{hash}.css',
             'depends' => [
-                'frontend\assets\ProfileAsset',
+                ProfileAsset::class,
+                DropzoneAsset::class
             ],
         ],
         'taskCreate' => [
-            'class' => 'yii\web\AssetBundle',
+            'class' => AssetBundle::class,
             'basePath' => '@webroot/assets',
             'baseUrl' => '@web/assets',
             'js' => 'js/task-create-{hash}.js',
             'css' => 'css/task-create-{hash}.css',
             'depends' => [
-                'frontend\assets\TaskCreateAsset',
+                TaskCreateAsset::class,
             ],
         ],
         'taskView' => [
-            'class' => 'yii\web\AssetBundle',
+            'class' => AssetBundle::class,
             'basePath' => '@webroot/assets',
             'baseUrl' => '@web/assets',
             'js' => 'js/task-view-{hash}.js',
             'css' => 'css/task-view-{hash}.css',
             'depends' => [
-                'frontend\assets\TaskViewAsset',
+                TaskViewAsset::class,
             ],
         ],
     ],

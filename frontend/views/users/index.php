@@ -52,16 +52,20 @@ $fieldConfig = ['options' => ['tag' => false]];
             <legend>Категории</legend>
             <?= $form->field($model, 'categories', $fieldConfig)
                 ->checkboxList($categories, [
-                    'item' => function ($_index, $label, $name, $checked, $id) {
-                        $checked = $checked ? 'checked' : '';
-
+                    'item' => function (
+                        $_index,
+                        $label,
+                        $name,
+                        $checked,
+                        $id
+                    ) use ($categories, $model) {
                         return "<input
                                     class='visually-hidden checkbox__input'
                                     type='checkbox'
                                     id='categories-$id'
                                     name='$name'
                                     value='$id'
-                                    $checked>
+                                    {$model->getIsCheckCategory($id)}>
                                 <label for='categories-$id'>$label </label>";
                     },
                     'tag' => false,
@@ -69,7 +73,7 @@ $fieldConfig = ['options' => ['tag' => false]];
         </fieldset>
         <fieldset class="search-task__categories">
             <legend>Дополнительно</legend>
-            <?= $form->field($model, 'additionally', $fieldConfig)
+            <?= $form->field($model, 'additionallyList', $fieldConfig)
                 ->checkboxList($additionallyList, [
                     'item' => function ($_index, $label, $name, $checked, $id) {
                         $checked = $checked ? 'checked' : '';

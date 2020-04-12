@@ -2,7 +2,6 @@
 
 namespace frontend\controllers;
 
-use common\models\User;
 use Yii;
 use app\models\Task;
 use yii\web\NotFoundHttpException;
@@ -23,10 +22,8 @@ class MyListController extends SecuredController
      *
      * @return string
      * @throws NotFoundHttpException
-     * @throws \yii\base\InvalidConfigException
-     * @throws \yii\di\NotInstantiableException
      */
-    public function actionIndex(string $category = '')
+    public function actionIndex(string $category = ''): string
     {
         if (!$status = Task::getStatusByCategory($category)) {
             throw new NotFoundHttpException('Страница не найдена!');
@@ -34,8 +31,8 @@ class MyListController extends SecuredController
 
         $user = Yii::$app->user;
         $tasks = Task::findAll([
-            $user->identity->role === User::ROLE_CLIENT ? 'author_id'
-                : 'executor_id' => $user->id,
+            $user->identity->getIsExecutor() ? 'executor_id'
+                : 'author_id' => $user->id,
             'status' => $status,
         ]);
 

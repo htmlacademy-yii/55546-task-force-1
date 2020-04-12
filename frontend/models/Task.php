@@ -2,14 +2,15 @@
 
 namespace app\models;
 
+use StdClass;
 use Yii;
+use yii\base\Model;
 use yii\db\ActiveQuery;
 use yii\db\ActiveRecord;
 use common\models\User;
 use yii\helpers\FileHelper;
 use yii\helpers\Url;
 use yii\validators\RangeValidator;
-use yii\web\UploadedFile;
 
 /**
  * Класс для работы с моделью заданий
@@ -21,37 +22,91 @@ use yii\web\UploadedFile;
 class Task extends ActiveRecord
 {
     /** @var string строка со статусом нового задания */
-    const STATUS_NEW = 'new';
+    public const STATUS_NEW = 'new';
     /** @var string строка со статусом выполняемого задания */
-    const STATUS_EXECUTION = 'execution';
+    public const STATUS_EXECUTION = 'execution';
     /** @var string строка со статусом завершенного задания */
-    const STATUS_COMPLETED = 'completed';
+    public const STATUS_COMPLETED = 'completed';
     /** @var string строка со статусом отменённого задания */
-    const STATUS_CANCELED = 'canceled';
+    public const STATUS_CANCELED = 'canceled';
     /** @var string строка со статусом проваленного задания */
-    const STATUS_FAILING = 'failing';
+    public const STATUS_FAILING = 'failing';
     /** @var string строка со статусом просроченного задания */
-    const STATUS_EXPIRED = 'expired';
+    public const STATUS_EXPIRED = 'expired';
+
+    /**
+     * Назначение для данного задания нового исполнителя
+     *
+     * @param int $executorId идентификатор назначенного исполнителя
+     */
+    public function setExecutor(int $executorId): void
+    {
+        $this->status = self::STATUS_EXECUTION;
+        $this->executor_id = $executorId;
+        $this->save();
+    }
 
     /**
      * Сохранение файлов для указанного задания
      *
-     * @param UploadedFile $files список файлов к заданию
-     *
-     * @param string       $path  адрес директории для хранения файлов
+     * @param array  $files список файлов к заданию
+     * @param string $path  адрес директории для хранения файлов
      *
      * @throws \yii\base\ErrorException
+     * @throws \yii\base\Exception
      * @throws \yii\db\Exception
      * @throws \yii\web\ServerErrorHttpException
      */
-    public function setFiles($files, string $path): void
+    public function setFiles(array $files, string $path): void
     {
         $pathTaskDir = "$path/$this->id";
         if (file_exists($pathTaskDir)) {
             FileHelper::removeDirectory($pathTaskDir);
         }
-        mkdir($pathTaskDir);
+        FileHelper::createDirectory($pathTaskDir);
         (new TaskFile(['path' => $pathTaskDir]))->setFiles($this->id, $files);
+    }
+
+    /**
+     * Проверка, откликался ли уже пользователь с указанным
+     * идентификатором на это задание
+     *
+     * @param int $userId идентификатор пользователя
+     *
+     * @return bool результат проверки, откликался ли пользователь на задание
+     */
+    public function getIsUserRespond(int $userId): bool
+    {
+        return TaskRespond::find()->where([
+            'task_id' => $this->id,
+            'user_id' => $userId,
+        ])->exists();
+    }
+
+    /**
+     * Проверка, является ли пользователь с указанным идентификатором
+     * автором этого задания
+     *
+     * @param int $userId идентификатор пользователя
+     *
+     * @return bool результат проверки, является ли пользователь автором задания
+     */
+    public function getIsAuthor(int $userId): bool
+    {
+        return $this->author_id === $userId;
+    }
+
+    /**
+     * Проверка, является ли пользователь с указанным идентификатором
+     * исполнителем этого задания
+     *
+     * @param int $userId идентификатор пользователя
+     *
+     * @return bool результат проверки, является ли пользователь исполнителем задания
+     */
+    public function getIsSelectedExecutor(int $userId): bool
+    {
+        return $this->executor_id === $userId;
     }
 
     /**
@@ -61,7 +116,7 @@ class Task extends ActiveRecord
      *
      * @return array|null
      */
-    public static function getStatusByCategory(string $category)
+    public static function getStatusByCategory(string $category): ?array
     {
         if (!empty($category)
             && !(new RangeValidator(['range' => self::getStatusList()]))->validate($category)
@@ -82,11 +137,11 @@ class Task extends ActiveRecord
     /**
      * Получение данных локации задания через яндекс карты
      *
-     * @return |null
+     * @return StdClass|null
      * @throws \yii\base\InvalidConfigException
      * @throws \yii\di\NotInstantiableException
      */
-    public function getLocation()
+    public function getLocation(): ?StdClass
     {
         return ($this->latitude && $this->longitude)
             ? Yii::$container->get('yandexMap')
@@ -212,7 +267,7 @@ class Task extends ActiveRecord
      */
     public static function getBaseTasksUrl(): string
     {
-        return Url::to("/tasks");
+        return Url::to('/tasks');
     }
 
     /**
@@ -279,9 +334,72 @@ class Task extends ActiveRecord
     /**
      * Устанавливает статус текущего задания - отмененно
      */
-    public function actionCancel()
+    public function actionCancel(): void
     {
         $this->status = self::STATUS_CANCELED;
         $this->save();
+    }
+
+    /**
+     * Возвращает задание в категорию новых, убирая старого исполнителя
+     */
+    public function actionRefusal(): void
+    {
+        $this->status = self::STATUS_NEW;
+        $this->executor_id = null;
+        $this->save();
+    }
+
+    /**
+     * Завершает текущее задание устанавливая соответствующий статус
+     *
+     * @param bool $result результат выволненнения задания
+     */
+    public function finishing(bool $result): void
+    {
+        $this->status = $result ? self::STATUS_COMPLETED : self::STATUS_FAILING;
+        $this->save();
+    }
+
+    /**
+     * Метод для создания нового задания
+     *
+     * @param TaskCreate $model         модель с данными нового задания
+     * @param string     $taskFilesPath адрес директории для сохранения файлов к заданию
+     *
+     * @return bool результат создания нового задания
+     */
+    public static function create(
+        TaskCreate $model,
+        string $taskFilesPath
+    ): bool {
+        $transaction = Yii::$app->db->beginTransaction();
+        try {
+            $task = new self([
+                'author_id' => Yii::$app->user->identity->id,
+                'title' => $model->title,
+                'description' => $model->description,
+                'category_id' => $model->categoryId,
+                'price' => $model->price,
+                'latitude' => $model->latitude,
+                'longitude' => $model->longitude,
+                'date_end' => $model->dateEnd,
+                'city_id' => $model->cityId,
+                'date_start' => date('Y-m-d h:i:s'),
+                'status' => self::STATUS_NEW,
+            ]);
+            $task->save();
+
+            if ($model->files) {
+                $task->setFiles($model->files, $taskFilesPath);
+            }
+            $transaction->commit();
+
+            return true;
+        } catch (\Exception $err) {
+            $transaction->rollBack();
+        }
+
+        return false;
     }
 }

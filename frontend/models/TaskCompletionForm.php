@@ -14,9 +14,9 @@ use yii\base\Model;
 class TaskCompletionForm extends Model
 {
     /** @var string строка со статусом исполнения задания - возниклик проблемы */
-    const STATUS_DIFFICULT = 'difficult';
+    public const STATUS_DIFFICULT = 'difficult';
     /** @var string строка со статусом исполнения задания - нет проблемы */
-    const STATUS_YES = 'yes';
+    public const STATUS_YES = 'yes';
 
     /** @var string строка со статусом исполнения задания выбранным заказчиком */
     public $isCompletion;
@@ -24,6 +24,16 @@ class TaskCompletionForm extends Model
     public $rating;
     /** @var string строка с описанием по поводу выполненного задания */
     public $text;
+
+    /**
+     * Проверка выволненности задания
+     *
+     * @return bool результат проверки выволненности задания
+     */
+    public function getIsCompletion(): bool
+    {
+        return $this->isCompletion === self::STATUS_YES;
+    }
 
     /**
      * Получение списка правил валидации для модели

@@ -1,5 +1,6 @@
 <?php
 
+use src\TaskforceUrlManager\TaskforceUrlManager;
 use yii\log\FileTarget;
 use yii\web\JsonParser;
 use yii\swiftmailer\Mailer;
@@ -11,7 +12,6 @@ use yii\authclient\clients\VKontakte;
 use yii\authclient\Collection;
 use yii\redis\Cache;
 use yii\i18n\Formatter;
-use src\TaskforceUrlManager\TaskforceUrlManager;
 use frontend\modules\v1\src\RestMessagesUrlRule;
 use frontend\modules\v1\Module;
 
@@ -35,8 +35,8 @@ return [
     ],
     'components' => [
         'assetManager' => [
-            'bundles' => (YII_ENV_PROD ? require __DIR__.'/assets-prod.php'
-                : []),
+            'bundles' => file_exists(__DIR__.'/assets-prod.php')
+                ? require __DIR__.'/assets-prod.php' : [],
         ],
         'mailer' => [
             'class' => Mailer::class,

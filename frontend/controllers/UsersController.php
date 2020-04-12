@@ -9,6 +9,7 @@ use common\models\User;
 use Yii;
 use yii\web\NotFoundHttpException;
 use yii\data\ActiveDataProvider;
+use yii\web\Response;
 
 /**
  * Контроллер для работы с исполнителями
@@ -26,7 +27,7 @@ class UsersController extends SecuredController
      *
      * @return string шаблон с данными страницы
      */
-    public function actionIndex(string $sort = '')
+    public function actionIndex(string $sort = ''): string
     {
         $query = User::find()
             ->joinWith('userData')
@@ -75,10 +76,10 @@ class UsersController extends SecuredController
      * @return string шаблон с данными страницы
      * @throws NotFoundHttpException ошибка при попытке найти несуществующего исполнителя
      */
-    public function actionView(int $id)
+    public function actionView(int $id): string
     {
         $user = User::findOne($id);
-        if (!$user || $user->role !== User::ROLE_EXECUTOR) {
+        if (!$user || !$user->getIsExecutor()) {
             throw new NotFoundHttpException('Исполнитель не найден!');
         }
 
@@ -96,11 +97,11 @@ class UsersController extends SecuredController
      *
      * @param int $userId идентификатор исполнитлея
      *
-     * @return \yii\web\Response
+     * @return Response
      * @throws \Throwable
      * @throws \yii\db\StaleObjectException
      */
-    public function actionSelectFavorite(int $userId)
+    public function actionSelectFavorite(int $userId): Response
     {
         FavoriteExecutor::toggleUserFavorite(Yii::$app->user->identity->id,
             $userId);

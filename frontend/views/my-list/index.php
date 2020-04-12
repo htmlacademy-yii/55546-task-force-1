@@ -18,7 +18,7 @@ $currentItemClass = 'menu_toggle__item--current';
                 </svg>
             </div>
             <?= Html::a('Завершённые',
-                "my-list?category=".Task::STATUS_COMPLETED); ?>
+                'my-list?category='.Task::STATUS_COMPLETED); ?>
         </li>
         <li class="menu-toggle__item menu-toggle__item--new <?= $category
         === Task::STATUS_NEW ? $currentItemClass : '' ?>">
@@ -56,7 +56,7 @@ $currentItemClass = 'menu_toggle__item--current';
                         fill="white"/>
                 </svg>
             </div>
-            <?= Html::a('Новые', "my-list?category=".Task::STATUS_NEW); ?>
+            <?= Html::a('Новые', 'my-list?category='.Task::STATUS_NEW); ?>
         </li>
         <li class="menu-toggle__item menu-toggle__item--active <?= $category
         === Task::STATUS_EXECUTION ? $currentItemClass : '' ?>">
@@ -69,7 +69,7 @@ $currentItemClass = 'menu_toggle__item--current';
                 </svg>
             </div>
             <?= Html::a('Активные',
-                "my-list?category=".Task::STATUS_EXECUTION); ?>
+                'my-list?category='.Task::STATUS_EXECUTION); ?>
         </li>
         <li class="menu-toggle__item menu-toggle__item--canceled <?= $category
         === Task::STATUS_CANCELED ? $currentItemClass : '' ?>">
@@ -82,7 +82,7 @@ $currentItemClass = 'menu_toggle__item--current';
                 </svg>
             </div>
             <?= Html::a('Отменённые',
-                "my-list?category=".Task::STATUS_CANCELED); ?>
+                'my-list?category='.Task::STATUS_CANCELED); ?>
         </li>
         <li class="menu-toggle__item menu-toggle__item--hidden <?= $category
         === Task::STATUS_EXPIRED ? $currentItemClass : '' ?>">
@@ -97,7 +97,7 @@ $currentItemClass = 'menu_toggle__item--current';
                 </svg>
             </div>
             <?= Html::a('Просроченные',
-                "my-list?category=".Task::STATUS_EXPIRED); ?>
+                'my-list?category='.Task::STATUS_EXPIRED); ?>
         </li>
     </ul>
 </section>
@@ -107,12 +107,12 @@ $currentItemClass = 'menu_toggle__item--current';
         <?php foreach ($tasks as $task): ?>
             <div class="new-task__card">
                 <div class="new-task__title">
-                    <?= Html::a("<h2>".Html::encode($task->title)."</h2>",
+                    <?= Html::a('<h2>'.Html::encode($task->title).'</h2>',
                         $task->getCurrentTaskUrl(),
                         ['class' => 'link-regular']); ?>
                     <?php if ($task->category): ?>
-                        <?= Html::a("<p>".Html::encode($task->category->title)
-                            ."</p>",
+                        <?= Html::a('<p>'.Html::encode($task->category->title)
+                            .'</p>',
                             Task::getUrlTasksByCategory($task->category->id),
                             ['class' => 'new-task__type link-regular']); ?>
                     <?php endif; ?>
