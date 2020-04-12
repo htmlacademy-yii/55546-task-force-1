@@ -279,7 +279,7 @@ class Task extends ActiveRecord
      */
     public static function getUrlTasksByCategory(int $categoryId): string
     {
-        return Url::to("/tasks?filter[category][]=$categoryId");
+        return Url::to("/tasks?filter[categories][]=$categoryId");
     }
 
     /**

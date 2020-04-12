@@ -36,7 +36,7 @@ class TasksFilter extends Model
     private const PERIOD_MONTH = 'month';
 
     /** @var array массив со списком всех доступных периодов */
-    const PERIOD_LIST
+    public const PERIOD_LIST
         = [
             self::PERIOD_ALL => 'За всё время',
             self::PERIOD_DAY => 'За день',
