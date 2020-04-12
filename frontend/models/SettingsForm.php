@@ -3,6 +3,7 @@
 namespace app\models;
 
 use common\models\User;
+use DateTime;
 use Yii;
 use yii\base\Model;
 use yii\web\UploadedFile;
@@ -28,6 +29,8 @@ class SettingsForm extends Model
     public $cityId;
     /** @var string строка с днём рождения пользователя */
     public $birthday;
+    /** @var number число timestamp с днём рождения пользователя */
+    public $timestampBirthday;
     /** @var string строка с описанием пользователя */
     public $description;
     /** @var array массив со списком специализаций пользователя */
@@ -43,66 +46,98 @@ class SettingsForm extends Model
     /** @var string строка с другим мессенджером пользователя */
     public $otherMessenger;
     /** @var array массив со списком уведомлений пользователя */
-    public $notifications
-        = [
-            'new-message' => false,
-            'task-actions' => false,
-            'new-review' => false,
-            'show-only-client' => false,
-            'hidden-profile' => false,
-        ];
+    public $notifications = [];
     /** @var array массив со списком настроек пользователя */
-    public $settings
-        = [
-            'show-only-client' => false,
-            'hidden-profile' => false,
-        ];
+    public $settings = [];
 
     /**
      * Получение списка правил валидации для модели
      *
      * @return array список правил валидации для модели
+     * @throws \Exception
      */
     public function rules(): array
     {
+        $today = new DateTime();
+
         return [
             [
-                [
-                    'avatar',
-                    'files',
-                    'name',
-                    'email',
-                    'cityId',
-                    'birthday',
-                    'description',
-                    'specializations',
-                    'password',
-                    'copyPassword',
-                    'phone',
-                    'skype',
-                    'otherMessenger',
-                    'notifications',
-                    'settings',
-                ],
-                'safe',
+                'files',
+                'file',
+                'extensions' => ['png', 'jpg', 'jpeg', 'gif'],
+                'maxFiles' => 6,
+                'message' => 'Ошибка при сохранении файлов',
+            ],
+            [
+                ['notifications', 'settings'],
+                'in',
+                'range' => [true, false],
+                'allowArray' => true,
             ],
             ['avatar', 'file', 'extensions' => ['png', 'jpg', 'jpeg', 'gif']],
             [['name', 'email'], 'trim'],
             [['name', 'email'], 'required', 'message' => 'Обязательное поле'],
-            ['name', 'validateName'],
+            [
+                'name',
+                'unique',
+                'targetClass' => User::class,
+                'targetAttribute' => 'login',
+                'filter' => function ($query) {
+                    $query->andWhere([
+                        '!=',
+                        'user.login',
+                        Yii::$app->user->identity->login,
+                    ]);
+                },
+                'message' => 'Выбранное имя уже занято',
+            ],
             ['email', 'email', 'message' => 'Не корректный тип email'],
-            ['email', 'validateEmail'],
+            [
+                'email',
+                'unique',
+                'targetClass' => User::class,
+                'filter' => function ($query) {
+                    $query->andWhere([
+                        '!=',
+                        'user.email',
+                        Yii::$app->user->identity->email,
+                    ]);
+                },
+                'message' => 'Указанный email уже используется',
+            ],
+            [['password', 'copyPassword'], 'string', 'min' => 6],
+            ['password', 'compare', 'compareAttribute' => 'copyPassword'],
             [
                 'birthday',
                 'match',
                 'pattern' => '/^\d{4}-\d{2}-\d{2}$/',
                 'message' => 'Не корректный формат даты',
             ],
-            ['birthday', 'validateBirthday'],
-            ['specializations', 'validateSpecializations'],
-            ['password', 'compare', 'compareAttribute' => 'copyPassword'],
+            [
+                'birthday',
+                'date',
+                'format' => 'php:Y-m-d',
+                'timestampAttribute' => 'timestampBirthday',
+                'max' => $today->getTimestamp(),
+                'maxString' => $today->format('Y-m-d'),
+                'tooBig' => '{attribute} должен быть не позже {max}.',
+            ],
+            [
+                'specializations',
+                'exist',
+                'targetClass' => Category::class,
+                'targetAttribute' => 'id',
+                'allowArray' => true,
+                'message' => 'Одна или несколько из выбранных вами специализаций не найдена',
+            ],
             ['cityId', 'integer'],
-            ['cityId', 'validateCity'],
+            [
+                'cityId',
+                'exist',
+                'targetClass' => City::class,
+                'targetAttribute' => 'id',
+                'message' => 'Город с указанным id не найден',
+            ],
             ['description', 'string'],
             ['phone', 'string', 'length' => [11, 11]],
             ['otherMessenger', 'trim'],
@@ -132,65 +167,5 @@ class SettingsForm extends Model
             'skype' => 'skype',
             'otherMessenger' => 'Другой мессенджер',
         ];
-    }
-
-    /**
-     * Валидатор для проверки доступности имени пользователя,
-     * при условии что это имя занято не им же
-     */
-    public function validateName(): void
-    {
-        if ((Yii::$app->user->identity->login !== $this->name)
-            && User::findOne(['login' => $this->name])
-        ) {
-            $this->addError('login', 'Выбранное имя уже занято');
-        }
-    }
-
-    /**
-     * Валидатор для проверки доступности почтового ящика пользователя,
-     * при условии что этот почтовый ящик занят не им же
-     */
-    public function validateEmail(): void
-    {
-        if ((Yii::$app->user->identity->email !== $this->email)
-            && User::findOne(['email' => $this->email])
-        ) {
-            $this->addError('email', 'Указанный email уже используется');
-        }
-    }
-
-    /**
-     * Валидатор для проверки доступности выбранного города в базе данных сайта
-     */
-    public function validateCity(): void
-    {
-        if (!City::findOne((int)$this->cityId)) {
-            $this->addError('email', 'Город с указанным id не найден');
-        }
-    }
-
-    /**
-     * Валидатор для проверки дня рождения пользователя
-     */
-    public function validateBirthday(): void
-    {
-        if (strtotime($this->birthday) >= time()) {
-            $this->addError('birthday',
-                'День рождения должен быть датой прошедшего времени');
-        }
-    }
-
-    /**
-     * Валидатор для проверки доступности выбранных специализаций в базе данных сайта
-     */
-    public function validateSpecializations(): void
-    {
-        if ((int)Category::find()->where(['id' => $this->specializations])
-                ->count() !== count($this->specializations)
-        ) {
-            $this->addError('specializations',
-                'Одна или несколько из выбранных вами специализаций не найдена');
-        }
     }
 }

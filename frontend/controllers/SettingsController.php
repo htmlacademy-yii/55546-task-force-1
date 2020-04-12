@@ -33,20 +33,20 @@ class SettingsController extends SecuredController
      * @throws \yii\base\Exception
      * @throws \yii\db\Exception
      * @throws \yii\web\ServerErrorHttpException
-     * @throws \yii\web\UnsupportedMediaTypeHttpException
      */
-    public function actionIndex()
+    public function actionIndex(): string
     {
         $user = Yii::$app->user->identity;
         $model = new SettingsForm();
+
+        if ($files = UploadedFile::getInstancesByName('files')) {
+            $model->files = $files;
+        }
+
         if (Yii::$app->request->isPost
             && $model->load(Yii::$app->request->post())
             && $model->validate()
         ) {
-            if ($files = UploadedFile::getInstancesByName('files')) {
-                $model->files = $files;
-            }
-
             (new UserSettingsHelper($model, $user))
                 ->updateFileWorks("$this->photosPath/$user->id")
                 ->updateUser()
@@ -54,7 +54,7 @@ class SettingsController extends SecuredController
                 ->updateUserNotifications()
                 ->updateUserSettings()
                 ->updateUserSpecializations()
-                ->updateUserRole(User::ROLE_CLIENT, User::ROLE_EXECUTOR);
+                ->updateUserRole();
         }
 
         return $this->render('index', [

@@ -1,23 +1,13 @@
 <?php
 
-use app\models\City;
 use frontend\assets\AppAsset;
 use yii\helpers\Html;
 use yii\helpers\Url;
 
 AppAsset::register($this);
 
-$isGuest = Yii::$app->user->isGuest;
-$user = $isGuest ? null : Yii::$app->user->identity;
-
-$selectedCity = null;
-$events = null;
-if (Yii::$app->session->get('city')) {
-    $selectedCity = Yii::$app->session->get('city');
-} elseif ($user) {
-    $selectedCity = $user->city_id;
-    $events = $user->events;
-}
+$user = $this->context->user;
+$events = $this->context->events;
 ?>
 
 <?php $this->beginPage() ?>
@@ -106,14 +96,14 @@ if (Yii::$app->session->get('city')) {
                     </li>
                     <li class="site-list__item">
                         <?= Html::a('Мой профиль',
-                            "/users/view/".($user ? $user->id : '')); ?>
+                            '/users/view/'.($user ? $user->id : '')); ?>
                     </li>
                 </ul>
             </div>
 
             <div class="header__town">
-                <?= Html::dropDownList('town[]', $selectedCity,
-                    City::getCitiesArray(),
+                <?= Html::dropDownList('town[]', $this->context->selectedCity,
+                    $this->context->cities,
                     [
                         'class' => 'multiple-select input town-select',
                         'size' => 1,
@@ -141,7 +131,7 @@ if (Yii::$app->session->get('city')) {
             <?php endif; ?>
 
             <div class="header__account">
-                <?php if (!$isGuest): ?>
+                <?php if (!$this->context->isGuest): ?>
                     <a class="header__account-photo">
                         <img src="<?= $user->userData->getAvatar(); ?>"
                              width="43" height="44"
@@ -152,7 +142,7 @@ if (Yii::$app->session->get('city')) {
                      </span>
                 <?php endif; ?>
             </div>
-            <?php if (!$isGuest): ?>
+            <?php if (!$this->context->isGuest): ?>
                 <div class="account__pop-up">
                     <ul class="account__pop-up-list">
                         <li><?= Html::a('Мои задания', '/my-list') ?></li>
@@ -168,50 +158,7 @@ if (Yii::$app->session->get('city')) {
             <?= $content; ?>
         </div>
     </main>
-    <footer class="page-footer">
-        <div class="main-container page-footer__container">
-            <div class="page-footer__info">
-                <p class="page-footer__info-copyright">
-                    © 2019, ООО «ТаскФорс»
-                    Все права защищены
-                </p>
-                <p class="page-footer__info-use">
-                    «TaskForce» — это сервис для поиска исполнителей на разовые
-                    задачи.
-                    mail@taskforce.com
-                </p>
-            </div>
-            <div class="page-footer__links">
-                <ul class="links__list">
-                    <li class="links__item">
-                        <?= Html::a('Задания', '/tasks'); ?>
-                    </li>
-                    <li class="links__item">
-                        <?= Html::a('Мой профиль',
-                            "/users/view/".($user ? $user->id : '')); ?>
-                    </li>
-                    <li class="links__item">
-                        <?= Html::a('Исполнители', '/users'); ?>
-                    </li>
-                    <li class="links__item">
-                        <?= Html::a('Регистрация', '/site/signup'); ?>
-                    </li>
-                    <li class="links__item">
-                        <?= Html::a('Создать задание', '/tasks/create'); ?>
-                    </li>
-                    <li class="links__item">
-                        <a href="">Справка</a>
-                    </li>
-                </ul>
-            </div>
-            <div class="page-footer__copyright">
-                <?= Html::a('<img class="copyright-logo"
-                         src="/img/academy-logo.png"
-                         width="185" height="63"
-                         alt="Логотип HTML Academy">', '#') ?>
-            </div>
-        </div>
-    </footer>
+    <?= $this->render('footer', ['user' => $user]); ?>
 </div>
 <?php $this->endBody() ?>
 </body>

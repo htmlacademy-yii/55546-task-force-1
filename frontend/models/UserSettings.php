@@ -2,6 +2,7 @@
 
 namespace app\models;
 
+use common\models\User;
 use yii\db\ActiveRecord;
 
 /**
@@ -49,7 +50,14 @@ class UserSettings extends ActiveRecord
     public function rules(): array
     {
         return [
+            ['user_id', 'required'],
             ['user_id', 'integer'],
+            [
+                'user_id',
+                'exist',
+                'targetClass' => User::class,
+                'targetAttribute' => 'id',
+            ],
             [['is_hidden_contacts', 'is_hidden_profile'], 'boolean'],
         ];
     }

@@ -5,13 +5,11 @@ namespace frontend\controllers;
 use app\models\Category;
 use app\models\ExecutorSearchForm;
 use app\models\FavoriteExecutor;
-use app\models\Review;
-use app\models\Task;
 use common\models\User;
 use Yii;
-use yii\db\Query;
 use yii\web\NotFoundHttpException;
 use yii\data\ActiveDataProvider;
+use yii\web\Response;
 
 /**
  * Контроллер для работы с исполнителями
@@ -29,57 +27,44 @@ class UsersController extends SecuredController
      *
      * @return string шаблон с данными страницы
      */
-    public function actionIndex(string $sort = '')
+    public function actionIndex(string $sort = ''): string
     {
-        $query = (new Query())->select([
-            'user.id',
-            'user.login',
-            'user.last_activity',
-            'user_data.avatar',
-            'user_data.rating',
-            'user_data.description',
-            'CONCAT("[",GROUP_CONCAT(JSON_OBJECT("title", category.title, "id", category.id) SEPARATOR ","),"]") as specializations',
-            '(SELECT COUNT(*) FROM review WHERE review.executor_id = user.id) as reviews_count',
-            '(SELECT COUNT(*) FROM task WHERE task.executor_id = user.id || task.author_id = user.id) as tasks_count',
-        ])->from('user')
+        $query = User::find()
+            ->joinWith('userData')
+            ->joinWith('userSettings')
+            ->joinWith('userSpecializations')
             ->where([
                 'user.role' => User::ROLE_EXECUTOR,
                 'user_settings.is_hidden_profile' => false,
-            ])
-            ->leftJoin('user_data', 'user.id = user_data.user_id')
-            ->leftJoin('user_specialization',
-                'user.id = user_specialization.user_id')
-            ->leftJoin('category',
-                'user_specialization.category_id = category.id')
-            ->leftJoin('user_settings', 'user.id = user_settings.user_id');
+            ])->groupBy([
+                'user.id',
+                'user_data.avatar',
+                'user_data.description',
+                'user_data.views',
+            ]);
 
         $model = new ExecutorSearchForm();
         if (Yii::$app->request->get('ExecutorSearchForm')
             && $model->load(Yii::$app->request->get())
+            && $model->validate()
         ) {
             $model->applyFilters($query);
         }
 
-        $query->orderBy($model->getSortQuery($sort));
-
-        $provider = new ActiveDataProvider([
-            'query' => $query->groupBy([
-                'user.id',
-                'user_data.rating',
-                'user_data.avatar',
-                'user_data.description',
-                'user_data.views',
-            ]),
-            'pagination' => [
-                'pageSize' => 5,
-            ],
-        ]);
+        $model->applySort($query, $sort);
 
         return $this->render('index', [
             'model' => $model,
-            'dataProvider' => $provider,
-            'categories' => Category::getCategoriesArray(),
             'selectedSort' => $sort,
+            'additionallyList' => ExecutorSearchForm::ADDITIONALLY_LIST,
+            'sortList' => User::SORT_TYPE_LIST,
+            'dataProvider' => new ActiveDataProvider([
+                'query' => $query,
+                'pagination' => [
+                    'pageSize' => 5,
+                ],
+            ]),
+            'categories' => Category::getCategoriesArray(),
         ]);
     }
 
@@ -91,32 +76,19 @@ class UsersController extends SecuredController
      * @return string шаблон с данными страницы
      * @throws NotFoundHttpException ошибка при попытке найти несуществующего исполнителя
      */
-    public function actionView(int $id)
+    public function actionView(int $id): string
     {
         $user = User::findOne($id);
-        if (!$user || $user->role !== User::ROLE_EXECUTOR) {
-            throw new NotFoundHttpException("Исполнитель не найден!");
+        if (!$user || !$user->getIsExecutor()) {
+            throw new NotFoundHttpException('Исполнитель не найден!');
         }
 
         $user->userData->updateCounters(['views' => 1]);
 
         return $this->render('view', [
             'user' => $user,
-            'reviewsCount' => Review::find()
-                ->where(['executor_id' => $user->id])->count(),
-            'completedTasksCount' => Task::find()
-                ->where(['executor_id' => $user->id])
-                ->andWhere(['!=', 'status', Task::STATUS_EXECUTION])
-                ->count(),
-            'isCustomer' => Task::find()->where([
-                'status' => Task::STATUS_EXECUTION,
-                'executor_id' => $user->id,
-                'author_id' => Yii::$app->user->identity->id,
-            ])->exists(),
-            'isFavorite' => FavoriteExecutor::find()->where([
-                'client_id' => Yii::$app->user->identity->id,
-                'executor_id' => $user->id,
-            ])->exists(),
+            'isCustomer' => Yii::$app->user->identity->getIsCustomer($user->id),
+            'isFavorite' => Yii::$app->user->identity->getIsFavorite($user->id),
         ]);
     }
 
@@ -125,22 +97,14 @@ class UsersController extends SecuredController
      *
      * @param int $userId идентификатор исполнитлея
      *
-     * @return \yii\web\Response
+     * @return Response
      * @throws \Throwable
      * @throws \yii\db\StaleObjectException
      */
-    public function actionSelectFavorite(int $userId)
+    public function actionSelectFavorite(int $userId): Response
     {
-        $params = [
-            'client_id' => Yii::$app->user->identity->id,
-            'executor_id' => $userId,
-        ];
-
-        if ($data = FavoriteExecutor::findOne($params)) {
-            $data->delete();
-        } else {
-            (new FavoriteExecutor($params))->save();
-        }
+        FavoriteExecutor::toggleUserFavorite(Yii::$app->user->identity->id,
+            $userId);
 
         return $this->redirect(User::getUserUrl($userId));
     }

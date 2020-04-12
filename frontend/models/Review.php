@@ -54,9 +54,32 @@ class Review extends ActiveRecord
     public function rules(): array
     {
         return [
-            [['task_id', 'author_id', 'executor_id', 'text'], 'required'],
+            [
+                ['task_id', 'author_id', 'executor_id', 'text', 'rating'],
+                'required',
+            ],
             [['task_id', 'author_id', 'executor_id'], 'integer'],
-            [['text'], 'string'],
+            [
+                ['author_id', 'executor_id'],
+                'exist',
+                'targetClass' => User::class,
+                'targetAttribute' => 'id',
+            ],
+            [
+                'task_id',
+                'exist',
+                'targetClass' => Task::class,
+                'targetAttribute' => 'id',
+            ],
+            [
+                'rating',
+                'filter',
+                'filter' => function ($rating) {
+                    return (int)$rating;
+                },
+            ],
+            ['rating', 'integer', 'min' => 1, 'max' => 5],
+            ['text', 'string'],
         ];
     }
 

@@ -2,6 +2,7 @@
 
 namespace app\models;
 
+use common\models\User;
 use yii\db\ActiveRecord;
 
 /**
@@ -33,6 +34,18 @@ class UserSpecialization extends ActiveRecord
         return [
             [['user_id', 'category_id'], 'required'],
             [['user_id', 'category_id'], 'integer'],
+            [
+                'user_id',
+                'exist',
+                'targetClass' => User::class,
+                'targetAttribute' => 'id',
+            ],
+            [
+                'category_id',
+                'exist',
+                'targetClass' => Category::class,
+                'targetAttribute' => 'id',
+            ],
         ];
     }
 }

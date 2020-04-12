@@ -61,8 +61,15 @@ class TaskFile extends ActiveRecord
     public function rules(): array
     {
         return [
-            [['task_id'], 'integer'],
-            [['file'], 'string', 'max' => 255],
+            [['task_id', 'file'], 'required'],
+            ['task_id', 'integer'],
+            [
+                'task_id',
+                'exist',
+                'targetClass' => Task::class,
+                'targetAttribute' => 'id',
+            ],
+            ['file', 'string', 'max' => 255],
         ];
     }
 }

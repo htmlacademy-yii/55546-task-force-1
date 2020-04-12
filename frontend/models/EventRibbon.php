@@ -2,6 +2,7 @@
 
 namespace app\models;
 
+use common\models\User;
 use yii\db\ActiveQuery;
 use yii\db\ActiveRecord;
 use yii\helpers\ArrayHelper;
@@ -16,15 +17,15 @@ use yii\helpers\ArrayHelper;
 class EventRibbon extends ActiveRecord
 {
     /** @var string строка со статусом нового отлика на задание */
-    const TYPE_NEW_TASK_RESPOND = 'new-task-respond';
+    public const TYPE_NEW_TASK_RESPOND = 'new-task-respond';
     /** @var string строка со статусом нового сообщения */
-    const TYPE_NEW_CHAT_MESSAGE = 'new-chat-message';
+    public const TYPE_NEW_CHAT_MESSAGE = 'new-chat-message';
     /** @var string строка со статусом отенённого задания */
-    const TYPE_TASK_DENIAL = 'task-denial';
+    public const TYPE_TASK_DENIAL = 'task-denial';
     /** @var string строка со статусом начала задания */
-    const TYPE_TASK_START = 'task-start';
+    public const TYPE_TASK_START = 'task-start';
     /** @var string строка со статусом завершения задания */
-    const TYPE_TASK_COMPLETE = 'task-complete';
+    public const TYPE_TASK_COMPLETE = 'task-complete';
 
     /**
      * Получение строки с описанием события в соответствии с его типом
@@ -49,14 +50,10 @@ class EventRibbon extends ActiveRecord
      */
     public function getIconClass(): string
     {
-        $class = 'lightbulb__new-task--executor';
-        if ($this->type === self::TYPE_NEW_CHAT_MESSAGE) {
-            $class = 'lightbulb__new-task--message';
-        } elseif ($this->type === self::TYPE_TASK_COMPLETE) {
-            $class = 'lightbulb__new-task--close';
-        }
-
-        return $class;
+        return ArrayHelper::getValue([
+            self::TYPE_NEW_CHAT_MESSAGE => 'lightbulb__new-task--message',
+            self::TYPE_TASK_COMPLETE => 'lightbulb__new-task--close',
+        ], $this->type, 'lightbulb__new-task--executor');
     }
 
     /**
@@ -87,7 +84,22 @@ class EventRibbon extends ActiveRecord
     public function rules(): array
     {
         return [
-            [['user_id', 'task_id', 'type', 'message'], 'safe'],
+            [['user_id', 'task_id', 'type', 'message'], 'required'],
+            [['user_id', 'task_id'], 'integer'],
+            [
+                'user_id',
+                'exist',
+                'targetClass' => User::class,
+                'targetAttribute' => 'id',
+            ],
+            [
+                'task_id',
+                'exist',
+                'targetClass' => Task::class,
+                'targetAttribute' => 'id',
+            ],
+            ['type', 'string', 'length' => [0, 255]],
+            ['message', 'string'],
         ];
     }
 }

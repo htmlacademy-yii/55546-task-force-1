@@ -21,6 +21,10 @@
   const inputAutoComplete = document.querySelector(`#autoComplete`);
   const citiesList = document.querySelector(`#cities-list`);
   inputAutoComplete.addEventListener(`input`, async ({target}) => {
+    if(!target.value) {
+      return;
+    }
+
     const data = await fetch(`/tasks/ajax-get-yandex-place?place=${target.value}`,
       {Method: `GET`, 'Content-Type': `json/application`})
       .then(res => res.json());

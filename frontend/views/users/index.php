@@ -3,33 +3,23 @@
 use yii\helpers\Html;
 use yii\widgets\ActiveForm;
 use yii\widgets\ListView;
-use common\models\User;
 
 $fieldConfig = ['options' => ['tag' => false]];
+
 ?>
 
 <section class="user__search">
     <div class="user__search-link">
         <p>Сортировать по:</p>
         <ul class="user__search-list">
-            <li class="user__search-item <?= $selectedSort
-            && $selectedSort === User::SORT_TYPE_RATING
-                ? 'user__search-item--current' : '' ?>">
-                <?= Html::a('Рейтингу', "?sort=".User::SORT_TYPE_RATING,
-                    ['class' => 'link-regular']); ?>
-            </li>
-            <li class="user__search-item <?= $selectedSort
-            && $selectedSort === User::SORT_TYPE_ORDERS
-                ? 'user__search-item--current' : '' ?>">
-                <?= Html::a('Числу заказов', "?sort=".User::SORT_TYPE_ORDERS,
-                    ['class' => 'link-regular']); ?>
-            </li>
-            <li class="user__search-item <?= $selectedSort
-            && $selectedSort === User::SORT_TYPE_POPULARITY
-                ? 'user__search-item--current' : '' ?>">
-                <?= Html::a('Популярности', "?sort=".User::SORT_TYPE_POPULARITY,
-                    ['class' => 'link-regular']); ?>
-            </li>
+            <?php foreach ($sortList as $key => $value): ?>
+                <li class="user__search-item <?= $selectedSort
+                && $selectedSort === $key
+                    ? 'user__search-item--current' : '' ?>">
+                    <?= Html::a($value, '?sort='.$key,
+                        ['class' => 'link-regular']); ?>
+                </li>
+            <?php endforeach; ?>
         </ul>
     </div>
     <?= ListView::widget([
@@ -49,7 +39,8 @@ $fieldConfig = ['options' => ['tag' => false]];
             'nextPageLabel' => '_',
             'prevPageLabel' => '_',
         ],
-    ]); ?>
+    ]);
+    ?>
 </section>
 <section class="search-task">
     <div class="search-task__wrapper">
@@ -61,16 +52,20 @@ $fieldConfig = ['options' => ['tag' => false]];
             <legend>Категории</legend>
             <?= $form->field($model, 'categories', $fieldConfig)
                 ->checkboxList($categories, [
-                    'item' => function ($_index, $label, $name, $checked, $id) {
-                        $checked = $checked ? "checked" : "";
-
+                    'item' => function (
+                        $_index,
+                        $label,
+                        $name,
+                        $checked,
+                        $id
+                    ) use ($categories, $model) {
                         return "<input
                                     class='visually-hidden checkbox__input'
                                     type='checkbox'
                                     id='categories-$id'
                                     name='$name'
                                     value='$id'
-                                    $checked>
+                                    {$model->getIsCheckCategory($id)}>
                                 <label for='categories-$id'>$label </label>";
                     },
                     'tag' => false,
@@ -78,13 +73,8 @@ $fieldConfig = ['options' => ['tag' => false]];
         </fieldset>
         <fieldset class="search-task__categories">
             <legend>Дополнительно</legend>
-            <?= $form->field($model, 'additionally', $fieldConfig)
-                ->checkboxList([
-                    'now-free' => 'Сейчас свободен',
-                    'now-online' => 'Сейчас онлайн',
-                    'there-are-reviews' => 'Есть отзывы',
-                    'in-favorites' => 'В избранном',
-                ], [
+            <?= $form->field($model, 'additionallyList', $fieldConfig)
+                ->checkboxList($additionallyList, [
                     'item' => function ($_index, $label, $name, $checked, $id) {
                         $checked = $checked ? 'checked' : '';
 

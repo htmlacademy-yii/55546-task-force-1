@@ -42,13 +42,15 @@ $fieldConfig = [
         <?php $form = ActiveForm::begin([
             'method' => 'GET',
             'options' => ['class' => 'search-task__form'],
+            'enableClientValidation' => false,
+            'enableAjaxValidation' => false,
         ]); ?>
         <fieldset class="search-task__categories">
             <legend>Категории</legend>
-            <?= $form->field($taskModel, 'category')
+            <?= $form->field($taskModel, 'categories')
                 ->checkboxList($categories, [
                     'item' => function ($_index, $label, $name, $checked, $id) {
-                        $checked = $checked ? "checked" : "";
+                        $checked = $checked ? 'checked' : '';
 
                         return "<input
                             class='visually-hidden checkbox__input'

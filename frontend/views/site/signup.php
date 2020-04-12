@@ -9,6 +9,7 @@ $fieldConfig = [
     'template' => "{label}\n{input}\n{error}",
     'options' => ['tag' => false],
 ];
+
 ?>
 <section class="registration__user">
     <h1>Регистрация аккаунта</h1>

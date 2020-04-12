@@ -16,7 +16,7 @@ use yii\db\ActiveQuery;
 class TasksFilter extends Model
 {
     /** @var array массив со списком категорий */
-    public $category = [];
+    public $categories = [];
     /** @var string строка с флагом - без исполнителя */
     public $isNoExecutor;
     /** @var string строка с флагом - удалённая работа */
@@ -27,16 +27,16 @@ class TasksFilter extends Model
     public $time;
 
     /** @var string строка с периодом за всё время */
-    const PERIOD_ALL = 'all';
+    private const PERIOD_ALL = 'all';
     /** @var string строка с периодом за день */
-    const PERIOD_DAY = 'day';
+    private const PERIOD_DAY = 'day';
     /** @var string строка с периодом за неделю */
-    const PERIOD_WEEK = 'week';
+    private const PERIOD_WEEK = 'week';
     /** @var string строка с периодом за месяц */
-    const PERIOD_MONTH = 'month';
+    private const PERIOD_MONTH = 'month';
 
     /** @var array массив со списком всех доступных периодов */
-    const PERIOD_LIST
+    public const PERIOD_LIST
         = [
             self::PERIOD_ALL => 'За всё время',
             self::PERIOD_DAY => 'За день',
@@ -52,10 +52,34 @@ class TasksFilter extends Model
     public function rules(): array
     {
         return [
+            [['isNoExecutor', 'isTelework'], 'boolean'],
             [
-                ['category', 'isNoExecutor', 'isTelework', 'title', 'time'],
-                'safe',
+                'categories',
+                'filter',
+                'filter' => function ($categories) {
+                    return $categories ? array_map(function ($item) {
+                        return (int)$item;
+                    }, $categories) : [];
+                },
             ],
+            [
+                'categories',
+                'exist',
+                'targetClass' => Category::class,
+                'targetAttribute' => 'id',
+                'allowArray' => true,
+            ],
+            [
+                'time',
+                'in',
+                'range' => [
+                    self::PERIOD_ALL,
+                    self::PERIOD_DAY,
+                    self::PERIOD_WEEK,
+                    self::PERIOD_MONTH,
+                ],
+            ],
+            ['title', 'string', 'length' => [0, 255]],
         ];
     }
 
@@ -67,7 +91,7 @@ class TasksFilter extends Model
     public function attributeLabels(): array
     {
         return [
-            'category' => 'Категори',
+            'categories' => 'Категори',
             'isNoExecutor' => 'Без исполнителя',
             'isTelework' => 'Удаленная работа',
             'title' => 'Поиск по названию',
@@ -82,8 +106,8 @@ class TasksFilter extends Model
      */
     public function applyFilters(ActiveQuery &$taskQuery): void
     {
-        if (!empty($this->category)) {
-            $taskQuery->andWhere(['category_id' => $this->category]);
+        if (!empty($this->categories)) {
+            $taskQuery->andWhere(['category_id' => $this->categories]);
         }
 
         if ($this->isNoExecutor) {
@@ -92,9 +116,8 @@ class TasksFilter extends Model
 
         if (!$this->isTelework) {
             $taskQuery->andWhere([
-                'city_id' => Yii::$app->session->get('city') ?
-                    Yii::$app->session->get('city')
-                    : Yii::$app->user->identity->city_id,
+                'city_id' => Yii::$app->session->get('city') ??
+                    Yii::$app->user->identity->city_id,
             ]);
         }
 
@@ -102,10 +125,7 @@ class TasksFilter extends Model
             $taskQuery->andWhere(['like', 'title', $this->title]);
         }
 
-        if (isset($this->time)
-            && in_array($this->time,
-                [self::PERIOD_DAY, self::PERIOD_WEEK, self::PERIOD_MONTH])
-        ) {
+        if (isset($this->time) && $this->time !== self::PERIOD_ALL) {
             $taskQuery->andWhere("date_start > CURRENT_TIMESTAMP() - INTERVAL 1 $this->time");
         }
     }

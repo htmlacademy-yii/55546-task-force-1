@@ -4,7 +4,6 @@ namespace frontend\modules\v1\controllers;
 
 use app\models\Message;
 use app\models\Task;
-use common\models\User;
 use src\NotificationHelper\NotificationHelper;
 use Yii;
 use yii\helpers\ArrayHelper;
@@ -73,9 +72,12 @@ class MessageController extends ActiveController
         ) {
             $task = Task::findOne((int)$result->task_id);
             try {
-                NotificationHelper::taskMessage(User::findOne((int)(
-                (int)Yii::$app->user->identity->id === (int)$task->author_id ?
-                    $task->executor_id : $task->author_id)), $task);
+                $user = (int)Yii::$app->user->identity->id
+                === (int)$task->author_id ? $task->executor : $task->author;
+
+                if ($user->userNotifications->is_new_message) {
+                    NotificationHelper::taskMessage($user, $task);
+                }
             } catch (\Exception $err) {
                 Yii::warning('Mail notification not sended');
             }

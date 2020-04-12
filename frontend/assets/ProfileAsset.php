@@ -2,6 +2,7 @@
 
 namespace frontend\assets;
 
+use frontend\widgets\assets\DropzoneAsset;
 use yii\web\AssetBundle;
 
 /**
@@ -18,5 +19,10 @@ class ProfileAsset extends AssetBundle
     /** @var string строка с адресом базового пути */
     public $baseUrl = '@web';
     /** @var array массив со списком скриптов */
-    public $js = ['js/dropzone.js', 'js/profile-init.js'];
+    public $js = ['js/profile-init.js'];
+
+    public $depends
+        = [
+            DropzoneAsset::class,
+        ];
 }

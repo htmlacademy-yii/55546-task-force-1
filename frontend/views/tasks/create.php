@@ -5,7 +5,7 @@ use yii\bootstrap\ActiveForm;
 use yii\helpers\Html;
 
 $fieldConfig = [
-    'template' => '{label}{input}{hint}{error}',
+    'template' => '{label}{input}{hint}',
     'options' => ['tag' => false],
 ];
 $labels = $model->attributeLabels();

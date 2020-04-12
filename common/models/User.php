@@ -7,12 +7,14 @@ use app\models\City;
 use app\models\EventRibbon;
 use app\models\FavoriteExecutor;
 use app\models\Review;
+use app\models\SignupForm;
 use app\models\Task;
 use app\models\UserData;
 use app\models\UserNotifications;
 use app\models\UserPhoto;
 use app\models\UserSettings;
 use app\models\UserSpecialization;
+use src\UserInitHelper\UserInitHelper;
 use Yii;
 use yii\base\NotSupportedException;
 use yii\db\ActiveQuery;
@@ -30,21 +32,29 @@ use yii\web\IdentityInterface;
 class User extends ActiveRecord implements IdentityInterface
 {
     /** @var integer статус неактивного пользователя */
-    const STATUS_INACTIVE = 9;
+    public const STATUS_INACTIVE = 9;
     /** @var integer статус активного пользователя */
-    const STATUS_ACTIVE = 10;
+    public const STATUS_ACTIVE = 10;
 
     /** @var string роль пользовтеля клиента */
-    const ROLE_CLIENT = 'client';
+    public const ROLE_CLIENT = 'client';
     /** @var string роль пользовтеля исполнителя */
-    const ROLE_EXECUTOR = 'executor';
+    public const ROLE_EXECUTOR = 'executor';
 
     /** @var string тип сортировки по рейтингу */
-    const SORT_TYPE_RATING = 'rating';
+    public const SORT_TYPE_RATING = 'rating';
     /** @var string тип сортировки по заказам */
-    const SORT_TYPE_ORDERS = 'orders';
+    public const SORT_TYPE_ORDERS = 'orders';
     /** @var string тип сортировки по популярности */
-    const SORT_TYPE_POPULARITY = 'popularity';
+    public const SORT_TYPE_POPULARITY = 'popularity';
+
+    /** @var array массиво со списком типов сортировки */
+    public const SORT_TYPE_LIST
+        = [
+            self::SORT_TYPE_RATING => 'Рейтингу',
+            self::SORT_TYPE_ORDERS => 'Числу заказов',
+            self::SORT_TYPE_POPULARITY => 'Популярности',
+        ];
 
     /**
      * Метод для получения строки с ссылкой на страницу текущего пользователя
@@ -67,6 +77,60 @@ class User extends ActiveRecord implements IdentityInterface
     }
 
     /**
+     * Проверка, является ли пользователь исполнителем
+     *
+     * @return bool лоическое значение, является ли пользователь исполнителем
+     */
+    public function getIsExecutor(): bool
+    {
+        return $this->role === self::ROLE_EXECUTOR;
+    }
+
+    /**
+     * Метод для получения информации, находится ли данный исполнитель
+     * в списке избранного у указанного клиента
+     *
+     * @param int $executorId число с идентификатором исполнителя
+     *
+     * @return bool лоическое значение, находится ли данный исполнитель в списке избранного
+     */
+    public function getIsFavorite(int $executorId): bool
+    {
+        return FavoriteExecutor::find()->where([
+            'client_id' => $this->id,
+            'executor_id' => $executorId,
+        ])->exists();
+    }
+
+    /**
+     * Метод для получения рейтинга исполнителя
+     *
+     * @return float рейтинга исполнителя
+     */
+    public function getRating(): float
+    {
+        return round(Review::find()->where(['executor_id' => $this->id])
+            ->average('rating'), 1);
+    }
+
+    /**
+     * Метод для получения информации, является ли данный клиент заказчиком у
+     * у указанного клиента
+     *
+     * @param int $executorId число с идентификатором исполнителя
+     *
+     * @return bool лоическое значение, является ли данный клиент заказчиком у исполнителя
+     */
+    public function getIsCustomer(int $executorId): bool
+    {
+        return Task::find()->where([
+            'status' => Task::STATUS_EXECUTION,
+            'executor_id' => $executorId,
+            'author_id' => $this->id,
+        ])->exists();
+    }
+
+    /**
      * Создание связи со списком событий для данного пользователя
      *
      * @return ActiveQuery список событий для данного пользователя
@@ -74,6 +138,19 @@ class User extends ActiveRecord implements IdentityInterface
     public function getEvents(): ActiveQuery
     {
         return $this->hasMany(EventRibbon::class, ['user_id' => 'id']);
+    }
+
+    /**
+     * Метод для получения количества выполненных заданий данным исполнителем
+     *
+     * @return int количество выполненных заданий
+     */
+    public function getCompletedTasksCount(): int
+    {
+        return Task::find()
+            ->where(['executor_id' => $this->id])
+            ->andWhere(['!=', 'status', Task::STATUS_EXECUTION])
+            ->count();
     }
 
     /**
@@ -159,13 +236,15 @@ class User extends ActiveRecord implements IdentityInterface
     }
 
     /**
-     * Получение списка специализаций для данного пользователя
+     * Создание связи со списком специализаций данного пользователя
      *
-     * @return array список специализаций для данного пользователя
+     * @return ActiveQuery
+     * @throws \yii\base\InvalidConfigException
      */
-    public function getSpecializations(): array
+    public function getUserSpecializations(): ActiveQuery
     {
-        return Category::findAll($this->getSpecializationsId());
+        return $this->hasMany(Category::class, ['id' => 'category_id'])
+            ->viaTable('user_specialization', ['user_id' => 'id']);
     }
 
     /**
@@ -215,23 +294,6 @@ class User extends ActiveRecord implements IdentityInterface
     }
 
     /**
-     * Общий метод для обработки ссылки на автара пользователя
-     *
-     * @param string $avatar необработанная строка ссылки на аватар
-     *
-     * @return string обработанная строка ссылки на аватар
-     */
-    public static function getCorrectAvatar(string $avatar): string
-    {
-        if (!empty($avatar)) {
-            return preg_match('/^http/', $avatar) ? $avatar
-                : Url::to("/$avatar");
-        }
-
-        return Url::to('/img/user-photo.png');
-    }
-
-    /**
      * Метод для получения строки с ссылкой на страницу нужного пользователя
      *
      * @param int $id идентификатор нужного пользователя
@@ -241,17 +303,6 @@ class User extends ActiveRecord implements IdentityInterface
     public static function getUserUrl(int $id): string
     {
         return Url::to("/users/view/$id");
-    }
-
-    /**
-     * Generates password hash from password and sets it to the model
-     *
-     * @param string $password
-     */
-    public function setPassword(string $password): void
-    {
-        $this->password_hash
-            = Yii::$app->security->generatePasswordHash($password);
     }
 
     /**
@@ -272,24 +323,35 @@ class User extends ActiveRecord implements IdentityInterface
     public function rules(): array
     {
         return [
-            ['login', 'trim'],
-            ['login', 'required'],
+            [['login', 'email', 'password', 'role'], 'required'],
+            [['login', 'email'], 'trim'],
             ['login', 'string', 'min' => 2, 'max' => 255],
-
-            ['email', 'trim'],
-            ['email', 'required'],
+            [
+                'login',
+                'unique',
+                'message' => 'Данное имя уже занято',
+            ],
             ['email', 'email'],
             ['email', 'string', 'max' => 255],
             [
                 'email',
                 'unique',
-                'message' => 'This email address has already been taken.',
+                'message' => 'Данный email уже используется',
             ],
-
-            ['password', 'required'],
             ['password', 'string', 'min' => 6],
-
-            ['name', 'safe'],
+            ['city_id', 'integer'],
+            [
+                'city_id',
+                'exist',
+                'targetClass' => City::class,
+                'targetAttribute' => 'id',
+                'message' => 'Указанный город не найден в нашей базе данных',
+            ],
+            [
+                'role',
+                'in',
+                'range' => [self::ROLE_CLIENT, self::ROLE_EXECUTOR],
+            ],
         ];
     }
 
@@ -419,5 +481,59 @@ class User extends ActiveRecord implements IdentityInterface
     public function removePasswordResetToken(): void
     {
         $this->password_reset_token = null;
+    }
+
+    /**
+     * Обновляет счетчики заданий, в соответствии со статусом их выполненности
+     *
+     * @param bool $result результат выволненнения задания
+     */
+    public function updateTaskCounter(bool $result): void
+    {
+        $this->userData->updateCounters([$result ? 'success_counter' : 'failing_counter' => 1]);
+    }
+
+    /**
+     * Обновляет время последней активности пользователя
+     *
+     * @throws \yii\db\Exception
+     */
+    public function updateLastActivity(): void
+    {
+        Yii::$app->db->createCommand("UPDATE user SET last_activity = NOW() WHERE id = :id",
+            [':id' => $this->id])->execute();
+    }
+
+    /**
+     * Создание нового пользователя в базе данных
+     *
+     * @param SignupForm $model модель с данными нового пользователя
+     *
+     * @return bool результат создания, успех или неудача
+     */
+    public static function createUser(SignupForm $model): bool
+    {
+        $transaction = Yii::$app->db->beginTransaction();
+        try {
+            (new UserInitHelper([
+                'login' => $model->login,
+                'email' => $model->email,
+                'password' => Yii::$app->getSecurity()
+                    ->generatePasswordHash($model->password),
+                'city_id' => $model->cityId,
+                'role' => self::ROLE_CLIENT,
+            ]))
+                ->initNotifications()
+                ->initSettings()
+                ->initUserData();
+
+            $transaction->commit();
+
+            return true;
+        } catch (\Exception $e) {
+            $transaction->rollBack();
+        }
+
+        return false;
     }
 }

@@ -21,7 +21,6 @@ class Message extends ActiveRecord
     public function rules(): array
     {
         return [
-            [['task_id', 'message', 'is_mine'], 'safe'],
             [
                 ['task_id', 'message'],
                 'required',
@@ -37,7 +36,7 @@ class Message extends ActiveRecord
                 'task_id',
                 'exist',
                 'targetClass' => Task::class,
-                'targetAttribute' => ['task_id' => 'id'],
+                'targetAttribute' => 'id',
             ],
             ['message', 'string'],
             ['is_mine', 'boolean'],
