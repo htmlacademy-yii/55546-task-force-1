@@ -82,8 +82,6 @@ class YandexMap
             return null;
         }
 
-        var_dump($content->response->GeoObjectCollection);
-
         return $content->response->GeoObjectCollection->featureMember[0]->GeoObject->Point->pos;
     }
 
