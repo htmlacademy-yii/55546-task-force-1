@@ -144,6 +144,7 @@ class SiteController extends SecuredController
      * Действие для регистрации нового пользователя
      *
      * @return string шаблон с данными страницы
+     * @throws \yii\base\Exception
      */
     public function actionSignup(): string
     {
@@ -151,7 +152,14 @@ class SiteController extends SecuredController
         if (Yii::$app->request->isPost
             && $model->load(Yii::$app->request->post())
             && $model->validate()
-            && User::createUser($model)
+            && User::create([
+                'login' => $model->login,
+                'email' => $model->email,
+                'password' => Yii::$app->getSecurity()
+                    ->generatePasswordHash($model->password),
+                'city_id' => $model->cityId,
+                'role' => User::ROLE_CLIENT,
+            ])
         ) {
             $this->goHome();
         }

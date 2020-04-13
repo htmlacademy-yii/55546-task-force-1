@@ -3,7 +3,6 @@
 namespace app\models;
 
 use common\models\User;
-use src\UserInitHelper\UserInitHelper;
 use Yii;
 use yii\authclient\clients\VKontakte;
 use yii\db\ActiveQuery;
@@ -79,23 +78,20 @@ class Auth extends ActiveRecord
         $user = null;
         $transaction = Yii::$app->db->beginTransaction();
         try {
-            $user = (new UserInitHelper([
+            $user = User::create([
                 'login' => $attributes['first_name'].' '
                     .$attributes['last_name'],
                 'email' => $attributes['email'],
-                'password' => Yii::$app->security->generateRandomString(6),
+                'password' => Yii::$app->getSecurity()->generatePasswordHash(
+                    Yii::$app->security->generateRandomString(6)),
                 'city_id' => null,
                 'role' => User::ROLE_CLIENT,
-            ]))->initNotifications()
-                ->initSettings()
-                ->initUserData(['avatar' => $attributes['photo']])
-                ->getUser();
+            ], ['data' => ['avatar' => $attributes['photo']]]);
             (new self([
                 'user_id' => $user->id,
                 'source' => $clientId,
                 'source_id' => $attributes['id'],
             ]))->save();
-
             $transaction->commit();
         } catch (\Exception $err) {
             $transaction->rollBack();
