@@ -132,20 +132,16 @@ $fieldConfig = ['template' => "<p>{label}{input}{error}</p>"];
     ]); ?>
     <?= $form->field($model, 'email', $fieldConfig)
         ->input('email', [
-            'class' => 'enter-form-email input input-middle '
-                .($model->hasErrors('email') ? 'field-danger' : ''),
+            'class' => 'enter-form-email input input-middle ',
             'id' => 'enter-email',
         ])
-        ->label(null, ['class' => 'form-modal-description'])
-        ->error(['class' => 'text-danger']); ?>
+        ->label(null, ['class' => 'form-modal-description']); ?>
     <?= $form->field($model, 'password', $fieldConfig)
         ->passwordInput([
-            'class' => 'enter-form-email input input-middle '
-                .($model->hasErrors('password') ? 'field-danger' : ''),
+            'class' => 'enter-form-email input input-middle ',
             'id' => 'enter-password',
         ])
-        ->label(null, ['class' => 'form-modal-description'])
-        ->error(['class' => 'text-danger']); ?>
+        ->label(null, ['class' => 'form-modal-description']); ?>
     <p>
         <?= AuthChoice::widget([
             'baseAuthUrl' => ['site/auth'],
