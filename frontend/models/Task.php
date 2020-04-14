@@ -4,7 +4,6 @@ namespace app\models;
 
 use StdClass;
 use Yii;
-use yii\base\Model;
 use yii\db\ActiveQuery;
 use yii\db\ActiveRecord;
 use common\models\User;
@@ -65,6 +64,19 @@ class Task extends ActiveRecord
         }
         FileHelper::createDirectory($pathTaskDir);
         (new TaskFile(['path' => $pathTaskDir]))->setFiles($this->id, $files);
+    }
+
+    /**
+     * Проверка права пользователя на создание сообщения к данному заданию
+     *
+     * @param int $userId идентификатор пользователя
+     *
+     * @return bool резльутат проверки, есть право на создание, или нет
+     */
+    public function getAccessCheckMessageCreate(int $userId): bool
+    {
+        return $this->getIsSelectedExecutor($userId)
+            || $this->getIsAuthor($userId);
     }
 
     /**

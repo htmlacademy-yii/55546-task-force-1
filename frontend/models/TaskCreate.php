@@ -68,7 +68,7 @@ class TaskCreate extends Model
                 'exist',
                 'targetClass' => Category::class,
                 'targetAttribute' => 'id',
-                'message' => 'sdf',
+                'message' => 'Категория не найдена',
             ],
             [['description', 'location'], 'string'],
             ['location', 'validateCity'],

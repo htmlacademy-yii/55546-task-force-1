@@ -5,7 +5,6 @@ namespace frontend\controllers;
 use app\models\SettingsForm;
 use app\models\Category;
 use app\models\City;
-use common\models\User;
 use src\UserSettingsHelper\UserSettingsHelper;
 use Yii;
 use yii\web\UploadedFile;

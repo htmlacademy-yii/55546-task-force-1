@@ -2,6 +2,7 @@
 
 namespace src\TaskHelper;
 
+use app\models\Message;
 use app\models\RespondForm;
 use app\models\Review;
 use app\models\Task;
@@ -122,5 +123,37 @@ class TaskHelper
             }
         }
         $respond->setStatusAccepted($status);
+    }
+
+    /**
+     * @param Task    $task объект задания
+     * @param Message $message объект нового сообщения к заданию
+     *
+     * @return array|null массив с данными нового задания
+     */
+    public static function message(Task $task, Message $message): ?array
+    {
+        $newMessage = null;
+        $transaction = Yii::$app->db->beginTransaction();
+        try {
+            $message->save();
+            $user = $task->getIsAuthor(Yii::$app->user->identity->id) ?
+                $task->executor : $task->author;
+
+            if ($user->userNotifications->is_new_message) {
+                NotificationHelper::taskMessage($user, $task);
+            }
+            $newMessage = [
+                'message' => $message->message,
+                'published_at' => $message->published_at,
+                'is_mine' => $message->is_mine,
+                'task_id' => $message->task_id,
+            ];
+            $transaction->commit();
+        } catch (\Exception $err) {
+            $transaction->rollBack();
+        }
+
+        return $newMessage;
     }
 }

@@ -4,14 +4,9 @@ namespace frontend\modules\v1\controllers;
 
 use app\models\Message;
 use app\models\Task;
-use src\NotificationHelper\NotificationHelper;
+use src\TaskHelper\TaskHelper;
 use Yii;
-use yii\helpers\ArrayHelper;
 use yii\rest\ActiveController;
-use yii\base\DynamicModel;
-use yii\data\ActiveDataFilter;
-use yii\rest\CreateAction;
-use yii\web\NotAcceptableHttpException;
 
 /**
  * Контроллер для работы со списком сообщений к заданиям
@@ -25,64 +20,56 @@ class MessageController extends ActiveController
     /** @var string строка с указанием класса модели */
     public $modelClass = Message::class;
 
-    public function beforeAction($action)
-    {
-        if (parent::beforeAction($action)) {
-            $version = ArrayHelper::getValue(Yii::$app->response->acceptParams,
-                'version', '1.0');
-
-            if (!preg_match('/^\D*1\.0$/', $version)) {
-                throw new NotAcceptableHttpException('Use only v1.0 version');
-            }
-        }
-
-        return true;
-    }
-
     /**
+     * Переопределение действий для контроллера
+     *
      * @return array
      */
     public function actions()
     {
         $actions = parent::actions();
-
-        $actions['index']['dataFilter'] = [
-            'class' => ActiveDataFilter::class,
-            'searchModel' => function () {
-                return (new DynamicModel(['task_id' => null]))->addRule('task_id',
-                    'integer');
-            },
-        ];
+        unset($actions['index'], $actions['create']);
 
         return $actions;
     }
 
     /**
-     * @param $action
-     * @param $result
+     * Получени списка сообщений для указанного задания
      *
-     * @return mixed
+     * @param int $id идентификатор задания
+     *
+     * @return array список сообщений
      */
-    public function afterAction($action, $result)
+    public function actionIndex(int $id): array
     {
-        $handlerResult = parent::afterAction($action, $result);
+        return $this->modelClass::findAll(['task_id' => $id]);
+    }
 
-        if (($action instanceof CreateAction)
-            && isset($handlerResult['task_id'])
+    /**
+     * Добавленние нового сообщения для указанного задания
+     *
+     * @param int $id идентификатор задания
+     *
+     * @return array|null данные нового задания
+     */
+    public function actionCreate(int $id): ?array
+    {
+        $userId = Yii::$app->user->identity->id;
+        $task = Task::findOne($id);
+        $message = json_decode(Yii::$app->getRequest()->getRawBody(), true);
+        if (!$message || !$task
+            || !$task->getAccessCheckMessageCreate($userId)
         ) {
-            $task = Task::findOne((int)$result->task_id);
-            try {
-                $user = (int)Yii::$app->user->identity->id
-                === (int)$task->author_id ? $task->executor : $task->author;
-
-                if ($user->userNotifications->is_new_message) {
-                    NotificationHelper::taskMessage($user, $task);
-                }
-            } catch (\Exception $err) {
-                Yii::warning('Mail notification not sended');
-            }
+            return null;
         }
 
-        return $handlerResult;
+        Yii::$app->response->statusCode = 201;
+
+        return TaskHelper::message($task, new $this->modelClass([
+            'message' => $message['message'],
+            'published_at' => date('Y-m-d h:i:s'),
+            'is_mine' => $task->getIsAuthor($userId),
+            'task_id' => $id,
+        ]));
     }
 }

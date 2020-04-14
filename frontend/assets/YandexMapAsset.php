@@ -32,8 +32,8 @@ class YandexMapAsset extends AssetBundle
     public function __construct($config = [])
     {
         $this->js = [
-            "https://api-maps.yandex.ru/2.1/?apikey="
-            .Yii::$container->get('yandexMap')->apiKey."&lang=ru_RU",
+            'https://api-maps.yandex.ru/2.1/?apikey='
+            .Yii::$container->get('yandexMap')->apiKey.'&lang=ru_RU',
         ];
 
         parent::__construct($config);
