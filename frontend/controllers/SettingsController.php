@@ -7,7 +7,6 @@ use app\models\Category;
 use app\models\City;
 use src\UserSettingsHelper\UserSettingsHelper;
 use Yii;
-use yii\web\UploadedFile;
 
 /**
  * Контроллер для работы с настройками пользователя
@@ -38,8 +37,8 @@ class SettingsController extends SecuredController
         $user = Yii::$app->user->identity;
         $model = new SettingsForm();
 
-        if ($files = UploadedFile::getInstancesByName('files')) {
-            $model->files = $files;
+        if (Yii::$app->request->isPost) {
+            $model->setAvatar();
         }
 
         if (Yii::$app->request->isPost

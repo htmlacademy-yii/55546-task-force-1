@@ -31,7 +31,7 @@ ProfileAsset::register($this);
                 ])
                     ->fileInput([
                         'id' => 'upload-avatar',
-                        'class' => ($model->hasErrors('email') ? 'field-danger'
+                        'class' => ($model->hasErrors('avatar') ? 'field-danger'
                             : ''),
                     ])
                     ->label(null, ['class' => 'link-regular'])

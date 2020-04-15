@@ -130,6 +130,9 @@ $fieldConfig = ['template' => "<p>{label}{input}{error}</p>"];
         'enableAjaxValidation' => true,
         'validationUrl' => Url::to('/site/login-ajax-validation'),
     ]); ?>
+
+    <?= $form->errorSummary($model); ?>
+
     <?= $form->field($model, 'email', $fieldConfig)
         ->input('email', [
             'class' => 'enter-form-email input input-middle ',

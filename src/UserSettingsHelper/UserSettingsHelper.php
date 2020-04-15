@@ -8,7 +8,6 @@ use app\models\UserSpecialization;
 use common\models\User;
 use Yii;
 use yii\helpers\FileHelper;
-use yii\web\UploadedFile;
 
 /**
  * Класс для работы c разделённым обновлением настроек пользователя
@@ -88,16 +87,14 @@ class UserSettingsHelper
     public function updateUserData(string $dir): UserSettingsHelper
     {
         $userData = $this->user->userData;
-        $this->model->avatar = UploadedFile::getInstance($this->model,
-            'avatar');
-        if ($this->model->avatar) {
+        if ($avatar = $this->model->getAvatar()) {
             $filePath
-                = "{$dir}/{$this->model->avatar->baseName}.{$this->model->avatar->extension}";
+                = "{$dir}/{$avatar->baseName}.{$avatar->extension}";
             if ($userData->avatar && file_exists($userData->avatar)) {
                 unlink($userData->avatar);
             }
 
-            $this->model->avatar->saveAs($filePath);
+            $avatar->saveAs($filePath);
             $userData->avatar = $filePath;
         }
 
