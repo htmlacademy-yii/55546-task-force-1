@@ -129,9 +129,10 @@ $fieldConfig = ['template' => "<p>{label}{input}{error}</p>"];
         'enableClientValidation' => false,
         'enableAjaxValidation' => true,
         'validationUrl' => Url::to('/site/login-ajax-validation'),
+        'errorSummaryCssClass' => 'text-danger',
     ]); ?>
 
-    <?= $form->errorSummary($model); ?>
+    <?= $form->errorSummary($model, ['header' => 'Вы ввели неверный email/пароль']); ?>
 
     <?= $form->field($model, 'email', $fieldConfig)
         ->input('email', [
