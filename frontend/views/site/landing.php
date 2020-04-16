@@ -1,5 +1,6 @@
 <?php
 
+use yii\helpers\StringHelper;
 use yii\helpers\Url;
 use yii\widgets\ActiveForm;
 use yii\helpers\Html;
@@ -95,7 +96,7 @@ $fieldConfig = ['template' => "<p>{label}{input}{error}</p>"];
                         <h3><?= Html::a(Html::encode($task->title ?? ''),
                                 $task->getCurrentTaskUrl(),
                                 ['class' => 'link-regular']) ?></h3>
-                        <p><?= Html::encode($task->description ?? ''); ?></p>
+                        <p><?= StringHelper::truncate(Html::encode($task->description ?? ''),50,'...'); ?></p>
                     </div>
                     <div class="landing-task-info">
                         <div class="task-info-left">

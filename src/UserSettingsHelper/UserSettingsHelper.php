@@ -45,13 +45,13 @@ class UserSettingsHelper
      */
     public function updateFileWorks(string $dir): UserSettingsHelper
     {
-        if ($this->model->files) {
+        if ($files = $this->model->getFiles()) {
             UserPhoto::deleteAll(['user_id' => $this->user->id]);
             if (file_exists($dir)) {
                 FileHelper::removeDirectory($dir);
             }
             FileHelper::createDirectory($dir);
-            (new UserPhoto(['path' => $dir]))->setPhotos($this->model->files);
+            (new UserPhoto(['path' => $dir]))->setPhotos($files);
         }
 
         return $this;

@@ -51,6 +51,24 @@ class SettingsForm extends Model
     public $settings = [];
 
     /**
+     * Возвращает массив с файлами работ пользователя
+     *
+     * @return array|null массив с файлами работ пользователя
+     */
+    public function getFiles(): ?array
+    {
+        return $this->files;
+    }
+
+    /**
+     * Устанавливает в модель формы массив с файлами работ пользователя
+     */
+    public function setFiles(): void
+    {
+        $this->files = UploadedFile::getInstancesByName('files');
+    }
+
+    /**
      * Возвращает аватарку пользователя
      *
      * @return UploadedFile|null объект аватарки пользователя

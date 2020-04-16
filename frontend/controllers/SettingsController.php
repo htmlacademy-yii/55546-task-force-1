@@ -39,6 +39,7 @@ class SettingsController extends SecuredController
 
         if (Yii::$app->request->isPost) {
             $model->setAvatar();
+            $model->setFiles();
         }
 
         if (Yii::$app->request->isPost

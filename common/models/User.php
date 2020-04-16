@@ -76,6 +76,18 @@ class User extends ActiveRecord implements IdentityInterface
     }
 
     /**
+     * Проверка, является ли пользователь хозяином профиля
+     *
+     * @param int $userId идентификатор пользователя
+     *
+     * @return bool лоическое значение, является ли пользователь хозяином профиля
+     */
+    public function getIsOwnerProfile(int $userId): bool
+    {
+        return $this->id === $userId;
+    }
+
+    /**
      * Проверка, является ли пользователь исполнителем
      *
      * @return bool лоическое значение, является ли пользователь исполнителем
