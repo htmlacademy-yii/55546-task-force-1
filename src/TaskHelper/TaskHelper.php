@@ -126,6 +126,8 @@ class TaskHelper
     }
 
     /**
+     * Добавление нового сообщения к заданию
+     *
      * @param Task    $task объект задания
      * @param Message $message объект нового сообщения к заданию
      *
