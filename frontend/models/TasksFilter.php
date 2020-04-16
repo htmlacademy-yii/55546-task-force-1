@@ -114,10 +114,17 @@ class TasksFilter extends Model
             $taskQuery->andWhere(['executor_id' => null]);
         }
 
+        if ($this->isTelework) {
+            $taskQuery->andWhere(['city_id' => null]);
+        }
+
         if (!$this->isTelework) {
             $taskQuery->andWhere([
-                'city_id' => Yii::$app->session->get('city') ??
+                'city_id' => [
+                    Yii::$app->session->get('city') ??
                     Yii::$app->user->identity->city_id,
+                    null,
+                ],
             ]);
         }
 

@@ -1,4 +1,5 @@
 <?php
+
 use frontend\widgets\assets\DropzoneAsset;
 
 /** @var string $text */

@@ -1,6 +1,5 @@
 <?php
 
-use src\TaskforceUrlManager\TaskforceUrlManager;
 use yii\log\FileTarget;
 use yii\web\JsonParser;
 use yii\swiftmailer\Mailer;
@@ -12,8 +11,8 @@ use yii\authclient\clients\VKontakte;
 use yii\authclient\Collection;
 use yii\redis\Cache;
 use yii\i18n\Formatter;
-use frontend\modules\v1\src\RestMessagesUrlRule;
 use frontend\modules\v1\Module;
+use yii\web\UrlManager;
 
 $params = array_merge(
     require __DIR__.'/../../common/config/params.php',
@@ -51,6 +50,7 @@ return [
         'formatter' => [
             'class' => Formatter::class,
             'language' => 'ru-RU',
+            'defaultTimeZone' => 'Asia/Novosibirsk',
         ],
         'cache' => [
             'class' => Cache::class,
@@ -101,7 +101,7 @@ return [
             'errorAction' => 'site/error',
         ],
         'urlManager' => [
-            'class' => TaskforceUrlManager::class,
+            'class' => UrlManager::class,
             'enablePrettyUrl' => true,
             'showScriptName' => false,
             'rules' => [
@@ -113,22 +113,13 @@ return [
                 'tasks/decision/<respondId>/<status>' => 'tasks/decision',
                 'users/view/<id>' => 'users/view',
                 [
-                    'class' => RestMessagesUrlRule::class,
-                    'pattern' => '/(?P<version>v\d+)\/messages\/(?P<task_id>\d+)$/',
-                    'routes' => [
-                        'GET' => '<version>/message',
-                        'POST' => '<version>/message/create',
+                    'class' => UrlRule::class,
+                    'controller' => 'v1/message',
+                    'extraPatterns' => [
+                        'GET {id}' => 'index',
+                        'POST {id}' => 'create',
                     ],
                 ],
-                [
-                    'class' => RestMessagesUrlRule::class,
-                    'pattern' => '/api\/messages\/(?P<task_id>\d+)$/',
-                    'routes' => [
-                        'GET' => 'v1/message',
-                        'POST' => 'v1/message/create',
-                    ],
-                ],
-                ['class' => UrlRule::class, 'controller' => 'api/message'],
             ],
         ],
     ],

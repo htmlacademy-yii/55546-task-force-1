@@ -87,6 +87,7 @@ class UsersController extends SecuredController
 
         return $this->render('view', [
             'user' => $user,
+            'isOwner' => $user->getIsOwnerProfile(Yii::$app->user->id),
             'isCustomer' => Yii::$app->user->identity->getIsCustomer($user->id),
             'isFavorite' => Yii::$app->user->identity->getIsFavorite($user->id),
         ]);

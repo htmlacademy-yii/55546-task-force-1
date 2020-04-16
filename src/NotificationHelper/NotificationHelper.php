@@ -30,12 +30,12 @@ class NotificationHelper
         self::send($authorTask, $task, [
             'type' => EventRibbon::TYPE_NEW_TASK_RESPOND,
             'messageEvent' => 'Новый отклик к заданию',
-            'titleMail' => "Новый отклик к вашему заданию "
+            'titleMail' => 'Новый отклик к вашему заданию '
                 .Html::encode($task->title),
-            'messageMail' => "<p>Был оставлен новый отклик к вашему заданию "
+            'messageMail' => '<p>Был оставлен новый отклик к вашему заданию '
                 .Html::a(Html::encode($task->title),
                     Yii::$app->params['siteUrl']."/tasks/view/$task->id")
-                .".</p>",
+                .'.</p>',
         ]);
     }
 
@@ -52,12 +52,12 @@ class NotificationHelper
         self::send($executorTask, $task, [
             'type' => EventRibbon::TYPE_TASK_START,
             'messageEvent' => 'Вы выбраны исполнителем',
-            'titleMail' => "Ваш отклик к заданию ".Html::encode($task->title)
-                ." был принят",
-            'messageMail' => "<p>Ваш отклик к заданию "
+            'titleMail' => 'Ваш отклик к заданию '.Html::encode($task->title)
+                .' был принят',
+            'messageMail' => '<p>Ваш отклик к заданию '
                 .Html::a(Html::encode($task->title),
                     Yii::$app->params['siteUrl']."/tasks/view/$task->id")
-                ." был принят.</p>",
+                .' был принят.</p>',
         ]);
     }
 
@@ -74,11 +74,11 @@ class NotificationHelper
         self::send($executorTask, $task, [
             'type' => EventRibbon::TYPE_TASK_COMPLETE,
             'messageEvent' => 'Задание завершено',
-            'titleMail' => "Задание ".Html::encode($task->title)." завершено",
-            'messageMail' => "<p>Заказчик завершил взятое вами задание "
+            'titleMail' => 'Задание '.Html::encode($task->title)." завершено",
+            'messageMail' => '<p>Заказчик завершил взятое вами задание '
                 .Html::a(Html::encode($task->title),
                     Yii::$app->params['siteUrl']."/tasks/view/$task->id")
-                .".</p>",
+                .'.</p>',
         ]);
     }
 
@@ -95,12 +95,12 @@ class NotificationHelper
         self::send($executorTask, $task, [
             'type' => EventRibbon::TYPE_TASK_DENIAL,
             'messageEvent' => 'Исполнитель отказался от задания',
-            'titleMail' => "Исполнитель отказался от задания "
+            'titleMail' => 'Исполнитель отказался от задания '
                 .Html::encode($task->title),
-            'messageMail' => "<p>Исполнитель отказался от задания "
+            'messageMail' => '<p>Исполнитель отказался от задания '
                 .Html::a(Html::encode($task->title),
                     Yii::$app->params['siteUrl']."/tasks/view/$task->id")
-                .".</p>",
+                .'.</p>',
         ]);
     }
 
@@ -117,11 +117,11 @@ class NotificationHelper
         self::send($user, $task, [
             'type' => EventRibbon::TYPE_NEW_CHAT_MESSAGE,
             'messageEvent' => 'Новое сообщение',
-            'titleMail' => "К заданию ".Html::encode($task->title)
-                ." было оставлено новое сообщение",
-            'messageMail' => "<p>К заданию ".Html::a(Html::encode($task->title),
+            'titleMail' => 'К заданию '.Html::encode($task->title)
+                .' было оставлено новое сообщение',
+            'messageMail' => '<p>К заданию '.Html::a(Html::encode($task->title),
                     Yii::$app->params['siteUrl']."/tasks/view/$task->id")
-                ." было оставлено новое сообщение.</p>",
+                .' было оставлено новое сообщение.</p>',
         ]);
     }
 

@@ -1,5 +1,6 @@
 <?php
 
+use yii\helpers\StringHelper;
 use yii\helpers\Url;
 use yii\widgets\ActiveForm;
 use yii\helpers\Html;
@@ -95,7 +96,8 @@ $fieldConfig = ['template' => "<p>{label}{input}{error}</p>"];
                         <h3><?= Html::a(Html::encode($task->title ?? ''),
                                 $task->getCurrentTaskUrl(),
                                 ['class' => 'link-regular']) ?></h3>
-                        <p><?= Html::encode($task->description ?? ''); ?></p>
+                        <p><?= StringHelper::truncate(Html::encode($task->description
+                                ?? ''), 50, '...'); ?></p>
                     </div>
                     <div class="landing-task-info">
                         <div class="task-info-left">
@@ -129,16 +131,21 @@ $fieldConfig = ['template' => "<p>{label}{input}{error}</p>"];
         'enableClientValidation' => false,
         'enableAjaxValidation' => true,
         'validationUrl' => Url::to('/site/login-ajax-validation'),
+        'errorSummaryCssClass' => 'text-danger',
     ]); ?>
+
+    <?= $form->errorSummary($model,
+        ['header' => 'Вы ввели неверный email/пароль']); ?>
+
     <?= $form->field($model, 'email', $fieldConfig)
         ->input('email', [
-            'class' => 'enter-form-email input input-middle',
+            'class' => 'enter-form-email input input-middle ',
             'id' => 'enter-email',
         ])
         ->label(null, ['class' => 'form-modal-description']); ?>
     <?= $form->field($model, 'password', $fieldConfig)
         ->passwordInput([
-            'class' => 'enter-form-email input input-middle',
+            'class' => 'enter-form-email input input-middle ',
             'id' => 'enter-password',
         ])
         ->label(null, ['class' => 'form-modal-description']); ?>

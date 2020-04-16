@@ -775,6 +775,22 @@ footer {
   color: #FF116E;
 }
 
+.field-danger {
+  border-color: #FF116E;
+}
+
+.text-danger {
+  color: #FF116E;
+}
+
+.has-error .help-block {
+  color: #FF116E;
+}
+
+.has-error input {
+  border-color: #FF116E;
+}
+
 .input-middle {
   padding-top: 14px;
   padding-bottom: 14px;

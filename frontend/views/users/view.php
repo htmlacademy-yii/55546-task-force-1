@@ -52,7 +52,7 @@ use app\models\Task;
                         ['class' => 'link-regular']) ?>
                     <?php endforeach; ?>
                 </div>
-                <?php if (!$user->userSettings->is_hidden_contacts
+                <?php if ($isOwner || !$user->userSettings->is_hidden_contacts
                     || $isCustomer
                 ): ?>
                     <h3 class="content-view__h3">Контакты</h3>

@@ -4,7 +4,6 @@ namespace app\models;
 
 use StdClass;
 use Yii;
-use yii\base\Model;
 use yii\db\ActiveQuery;
 use yii\db\ActiveRecord;
 use common\models\User;
@@ -65,6 +64,19 @@ class Task extends ActiveRecord
         }
         FileHelper::createDirectory($pathTaskDir);
         (new TaskFile(['path' => $pathTaskDir]))->setFiles($this->id, $files);
+    }
+
+    /**
+     * Проверка права пользователя на создание сообщения к данному заданию
+     *
+     * @param int $userId идентификатор пользователя
+     *
+     * @return bool резльутат проверки, есть право на создание, или нет
+     */
+    public function getAccessCheckMessageCreate(int $userId): bool
+    {
+        return $this->getIsSelectedExecutor($userId)
+            || $this->getIsAuthor($userId);
     }
 
     /**
@@ -319,11 +331,6 @@ class Task extends ActiveRecord
             ['title', 'string', 'max' => 255],
             ['status', 'in', 'range' => self::getStatusList()],
             [
-                'date_start',
-                'match',
-                'pattern' => '/^\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$/',
-            ],
-            [
                 'date_end',
                 'match',
                 'pattern' => '/^\d{4}-\d{2}-\d{2}( \d{2}:\d{2}:\d{2}$)?$/',
@@ -385,7 +392,6 @@ class Task extends ActiveRecord
                 'longitude' => $model->longitude,
                 'date_end' => $model->dateEnd,
                 'city_id' => $model->cityId,
-                'date_start' => date('Y-m-d h:i:s'),
                 'status' => self::STATUS_NEW,
             ]);
             $task->save();

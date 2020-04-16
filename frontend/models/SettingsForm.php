@@ -20,7 +20,7 @@ class SettingsForm extends Model
     /** @var UploadedFile[] массив со списком фотографий работ пользователя */
     public $files;
     /** @var UploadedFile картинка с аватаром пользователя */
-    public $avatar;
+    private $avatar;
     /** @var string строка с именем пользователя */
     public $name;
     /** @var string строка с почтовым ящиком пользователя */
@@ -49,6 +49,42 @@ class SettingsForm extends Model
     public $notifications = [];
     /** @var array массив со списком настроек пользователя */
     public $settings = [];
+
+    /**
+     * Возвращает массив с файлами работ пользователя
+     *
+     * @return array|null массив с файлами работ пользователя
+     */
+    public function getFiles(): ?array
+    {
+        return $this->files;
+    }
+
+    /**
+     * Устанавливает в модель формы массив с файлами работ пользователя
+     */
+    public function setFiles(): void
+    {
+        $this->files = UploadedFile::getInstancesByName('files');
+    }
+
+    /**
+     * Возвращает аватарку пользователя
+     *
+     * @return UploadedFile|null объект аватарки пользователя
+     */
+    public function getAvatar(): ?UploadedFile
+    {
+        return $this->avatar;
+    }
+
+    /**
+     * Устанавливает в модель формы аватарку пользователя
+     */
+    public function setAvatar(): void
+    {
+        $this->avatar = UploadedFile::getInstance($this, 'avatar');
+    }
 
     /**
      * Получение списка правил валидации для модели

@@ -8,7 +8,6 @@ use app\models\UserSpecialization;
 use common\models\User;
 use Yii;
 use yii\helpers\FileHelper;
-use yii\web\UploadedFile;
 
 /**
  * Класс для работы c разделённым обновлением настроек пользователя
@@ -46,13 +45,13 @@ class UserSettingsHelper
      */
     public function updateFileWorks(string $dir): UserSettingsHelper
     {
-        if ($this->model->files) {
+        if ($files = $this->model->getFiles()) {
             UserPhoto::deleteAll(['user_id' => $this->user->id]);
             if (file_exists($dir)) {
                 FileHelper::removeDirectory($dir);
             }
             FileHelper::createDirectory($dir);
-            (new UserPhoto(['path' => $dir]))->setPhotos($this->model->files);
+            (new UserPhoto(['path' => $dir]))->setPhotos($files);
         }
 
         return $this;
@@ -88,16 +87,14 @@ class UserSettingsHelper
     public function updateUserData(string $dir): UserSettingsHelper
     {
         $userData = $this->user->userData;
-        $this->model->avatar = UploadedFile::getInstance($this->model,
-            'avatar');
-        if ($this->model->avatar) {
+        if ($avatar = $this->model->getAvatar()) {
             $filePath
-                = "{$dir}/{$this->model->avatar->baseName}.{$this->model->avatar->extension}";
+                = "{$dir}/{$avatar->baseName}.{$avatar->extension}";
             if ($userData->avatar && file_exists($userData->avatar)) {
                 unlink($userData->avatar);
             }
 
-            $this->model->avatar->saveAs($filePath);
+            $avatar->saveAs($filePath);
             $userData->avatar = $filePath;
         }
 

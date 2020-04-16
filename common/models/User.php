@@ -7,18 +7,17 @@ use app\models\City;
 use app\models\EventRibbon;
 use app\models\FavoriteExecutor;
 use app\models\Review;
-use app\models\SignupForm;
 use app\models\Task;
 use app\models\UserData;
 use app\models\UserNotifications;
 use app\models\UserPhoto;
 use app\models\UserSettings;
 use app\models\UserSpecialization;
-use src\UserInitHelper\UserInitHelper;
 use Yii;
 use yii\base\NotSupportedException;
 use yii\db\ActiveQuery;
 use yii\db\ActiveRecord;
+use yii\helpers\ArrayHelper;
 use yii\helpers\Url;
 use yii\web\IdentityInterface;
 
@@ -74,6 +73,18 @@ class User extends ActiveRecord implements IdentityInterface
     public function getFavoriteUrl(): string
     {
         return "/users/select-favorite?userId={$this->id}";
+    }
+
+    /**
+     * Проверка, является ли пользователь хозяином профиля
+     *
+     * @param int $userId идентификатор пользователя
+     *
+     * @return bool лоическое значение, является ли пользователь хозяином профиля
+     */
+    public function getIsOwnerProfile(int $userId): bool
+    {
+        return $this->id === $userId;
     }
 
     /**
@@ -490,7 +501,9 @@ class User extends ActiveRecord implements IdentityInterface
      */
     public function updateTaskCounter(bool $result): void
     {
-        $this->userData->updateCounters([$result ? 'success_counter' : 'failing_counter' => 1]);
+        $this->userData->updateCounters([
+            $result ? 'success_counter' : 'failing_counter' => 1,
+        ]);
     }
 
     /**
@@ -507,33 +520,45 @@ class User extends ActiveRecord implements IdentityInterface
     /**
      * Создание нового пользователя в базе данных
      *
-     * @param SignupForm $model модель с данными нового пользователя
+     * @param array $data данные нового пользователя
+     * @param array $dataInit дополнительные данные для инициализации нового пользователя
      *
-     * @return bool результат создания, успех или неудача
+     * @return User|null объект нового созданного пользователя
      */
-    public static function createUser(SignupForm $model): bool
-    {
+    public static function create(
+        array $data,
+        array $dataInit = []
+    ): ?User {
+        $user = null;
         $transaction = Yii::$app->db->beginTransaction();
         try {
-            (new UserInitHelper([
-                'login' => $model->login,
-                'email' => $model->email,
-                'password' => Yii::$app->getSecurity()
-                    ->generatePasswordHash($model->password),
-                'city_id' => $model->cityId,
-                'role' => self::ROLE_CLIENT,
-            ]))
-                ->initNotifications()
-                ->initSettings()
-                ->initUserData();
-
+            $user = new self($data);
+            $user->save();
+            (new UserData(ArrayHelper::merge([
+                'user_id' => $user->id,
+                'description' => '',
+                'other_messenger' => '',
+                'avatar' => '',
+                'views' => 0,
+                'success_counter' => 0,
+                'failing_counter' => 0,
+            ], $dataInit['data'] ?? [])))->save();
+            (new UserNotifications(ArrayHelper::merge([
+                'user_id' => $user->id,
+                'is_new_message' => 0,
+                'is_task_actions' => 0,
+                'is_new_review' => 0,
+            ], $dataInit['notifications'] ?? [])))->save();
+            (new UserSettings(ArrayHelper::merge([
+                'user_id' => $user->id,
+                'is_hidden_contacts' => 0,
+                'is_hidden_profile' => 0,
+            ], $dataInit['settings'] ?? [])))->save();
             $transaction->commit();
-
-            return true;
         } catch (\Exception $e) {
             $transaction->rollBack();
         }
 
-        return false;
+        return $user;
     }
 }

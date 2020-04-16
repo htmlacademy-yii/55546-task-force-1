@@ -5,7 +5,7 @@ use yii\bootstrap\ActiveForm;
 use yii\helpers\Html;
 
 $fieldConfig = [
-    'template' => '{label}{input}{hint}',
+    'template' => '{label}{input}{error}{hint}',
     'options' => ['tag' => false],
 ];
 $labels = $model->attributeLabels();
@@ -27,22 +27,28 @@ TaskCreateAsset::register($this);
         ]);
         echo $form->field($model, 'title', $fieldConfig)
             ->textarea([
-                'class' => 'input textarea',
+                'class' => 'input textarea '.($model->hasErrors('title')
+                        ? 'field-danger' : ''),
                 'rows' => 1,
                 'placeholder' => 'Повесить полку',
-            ])->hint('<span>Кратко опишите суть работы</span>');
+            ])->hint('<span>Кратко опишите суть работы</span>')
+            ->error(['class' => 'text-danger']);
         echo $form->field($model, 'description', $fieldConfig)
             ->textarea([
-                'class' => 'input textarea',
+                'class' => 'input textarea '.($model->hasErrors('description')
+                        ? 'field-danger' : ''),
                 'rows' => 7,
                 'placeholder' => 'Place your text',
             ])
-            ->hint('<span>Укажите все пожелания и детали, чтобы исполнителям было проще соориентироваться</span>');
+            ->hint('<span>Укажите все пожелания и детали, чтобы исполнителям было проще соориентироваться</span>')
+            ->error(['class' => 'text-danger']);
         echo $form->field($model, 'categoryId', $fieldConfig)
             ->dropDownList($categories, [
-                'class' => 'multiple-select input multiple-select-big',
+                'class' => 'multiple-select input multiple-select-big '
+                    .($model->hasErrors('categoryId') ? 'field-danger' : ''),
                 'size' => 1,
-            ])->hint('<span>Выберите категорию</span>');
+            ])->hint('<span>Выберите категорию</span>')
+            ->error(['class' => 'text-danger']);
         ?>
         <label>Файлы</label>
         <span>Загрузите файлы, которые помогут исполнителю лучше выполнить или оценить работу</span>
@@ -51,30 +57,37 @@ TaskCreateAsset::register($this);
         </div>
         <?= $form->field($model, 'location', $fieldConfig)
             ->input('search', [
-                'class' => 'input-navigation input-middle input',
+                'class' => 'input-navigation input-middle input '
+                    .($model->hasErrors('location') ? 'field-danger' : ''),
                 'list' => 'cities-list',
                 'placeholder' => 'Санкт-Петербург, Калининский район',
                 'id' => 'autoComplete',
             ])
-            ->hint('<span>Укажите адрес исполнения, если задание требует присутствия</span>') ?>
+            ->hint('<span>Укажите адрес исполнения, если задание требует присутствия</span>')
+            ->error(['class' => 'text-danger']); ?>
         <datalist id="cities-list"></datalist>
 
         <div class="create__price-time">
             <div class="create__price-time--wrapper">
                 <?= $form->field($model, 'price', $fieldConfig)
                     ->textarea([
-                        'class' => 'input textarea input-money',
+                        'class' => 'input textarea input-money '
+                            .($model->hasErrors('price') ? 'field-danger' : ''),
                         'rows' => 1,
                         'placeholder' => '1000',
                     ])
-                    ->hint('<span>Не заполняйте для оценки исполнителем</span>') ?>
+                    ->hint('<span>Не заполняйте для оценки исполнителем</span>')
+                    ->error(['class' => 'text-danger']); ?>
             </div>
             <div class="create__price-time--wrapper">
                 <?= $form->field($model, 'dateEnd', $fieldConfig)
                     ->input('date', [
-                        'class' => 'input-middle input input-date',
+                        'class' => 'input-middle input input-date '
+                            .($model->hasErrors('dateEnd') ? 'field-danger'
+                                : ''),
                         'placeholder' => '10.11, 15:00',
-                    ])->hint('<span>Укажите крайний срок исполнения</span>') ?>
+                    ])->hint('<span>Укажите крайний срок исполнения</span>')
+                    ->error(['class' => 'text-danger']); ?>
             </div>
         </div>
         <?php ActiveForm::end() ?>
