@@ -331,11 +331,6 @@ class Task extends ActiveRecord
             ['title', 'string', 'max' => 255],
             ['status', 'in', 'range' => self::getStatusList()],
             [
-                'date_start',
-                'match',
-                'pattern' => '/^\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$/',
-            ],
-            [
                 'date_end',
                 'match',
                 'pattern' => '/^\d{4}-\d{2}-\d{2}( \d{2}:\d{2}:\d{2}$)?$/',
@@ -397,7 +392,6 @@ class Task extends ActiveRecord
                 'longitude' => $model->longitude,
                 'date_end' => $model->dateEnd,
                 'city_id' => $model->cityId,
-                'date_start' => date('Y-m-d h:i:s'),
                 'status' => self::STATUS_NEW,
             ]);
             $task->save();

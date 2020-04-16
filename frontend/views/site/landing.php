@@ -132,7 +132,8 @@ $fieldConfig = ['template' => "<p>{label}{input}{error}</p>"];
         'errorSummaryCssClass' => 'text-danger',
     ]); ?>
 
-    <?= $form->errorSummary($model, ['header' => 'Вы ввели неверный email/пароль']); ?>
+    <?= $form->errorSummary($model,
+        ['header' => 'Вы ввели неверный email/пароль']); ?>
 
     <?= $form->field($model, 'email', $fieldConfig)
         ->input('email', [

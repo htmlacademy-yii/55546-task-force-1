@@ -50,6 +50,7 @@ return [
         'formatter' => [
             'class' => Formatter::class,
             'language' => 'ru-RU',
+            'defaultTimeZone' => 'Asia/Novosibirsk',
         ],
         'cache' => [
             'class' => Cache::class,

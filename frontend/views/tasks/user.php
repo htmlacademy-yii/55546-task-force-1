@@ -26,8 +26,9 @@ use yii\helpers\Html;
                 <span class="last-"><?= $user->ordersCount; ?> заказов</span>
             <?php else: ?>
                 <span><?= count($user->tasks); ?> заданий</span>
-                <span
-                    class="last-"><?= Yii::$app->formatter->asRelativeTime($user->date_registration); ?> на сайте</span>
+                <span class="last-">c
+                    <?= explode(' ',
+                        $user->date_registration)[0]; ?> на сайте</span>
             <?php endif; ?>
         </p>
         <?php if ($isShowExecutor): ?>

@@ -92,7 +92,7 @@ $this->beginPage();
         </div>
     </header>
     <main><?= $content; ?></main>
-    <?= $this->render('footer', ['user' => Yii::$app->user->identity]); ?>
+    <?= $this->render('footer', ['user' => $this->context->user]); ?>
 </div>
 <?php $this->endBody(); ?>
 </body>
