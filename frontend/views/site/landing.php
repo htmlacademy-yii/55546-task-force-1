@@ -96,7 +96,8 @@ $fieldConfig = ['template' => "<p>{label}{input}{error}</p>"];
                         <h3><?= Html::a(Html::encode($task->title ?? ''),
                                 $task->getCurrentTaskUrl(),
                                 ['class' => 'link-regular']) ?></h3>
-                        <p><?= StringHelper::truncate(Html::encode($task->description ?? ''),50,'...'); ?></p>
+                        <p><?= StringHelper::truncate(Html::encode($task->description
+                                ?? ''), 50, '...'); ?></p>
                     </div>
                     <div class="landing-task-info">
                         <div class="task-info-left">

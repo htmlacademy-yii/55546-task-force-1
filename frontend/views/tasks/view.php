@@ -94,7 +94,8 @@ TaskViewAsset::register($this);
                     'data-for' => 'canceled-form',
                 ]);
             }
-            if (!$isAuthor && $user->getIsExecutor() && $task->getIsUserRespond($user->id)
+            if (!$isAuthor && $user->getIsExecutor()
+                && $task->getIsUserRespond($user->id)
                 && $task->getIsSelectedExecutor($user->id)
             ) {
                 echo Html::button('Отказаться', [
@@ -102,7 +103,9 @@ TaskViewAsset::register($this);
                     'data-for' => 'refuse-form',
                 ]);
             }
-            if (!$isAuthor && $user->getIsExecutor() && !$task->getIsUserRespond($user->id)) {
+            if (!$isAuthor && $user->getIsExecutor()
+                && !$task->getIsUserRespond($user->id)
+            ) {
                 echo Html::button('Откликнуться', [
                     'class' => 'button button__big-color response-button open-modal',
                     'data-for' => 'response-form',
