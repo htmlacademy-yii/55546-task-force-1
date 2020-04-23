@@ -1,7 +1,7 @@
 <?php
 
+use src\UrlHelper\UrlHelper;
 use yii\helpers\Html;
-use app\models\Task;
 
 $task = $model;
 ?>
@@ -9,10 +9,11 @@ $task = $model;
 <div class="new-task__card">
     <div class="new-task__title">
         <?= Html::a("<h2>".Html::encode($task->title ?? '')."</h2>",
-            $task->getCurrentTaskUrl(), ['class' => 'link-regular']); ?>
+            UrlHelper::createTaskUrl($task->id),
+            ['class' => 'link-regular']); ?>
         <?php if ($task->category): ?>
             <?= Html::a("<p>".Html::encode($task->category->title)."</p>",
-                Task::getUrlTasksByCategory($task->category->id),
+                UrlHelper::createTaskUrlByCategory($task->category->id),
                 ['class' => 'new-task__type link-regular']); ?>
         <?php endif; ?>
     </div>

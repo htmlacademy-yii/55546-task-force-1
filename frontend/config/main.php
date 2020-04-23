@@ -6,13 +6,15 @@ use yii\swiftmailer\Mailer;
 use yii\rest\UrlRule;
 use frontend\controllers\TasksController;
 use frontend\controllers\SettingsController;
-use common\models\User;
+
 use yii\authclient\clients\VKontakte;
 use yii\authclient\Collection;
 use yii\redis\Cache;
 use yii\i18n\Formatter;
 use frontend\modules\v1\Module;
 use yii\web\UrlManager;
+use yii\web\User;
+use common\models\User as UserIdentity;
 
 $params = array_merge(
     require __DIR__.'/../../common/config/params.php',
@@ -22,6 +24,7 @@ $params = array_merge(
 );
 
 return [
+    'language' => 'ru-RU',
     'timeZone' => 'UTC',
     'id' => 'app-frontend',
     'basePath' => dirname(__DIR__),
@@ -78,7 +81,7 @@ return [
             ],
         ],
         'user' => [
-            'identityClass' => User::class,
+            'identityClass' => UserIdentity::class,
             'enableAutoLogin' => true,
             'identityCookie' => [
                 'name' => '_identity-frontend',
@@ -131,6 +134,9 @@ return [
             ],
             TasksController::class => [
                 'tasksPath' => 'users-files/tasks',
+            ],
+            User::class => [
+                'loginUrl' => ['/'],
             ],
         ],
     ],

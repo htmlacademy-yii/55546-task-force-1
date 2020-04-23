@@ -1,10 +1,10 @@
 <?php
 
+use src\UrlHelper\UrlHelper;
 use yii\helpers\StringHelper;
 use yii\helpers\Url;
 use yii\widgets\ActiveForm;
 use yii\helpers\Html;
-use app\models\Task;
 use yii\authclient\widgets\AuthChoice;
 
 $this->title = 'Главная страница сайта TaskForce';
@@ -21,7 +21,7 @@ $fieldConfig = ['template' => "<p>{label}{input}{error}</p>"];
             У нас вы быстро найдёте исполнителя для любой жизненной
             ситуации?<br>
             Быстро, безопасно и с гарантией. Просто, как раз, два, три. </p>
-        <?= Html::button('Создать аккаунт', ['class' => 'button']) ?>
+        <?= Html::a('Создать аккаунт', '/site/signup', ['class' => 'button']) ?>
     </div>
     <div class="landing-center">
         <div class="landing-instruction">
@@ -94,7 +94,7 @@ $fieldConfig = ['template' => "<p>{label}{input}{error}</p>"];
                     <?php endif; ?>
                     <div class="landing-task-description">
                         <h3><?= Html::a(Html::encode($task->title ?? ''),
-                                $task->getCurrentTaskUrl(),
+                                UrlHelper::createTaskUrl($task->id),
                                 ['class' => 'link-regular']) ?></h3>
                         <p><?= StringHelper::truncate(Html::encode($task->description
                                 ?? ''), 50, '...'); ?></p>
@@ -103,7 +103,7 @@ $fieldConfig = ['template' => "<p>{label}{input}{error}</p>"];
                         <div class="task-info-left">
                             <?php if ($task->category): ?>
                                 <p><?= Html::a(Html::encode($task->category->title),
-                                        Task::getUrlTasksByCategory($task->category->id),
+                                        UrlHelper::createTaskUrlByCategory($task->category->id),
                                         ['class' => 'link-regular']) ?></p>
                             <?php endif; ?>
                             <p><?= $task->date_start
@@ -118,7 +118,7 @@ $fieldConfig = ['template' => "<p>{label}{input}{error}</p>"];
             <?php endforeach; ?>
         </div>
         <div class="landing-bottom-container">
-            <?= Html::a('смотреть все задания', Task::getBaseTasksUrl(),
+            <?= Html::a('смотреть все задания', UrlHelper::getBaseTasksUrl(),
                 ['class' => 'button red-button']); ?>
         </div>
     </div>

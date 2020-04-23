@@ -69,4 +69,16 @@ class UserData extends ActiveRecord
             ],
         ];
     }
+
+    /**
+     * Обновляет счетчики заданий, в соответствии со статусом их выполненности
+     *
+     * @param bool $result результат выволненнения задания
+     */
+    public function updateTaskCounter(bool $result): void
+    {
+        $this->updateCounters([
+            $result ? 'success_counter' : 'failing_counter' => 1,
+        ]);
+    }
 }

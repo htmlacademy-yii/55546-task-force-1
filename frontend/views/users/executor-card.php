@@ -1,8 +1,7 @@
 <?php
 
+use src\UrlHelper\UrlHelper;
 use yii\helpers\Html;
-use app\models\Task;
-use common\models\User;
 
 $executor = $model;
 
@@ -12,14 +11,14 @@ $executor = $model;
     <div class="feedback-card__top">
         <div class="user__search-icon">
             <?= Html::a("<img src='{$executor->userData->getAvatar()}' width='65' height='65'>",
-                User::getUserUrl((int)$executor->id)); ?>
+                UrlHelper::createUserUrl($executor->id)); ?>
             <span><?= $executor->ordersCount ?? 0; ?> заданий</span>
             <span><?= $executor->reviewsCount ?? 0; ?> отзывов</span>
         </div>
         <div class="feedback-card__top--name user__search-card">
             <p class="link-name">
                 <?= Html::a(Html::encode($executor->login ?? ''),
-                    User::getUserUrl((int)$executor->id),
+                    UrlHelper::createUserUrl($executor->id),
                     ['class' => 'link-regular']); ?>
             </p>
 
@@ -43,7 +42,7 @@ $executor = $model;
             <?php foreach ($executor->userSpecializations as $specialization):
                 ?>
                 <?= Html::a(Html::encode($specialization->title),
-                Task::getUrlTasksByCategory((int)$specialization->id),
+                UrlHelper::createTaskUrlByCategory($specialization->id),
                 ['class' => 'link-regular']); ?>
             <?php endforeach; ?>
         </div>

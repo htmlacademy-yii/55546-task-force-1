@@ -1,4 +1,5 @@
 (() => {
+  const photoBlock = document.querySelector(`#photo-block`);
   const btn = document.querySelector(`#submit-btn`);
   const files = [];
 
@@ -19,5 +20,10 @@
     previewTemplate: '<a href="#"><img data-dz-thumbnail alt="Фото работы"></a>',
   });
 
-  dropzone.on("addedfile", file => files.push(file));
+  dropzone.on("addedfile", file => {
+    files.push(file);
+    if(photoBlock) {
+      photoBlock.style.display = `none`;
+    }
+  });
 })();

@@ -1,6 +1,8 @@
 <?php
 
+use src\UrlHelper\UrlHelper;
 use yii\helpers\Html;
+use yii\helpers\Url;
 
 ?>
 <footer class="page-footer">
@@ -23,7 +25,8 @@ use yii\helpers\Html;
                 </li>
                 <li class="links__item">
                     <?= Html::a('Мой профиль',
-                        '/users/view/'.($user ? $user->id : '')); ?>
+                        ($user ? UrlHelper::createUserUrl($user->id)
+                            : Url::to('/'))); ?>
                 </li>
                 <li class="links__item">
                     <?= Html::a('Исполнители', '/users'); ?>
@@ -31,9 +34,11 @@ use yii\helpers\Html;
                 <li class="links__item">
                     <?= Html::a('Регистрация', '/site/signup'); ?>
                 </li>
-                <li class="links__item">
-                    <?= Html::a('Создать задание', '/tasks/create'); ?>
-                </li>
+                <?php if ($user && !$user->getIsExecutor()): ?>
+                    <li class="links__item">
+                        <?= Html::a('Создать задание', '/tasks/create'); ?>
+                    </li>
+                <?php endif; ?>
                 <li class="links__item">
                     <?= Html::a('Справка', '/'); ?>
                 </li>

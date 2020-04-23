@@ -42,6 +42,21 @@ class ExecutorSearchForm extends Model
             self::ADDITIONALLY_FAVORITES => 'В избранном',
         ];
 
+    /** @var string тип сортировки по рейтингу */
+    public const SORT_TYPE_RATING = 'rating';
+    /** @var string тип сортировки по заказам */
+    public const SORT_TYPE_ORDERS = 'orders';
+    /** @var string тип сортировки по популярности */
+    public const SORT_TYPE_POPULARITY = 'popularity';
+
+    /** @var array массиво со списком типов сортировки */
+    public const SORT_TYPE_LIST
+        = [
+            self::SORT_TYPE_RATING => 'Рейтингу',
+            self::SORT_TYPE_ORDERS => 'Числу заказов',
+            self::SORT_TYPE_POPULARITY => 'Популярности',
+        ];
+
     /**
      * Проверяет, отмечена ли категория с указанным идентификатором
      *
@@ -123,9 +138,31 @@ class ExecutorSearchForm extends Model
     }
 
     /**
+     * Формирование базового запроса по списку исполнителей
+     *
+     * @param ActiveQuery $query ссылка на объект запроса
+     */
+    public function initQuery(ActiveQuery &$query): void
+    {
+        $query
+            ->joinWith('userData')
+            ->joinWith('userSettings')
+            ->joinWith('userSpecializations')
+            ->where([
+                'user.role' => User::ROLE_EXECUTOR,
+                'user_settings.is_hidden_profile' => false,
+            ])->groupBy([
+                'user.id',
+                'user_data.avatar',
+                'user_data.description',
+                'user_data.views',
+            ]);
+    }
+
+    /**
      * Применение фильтра для списка исполнителей
      *
-     * @param ActiveQuery $query ссылка на объект
+     * @param ActiveQuery $query ссылка на объект запроса
      */
     public function applyFilters(ActiveQuery &$query): void
     {
@@ -165,15 +202,15 @@ class ExecutorSearchForm extends Model
     /**
      * Применение сортировки к списку исполнителей
      *
-     * @param ActiveQuery $query
-     * @param string      $sort
+     * @param ActiveQuery $query ссылка на объект запроса
+     * @param string      $sort  тип сортировки
      */
     public function applySort(ActiveQuery &$query, string $sort): void
     {
         $query->orderBy(ArrayHelper::getValue([
-            User::SORT_TYPE_RATING => '(SELECT AVG(rating) FROM review WHERE review.executor_id = user.id) DESC',
-            User::SORT_TYPE_ORDERS => '(SELECT COUNT(*) FROM task WHERE task.executor_id = user.id) DESC',
-            User::SORT_TYPE_POPULARITY => 'user_data.views DESC',
+            self::SORT_TYPE_RATING => '(SELECT AVG(rating) FROM review WHERE review.executor_id = user.id) DESC',
+            self::SORT_TYPE_ORDERS => '(SELECT COUNT(*) FROM task WHERE task.executor_id = user.id) DESC',
+            self::SORT_TYPE_POPULARITY => 'user_data.views DESC',
         ], $sort, 'user.date_registration DESC'));
     }
 }
