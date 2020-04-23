@@ -46,14 +46,9 @@ class SettingsController extends SecuredController
             && $model->load(Yii::$app->request->post())
             && $model->validate()
         ) {
-            (new UserSettingsHelper($model, $user))
-                ->updateFileWorks("$this->photosPath/$user->id")
-                ->updateUser()
-                ->updateUserData($this->avatarsPath)
-                ->updateUserNotifications()
-                ->updateUserSettings()
-                ->updateUserSpecializations()
-                ->updateUserRole();
+            $settingsHelper = new UserSettingsHelper($model, $user);
+            $settingsHelper->updateFileWorks("$this->photosPath/$user->id");
+            $settingsHelper->updateUserData($this->avatarsPath);
         }
 
         return $this->render('index', [

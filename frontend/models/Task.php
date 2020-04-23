@@ -8,8 +8,6 @@ use yii\db\ActiveQuery;
 use yii\db\ActiveRecord;
 use common\models\User;
 use yii\helpers\FileHelper;
-use yii\helpers\Url;
-use yii\validators\RangeValidator;
 
 /**
  * Класс для работы с моделью заданий
@@ -122,31 +120,6 @@ class Task extends ActiveRecord
     }
 
     /**
-     * Получение статусов заданий которые должны быть видны на странице данной категории
-     *
-     * @param string $category строка с категорией
-     *
-     * @return array|null
-     */
-    public static function getStatusByCategory(string $category): ?array
-    {
-        if (!empty($category)
-            && !(new RangeValidator(['range' => self::getStatusList()]))->validate($category)
-        ) {
-            return null;
-        }
-
-        $status = self::getStatusList();
-        if (!empty($category)) {
-            $status = ($category === self::STATUS_CANCELED
-                || $category === self::STATUS_FAILING) ?
-                [self::STATUS_CANCELED, self::STATUS_FAILING] : [$category];
-        }
-
-        return $status;
-    }
-
-    /**
      * Получение данных локации задания через яндекс карты
      *
      * @return StdClass|null
@@ -159,20 +132,6 @@ class Task extends ActiveRecord
             ? Yii::$container->get('yandexMap')
                 ->getAddressByPositions($this->latitude, $this->longitude)
             : null;
-    }
-
-    /**
-     * Получение название имени файла без лишнего текта
-     *
-     * @param string $fileName строка с адресом файла
-     *
-     * @return string строка с именем файла
-     */
-    public function getCorrectFileName(string $fileName): string
-    {
-        $arr = explode('/', $fileName);
-
-        return end($arr);
     }
 
     /**
@@ -246,16 +205,6 @@ class Task extends ActiveRecord
     }
 
     /**
-     * Получение строки с ссылкой на страницу данного задания
-     *
-     * @return string строка с ссылкой на страницу данного задания
-     */
-    public function getCurrentTaskUrl(): string
-    {
-        return Url::to("/tasks/view/$this->id");
-    }
-
-    /**
      * Получение массива со списком всех статусов доступных для заданий
      *
      * @return array массив со списком всех статусов доступных для заданий
@@ -270,28 +219,6 @@ class Task extends ActiveRecord
             self::STATUS_FAILING,
             self::STATUS_EXPIRED,
         ];
-    }
-
-    /**
-     * Получение строки с ссылкой на страницу со списком заданий
-     *
-     * @return string
-     */
-    public static function getBaseTasksUrl(): string
-    {
-        return Url::to('/tasks');
-    }
-
-    /**
-     * Получение строки с ссылкой на страницу со списком заданий отфильтрованных по указанной категории
-     *
-     * @param int $categoryId категория для фильтрации заданий
-     *
-     * @return string строка с ссылкой на страницу со списком отфильтрованных заданий
-     */
-    public static function getUrlTasksByCategory(int $categoryId): string
-    {
-        return Url::to("/tasks?filter[categories][]=$categoryId");
     }
 
     /**

@@ -25,11 +25,19 @@ class UserSettingsHelper
      *
      * @param SettingsForm $model объект модели формы с валиднами данными
      * @param User         $user  объект текущего пользователя
+     *
+     * @throws \yii\base\Exception
      */
     public function __construct(SettingsForm $model, User $user)
     {
         $this->model = $model;
         $this->user = $user;
+
+        $this->updateUser();
+        $this->updateUserNotifications();
+        $this->updateUserSettings();
+        $this->updateUserSpecializations();
+        $this->updateUserRole();
     }
 
     /**
@@ -37,13 +45,12 @@ class UserSettingsHelper
      *
      * @param string $dir строка с адресом директории для сохранения фотографий
      *
-     * @return UserSettingsHelper текущий экземпляр класса помошника
      * @throws \yii\base\ErrorException
      * @throws \yii\base\Exception
      * @throws \yii\db\Exception
      * @throws \yii\web\ServerErrorHttpException
      */
-    public function updateFileWorks(string $dir): UserSettingsHelper
+    public function updateFileWorks(string $dir): void
     {
         if ($files = $this->model->getFiles()) {
             UserPhoto::deleteAll(['user_id' => $this->user->id]);
@@ -53,28 +60,6 @@ class UserSettingsHelper
             FileHelper::createDirectory($dir);
             (new UserPhoto(['path' => $dir]))->setPhotos($files);
         }
-
-        return $this;
-    }
-
-    /**
-     * Обновления основной информации пользователя
-     *
-     * @return UserSettingsHelper текущий экземпляр класса помошника
-     * @throws \yii\base\Exception
-     */
-    public function updateUser(): UserSettingsHelper
-    {
-        $this->user->login = $this->model->name;
-        $this->user->email = $this->model->email;
-        $this->user->city_id = $this->model->cityId;
-        if (!empty($this->model->password)) {
-            $this->user->password = Yii::$app->getSecurity()
-                ->generatePasswordHash($this->model->password);
-        }
-        $this->user->save();
-
-        return $this;
     }
 
     /**
@@ -82,16 +67,16 @@ class UserSettingsHelper
      *
      * @param string $dir строка с адресом директории для сохранения аватарки пользователя
      *
-     * @return UserSettingsHelper текущий экземпляр класса помошника
+     * @throws \yii\base\ErrorException
      */
-    public function updateUserData(string $dir): UserSettingsHelper
+    public function updateUserData(string $dir): void
     {
         $userData = $this->user->userData;
         if ($avatar = $this->model->getAvatar()) {
             $filePath
                 = "{$dir}/{$avatar->baseName}.{$avatar->extension}";
             if ($userData->avatar && file_exists($userData->avatar)) {
-                unlink($userData->avatar);
+                FileHelper::removeDirectory($userData->avatar);
             }
 
             $avatar->saveAs($filePath);
@@ -104,16 +89,29 @@ class UserSettingsHelper
         $userData->skype = $this->model->skype;
         $userData->other_messenger = $this->model->otherMessenger;
         $userData->save();
+    }
 
-        return $this;
+    /**
+     * Обновления основной информации пользователя
+     *
+     * @throws \yii\base\Exception
+     */
+    private function updateUser(): void
+    {
+        $this->user->login = $this->model->name;
+        $this->user->email = $this->model->email;
+        $this->user->city_id = $this->model->cityId;
+        if (!empty($this->model->password)) {
+            $this->user->password = Yii::$app->getSecurity()
+                ->generatePasswordHash($this->model->password);
+        }
+        $this->user->save();
     }
 
     /**
      * Обновление активных уведомлений пользователя
-     *
-     * @return UserSettingsHelper текущий экземпляр класса помошника
      */
-    public function updateUserNotifications(): UserSettingsHelper
+    private function updateUserNotifications(): void
     {
         $userNotifications = $this->user->userNotifications;
         $userNotifications->is_new_message
@@ -123,16 +121,12 @@ class UserSettingsHelper
         $userNotifications->is_new_review
             = (bool)$this->model->notifications['new-review'];
         $userNotifications->save();
-
-        return $this;
     }
 
     /**
      * Обновление настроек пользователя
-     *
-     * @return UserSettingsHelper текущий экземпляр класса помошника
      */
-    public function updateUserSettings(): UserSettingsHelper
+    private function updateUserSettings(): void
     {
         $userSettings = $this->user->userSettings;
         $userSettings->is_hidden_contacts
@@ -140,17 +134,14 @@ class UserSettingsHelper
         $userSettings->is_hidden_profile
             = (bool)$this->model->settings['hidden-profile'];
         $userSettings->save();
-
-        return $this;
     }
 
     /**
      * Обновление специализаций пользователя
      *
-     * @return UserSettingsHelper текущий экземпляр класса помошника
      * @throws \yii\db\Exception
      */
-    public function updateUserSpecializations(): UserSettingsHelper
+    private function updateUserSpecializations(): void
     {
         $specializations = is_array($this->model->specializations)
             ? $this->model->specializations : [];
@@ -160,23 +151,17 @@ class UserSettingsHelper
                 array_map(function ($id) {
                     return [$this->user->id, $id];
                 }, $specializations))->execute();
-
-        return $this;
     }
 
     /**
      * Обновление роли пользователя
-     *
-     * @return UserSettingsHelper текущий экземпляр класса помошника
      */
-    public function updateUserRole(): UserSettingsHelper
+    private function updateUserRole(): void
     {
         $specializations = is_array($this->model->specializations)
             ? $this->model->specializations : [];
         $this->user->role = empty($specializations) ? User::ROLE_CLIENT
             : User::ROLE_EXECUTOR;
         $this->user->save();
-
-        return $this;
     }
 }

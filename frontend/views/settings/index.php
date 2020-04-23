@@ -148,6 +148,15 @@ ProfileAsset::register($this);
             ])->label(false)->error(['class' => 'text-danger']); ?>
         </div>
 
+        <?php if ($user->photos): ?>
+            <div id="photo-block">
+                <?php foreach ($user->photos as $item): ?>
+                    <img src="<?= $item->photo; ?>"
+                         style="width: 120px; height: 120px;">
+                <?php endforeach; ?>
+            </div>
+        <?php endif; ?>
+
         <h3 class="div-line">Контакты</h3>
         <div class="account__redaction-section-wrapper account__redaction">
             <div class="account__input">

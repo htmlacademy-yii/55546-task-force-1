@@ -6,6 +6,7 @@ use app\models\Category;
 use app\models\ExecutorSearchForm;
 use app\models\FavoriteExecutor;
 use common\models\User;
+use src\UrlHelper\UrlHelper;
 use Yii;
 use yii\web\NotFoundHttpException;
 use yii\data\ActiveDataProvider;
@@ -29,21 +30,9 @@ class UsersController extends SecuredController
      */
     public function actionIndex(string $sort = ''): string
     {
-        $query = User::find()
-            ->joinWith('userData')
-            ->joinWith('userSettings')
-            ->joinWith('userSpecializations')
-            ->where([
-                'user.role' => User::ROLE_EXECUTOR,
-                'user_settings.is_hidden_profile' => false,
-            ])->groupBy([
-                'user.id',
-                'user_data.avatar',
-                'user_data.description',
-                'user_data.views',
-            ]);
-
+        $query = User::find();
         $model = new ExecutorSearchForm();
+        $model->initQuery($query);
         if (Yii::$app->request->get('ExecutorSearchForm')
             && $model->load(Yii::$app->request->get())
             && $model->validate()
@@ -57,7 +46,7 @@ class UsersController extends SecuredController
             'model' => $model,
             'selectedSort' => $sort,
             'additionallyList' => ExecutorSearchForm::ADDITIONALLY_LIST,
-            'sortList' => User::SORT_TYPE_LIST,
+            'sortList' => ExecutorSearchForm::SORT_TYPE_LIST,
             'dataProvider' => new ActiveDataProvider([
                 'query' => $query,
                 'pagination' => [
@@ -107,6 +96,6 @@ class UsersController extends SecuredController
         FavoriteExecutor::toggleUserFavorite(Yii::$app->user->identity->id,
             $userId);
 
-        return $this->redirect(User::getUserUrl($userId));
+        return $this->redirect(UrlHelper::createUserUrl($userId));
     }
 }

@@ -6,7 +6,8 @@ use app\models\RespondForm;
 use app\models\TaskCompletionForm;
 use app\models\TaskCreate;
 use app\models\TaskRespond;
-use src\TaskHelper\TaskHelper;
+use src\ActionTaskHelper\ActionTaskHelper;
+use src\UrlHelper\UrlHelper;
 use Yii;
 use yii\bootstrap\ActiveForm;
 use yii\data\ActiveDataProvider;
@@ -49,7 +50,7 @@ class TasksController extends SecuredController
                 return $user && $user->getIsExecutor();
             },
             'denyCallback' => function ($rule, $action) {
-                return $action->controller->redirect(Task::getBaseTasksUrl());
+                return $action->controller->redirect(UrlHelper::getBaseTasksUrl());
             },
         ];
 
@@ -153,10 +154,10 @@ class TasksController extends SecuredController
         if ($model->load(Yii::$app->request->post()) && $model->validate()
             && $task = Task::findOne($taskId)
         ) {
-            TaskHelper::completion($task, $model);
+            ActionTaskHelper::completion($task, $model);
         }
 
-        return $this->redirect(Task::getBaseTasksUrl());
+        return $this->redirect(UrlHelper::getBaseTasksUrl());
     }
 
     /**
@@ -176,10 +177,10 @@ class TasksController extends SecuredController
                 'user_id' => Yii::$app->user->id,
             ])
         ) {
-            TaskHelper::refusal($task, $respond);
+            ActionTaskHelper::refusal($task, $respond);
         }
 
-        return $this->redirect(Task::getBaseTasksUrl());
+        return $this->redirect(UrlHelper::getBaseTasksUrl());
     }
 
     /**
@@ -195,10 +196,10 @@ class TasksController extends SecuredController
         if ($model->load(Yii::$app->request->post()) && $model->validate()
             && $task = Task::findOne($taskId)
         ) {
-            TaskHelper::respond($task, $model);
+            ActionTaskHelper::respond($task, $model);
         }
 
-        return $this->redirect(Task::getBaseTasksUrl());
+        return $this->redirect(UrlHelper::getBaseTasksUrl());
     }
 
     /**
@@ -212,15 +213,15 @@ class TasksController extends SecuredController
     public function actionDecision(int $respondId, string $status): Response
     {
         if (!$respond = TaskRespond::findOne($respondId)) {
-            return $this->redirect(Task::getBaseTasksUrl());
+            return $this->redirect(UrlHelper::getBaseTasksUrl());
         }
 
         $task = Task::findOne($respond->task_id);
         if (Yii::$app->user->identity->id === $task->author_id) {
-            TaskHelper::decision($task, $respond, $status);
+            ActionTaskHelper::decision($task, $respond, $status);
         }
 
-        return $this->redirect($task->getCurrentTaskUrl());
+        return $this->redirect(UrlHelper::createTaskUrl($task->id));
     }
 
     /**
@@ -241,7 +242,7 @@ class TasksController extends SecuredController
 
         $task->actionCancel();
 
-        return $this->redirect(Task::getBaseTasksUrl());
+        return $this->redirect(UrlHelper::getBaseTasksUrl());
     }
 
     /**
@@ -263,7 +264,7 @@ class TasksController extends SecuredController
             && $model->validate()
             && Task::create($model, $this->tasksPath)
         ) {
-            $this->redirect(Task::getBaseTasksUrl());
+            $this->redirect(UrlHelper::getBaseTasksUrl());
         }
 
         return $this->render('create', [

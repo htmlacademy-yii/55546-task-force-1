@@ -1,7 +1,7 @@
 <?php
 
+use src\UrlHelper\UrlHelper;
 use yii\helpers\Html;
-use app\models\Task;
 
 ?>
 <section class="content-view">
@@ -33,7 +33,8 @@ use app\models\Task;
                 <?php if ($user->last_activity): ?>
                     <span>Был на сайте <?= Yii::$app->formatter->asRelativeTime($user->last_activity); ?></span>
                 <?php endif; ?>
-                <?= Html::a('<b></b>', $user->getFavoriteUrl()); ?>
+                <?= Html::a('<b></b>',
+                    "/users/select-favorite?userId={$user->id}"); ?>
             </div>
         </div>
         <div class="content-view__description">
@@ -48,7 +49,7 @@ use app\models\Task;
                     ):
                         ?>
                         <?= Html::a(Html::encode($specialization->title),
-                        Task::getUrlTasksByCategory($specialization->id),
+                        UrlHelper::createTaskUrlByCategory($specialization->id),
                         ['class' => 'link-regular']) ?>
                     <?php endforeach; ?>
                 </div>
@@ -88,14 +89,14 @@ use app\models\Task;
                     <div class="feedback-card__reviews">
                         <p class="link-task link">Задание
                             «<?= Html::a(Html::encode($review->task->title),
-                                $review->task->getCurrentTaskUrl(),
+                                UrlHelper::createTaskUrl($review->task->id),
                                 ['class' => 'link-regular']); ?>»</p>
                         <div class="card__review">
                             <?= Html::a("<img src='{$review->author->userData->getAvatar()}' width='55' height='54'>",
-                                $review->author->getCurrentUserUrl()); ?>
+                                UrlHelper::createUserUrl($review->author->id)); ?>
                             <div class="feedback-card__reviews-content">
                                 <p class="link-name link"><?= Html::a(Html::encode($review->author->login),
-                                        $review->author->getCurrentUserUrl(),
+                                        UrlHelper::createUserUrl($review->author->id),
                                         ['class' => 'link-regular']); ?></p>
                                 <p class="review-text"><?= Html::encode($review->text); ?></p>
                             </div>

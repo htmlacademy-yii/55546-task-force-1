@@ -4,7 +4,7 @@ namespace frontend\modules\v1\controllers;
 
 use app\models\Message;
 use app\models\Task;
-use src\TaskHelper\TaskHelper;
+use src\ActionTaskHelper\ActionTaskHelper;
 use Yii;
 use yii\rest\ActiveController;
 
@@ -65,7 +65,7 @@ class MessageController extends ActiveController
 
         Yii::$app->response->statusCode = 201;
 
-        return TaskHelper::message($task, new $this->modelClass([
+        return ActionTaskHelper::message($task, new $this->modelClass([
             'message' => $message['message'],
             'published_at' => date('Y-m-d h:i:s'),
             'is_mine' => $task->getIsAuthor($userId),

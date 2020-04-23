@@ -1,6 +1,7 @@
 <?php
 
 use app\models\Task;
+use src\UrlHelper\UrlHelper;
 use yii\helpers\Html;
 
 $currentItemClass = 'menu_toggle__item--current';
@@ -108,12 +109,12 @@ $currentItemClass = 'menu_toggle__item--current';
             <div class="new-task__card">
                 <div class="new-task__title">
                     <?= Html::a('<h2>'.Html::encode($task->title).'</h2>',
-                        $task->getCurrentTaskUrl(),
+                        UrlHelper::createTaskUrl($task->id),
                         ['class' => 'link-regular']); ?>
                     <?php if ($task->category): ?>
                         <?= Html::a('<p>'.Html::encode($task->category->title)
                             .'</p>',
-                            Task::getUrlTasksByCategory($task->category->id),
+                            UrlHelper::createTaskUrlByCategory($task->category->id),
                             ['class' => 'new-task__type link-regular']); ?>
                     <?php endif; ?>
                 </div>
@@ -129,15 +130,15 @@ $currentItemClass = 'menu_toggle__item--current';
                 ): ?>
                     <div class="feedback-card__top ">
                         <?= Html::a("<img src='{$task->executor->userData->getAvatar()}' width='36' height='36'>",
-                            $task->executor->getCurrentUserUrl()); ?>
+                            UrlHelper::createUserUrl($task->executor->id)); ?>
                         <div class="feedback-card__top--name my-list__bottom">
                             <p class="link-name">
                                 <?= Html::a(Html::encode($task->executor->login),
-                                    $task->executor->getCurrentUserUrl(),
+                                    UrlHelper::createUserUrl($task->executor->id),
                                     ['class' => 'link-regular']); ?>
                             </p>
                             <?= Html::a("<b>$task->messagesCount</b>",
-                                $task->getCurrentTaskUrl(),
+                                UrlHelper::createTaskUrl($task->id),
                                 ['class' => 'my-list__bottom-chat my-list__bottom-chat--new']); ?>
 
                             <?php if ($task->review): ?>

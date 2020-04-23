@@ -5,7 +5,6 @@ namespace app\models;
 use common\models\User;
 use yii\db\ActiveQuery;
 use yii\db\ActiveRecord;
-use yii\helpers\ArrayHelper;
 
 /**
  * Класс для работы с моделью ленты событий
@@ -26,35 +25,6 @@ class EventRibbon extends ActiveRecord
     public const TYPE_TASK_START = 'task-start';
     /** @var string строка со статусом завершения задания */
     public const TYPE_TASK_COMPLETE = 'task-complete';
-
-    /**
-     * Получение строки с описанием события в соответствии с его типом
-     *
-     * @return string строка с описанием события
-     */
-    public function getDescription(): string
-    {
-        return ArrayHelper::getValue([
-            self::TYPE_NEW_TASK_RESPOND => 'Новый отклик к заданию',
-            self::TYPE_NEW_CHAT_MESSAGE => 'Новое сообщение в чате',
-            self::TYPE_TASK_DENIAL => 'Исполнитель отказался от задания',
-            self::TYPE_TASK_START => 'Ваш отклик был принят',
-            self::TYPE_TASK_COMPLETE => 'Завершено задание',
-        ], $this->type, 'Не определённое действие');
-    }
-
-    /**
-     * Получение строки CSS класса для формирования иконки соответствующей типу события
-     *
-     * @return string строка CSS класса
-     */
-    public function getIconClass(): string
-    {
-        return ArrayHelper::getValue([
-            self::TYPE_NEW_CHAT_MESSAGE => 'lightbulb__new-task--message',
-            self::TYPE_TASK_COMPLETE => 'lightbulb__new-task--close',
-        ], $this->type, 'lightbulb__new-task--executor');
-    }
 
     /**
      * Создание связи с заданием для данного события

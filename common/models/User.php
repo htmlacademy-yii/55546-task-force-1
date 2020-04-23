@@ -18,7 +18,6 @@ use yii\base\NotSupportedException;
 use yii\db\ActiveQuery;
 use yii\db\ActiveRecord;
 use yii\helpers\ArrayHelper;
-use yii\helpers\Url;
 use yii\web\IdentityInterface;
 
 /**
@@ -39,41 +38,6 @@ class User extends ActiveRecord implements IdentityInterface
     public const ROLE_CLIENT = 'client';
     /** @var string роль пользовтеля исполнителя */
     public const ROLE_EXECUTOR = 'executor';
-
-    /** @var string тип сортировки по рейтингу */
-    public const SORT_TYPE_RATING = 'rating';
-    /** @var string тип сортировки по заказам */
-    public const SORT_TYPE_ORDERS = 'orders';
-    /** @var string тип сортировки по популярности */
-    public const SORT_TYPE_POPULARITY = 'popularity';
-
-    /** @var array массиво со списком типов сортировки */
-    public const SORT_TYPE_LIST
-        = [
-            self::SORT_TYPE_RATING => 'Рейтингу',
-            self::SORT_TYPE_ORDERS => 'Числу заказов',
-            self::SORT_TYPE_POPULARITY => 'Популярности',
-        ];
-
-    /**
-     * Метод для получения строки с ссылкой на страницу текущего пользователя
-     *
-     * @return string строка с ссылкой на страницу текущего пользователя
-     */
-    public function getCurrentUserUrl(): string
-    {
-        return self::getUserUrl($this->id);
-    }
-
-    /**
-     * Метод для получения строки с ссылкой на страницу выбора данного пользователя в качестве фаворита
-     *
-     * @return string строка с ссылкой на страницу выбора данного пользователя в качестве фаворита
-     */
-    public function getFavoriteUrl(): string
-    {
-        return "/users/select-favorite?userId={$this->id}";
-    }
 
     /**
      * Проверка, является ли пользователь хозяином профиля
@@ -305,18 +269,6 @@ class User extends ActiveRecord implements IdentityInterface
     }
 
     /**
-     * Метод для получения строки с ссылкой на страницу нужного пользователя
-     *
-     * @param int $id идентификатор нужного пользователя
-     *
-     * @return string строка с ссылкой на страницу нужного пользователя
-     */
-    public static function getUserUrl(int $id): string
-    {
-        return Url::to("/users/view/$id");
-    }
-
-    /**
      * Получение имени таблицы модели
      *
      * @return string имя таблицы модели
@@ -492,18 +444,6 @@ class User extends ActiveRecord implements IdentityInterface
     public function removePasswordResetToken(): void
     {
         $this->password_reset_token = null;
-    }
-
-    /**
-     * Обновляет счетчики заданий, в соответствии со статусом их выполненности
-     *
-     * @param bool $result результат выволненнения задания
-     */
-    public function updateTaskCounter(bool $result): void
-    {
-        $this->userData->updateCounters([
-            $result ? 'success_counter' : 'failing_counter' => 1,
-        ]);
     }
 
     /**

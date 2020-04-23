@@ -1,5 +1,6 @@
 <?php
 
+use src\UrlHelper\UrlHelper;
 use yii\helpers\Html;
 
 ?>
@@ -32,7 +33,7 @@ use yii\helpers\Html;
             <?php endif; ?>
         </p>
         <?php if ($isShowExecutor): ?>
-            <?= Html::a('Смотреть профиль', $user->getCurrentUserUrl(),
+            <?= Html::a('Смотреть профиль', UrlHelper::createUserUrl($user->id),
                 ['class' => 'link-regular']) ?>
         <?php endif; ?>
     </div>

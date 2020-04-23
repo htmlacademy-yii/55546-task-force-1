@@ -2,6 +2,8 @@
 
 use frontend\assets\TaskViewAsset;
 use frontend\assets\YandexMapAsset;
+use src\TaskHelper\TaskHelper;
+use src\UrlHelper\UrlHelper;
 use yii\helpers\Html;
 use app\models\TaskRespond;
 use app\models\Task;
@@ -25,7 +27,7 @@ TaskViewAsset::register($this);
                         Размещено в категории
                         <?php if ($task->category): ?>
                             <?= Html::a(Html::encode($task->category->title),
-                                Task::getUrlTasksByCategory($task->category->id),
+                                UrlHelper::createTaskUrlByCategory($task->category->id),
                                 ['class' => 'link-regular']) ?>
                         <?php endif; ?>
                         <?= $task->date_start
@@ -49,7 +51,7 @@ TaskViewAsset::register($this);
                 <div class="content-view__attach">
                     <h3 class="content-view__h3">Вложения</h3>
                     <?php foreach ($task->files as $file): ?>
-                        <?= Html::a($task->getCorrectFileName($file['file']),
+                        <?= Html::a(TaskHelper::getTaskFileName($file['file']),
                             "/$file[file]", ['download' => true]); ?>
                     <?php endforeach; ?>
                 </div>
@@ -125,10 +127,10 @@ TaskViewAsset::register($this);
                         <div class="content-view__feedback-card">
                             <div class="feedback-card__top">
                                 <?= Html::a("<img src='{$respond->user->userData->getAvatar()}' width='55' height='55'>",
-                                    $respond->user->getCurrentUserUrl()) ?>
+                                    UrlHelper::createUserUrl($respond->user->id)) ?>
                                 <div class="feedback-card__top--name">
                                     <p><?= Html::a(Html::encode($respond->user->login),
-                                            $respond->user->getCurrentUserUrl(),
+                                            UrlHelper::createUserUrl($respond->user->id),
                                             ['class' => 'link-regular']); ?></p>
                                     <?php for ($i = 1; $i <= 5; $i++): ?>
                                         <span <?= ($respond->user->rating

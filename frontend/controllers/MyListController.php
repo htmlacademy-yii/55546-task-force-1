@@ -2,6 +2,7 @@
 
 namespace frontend\controllers;
 
+use src\TaskHelper\TaskHelper;
 use Yii;
 use app\models\Task;
 use yii\web\NotFoundHttpException;
@@ -25,16 +26,17 @@ class MyListController extends SecuredController
      */
     public function actionIndex(string $category = ''): string
     {
-        if (!$status = Task::getStatusByCategory($category)) {
+        if (!$status = TaskHelper::getStatusByCategoryTask($category)) {
             throw new NotFoundHttpException('Страница не найдена!');
         }
 
         $user = Yii::$app->user;
-        $tasks = Task::findAll([
-            $user->identity->getIsExecutor() ? 'executor_id'
-                : 'author_id' => $user->id,
-            'status' => $status,
-        ]);
+        $tasks = Task::find()
+            ->where(['status' => $status])
+            ->andWhere('executor_id = :executor_id OR author_id = :author_id', [
+                ':executor_id' => $user->id,
+                ':author_id' => $user->id,
+            ])->all();
 
         return $this->render('index', compact('tasks', 'category'));
     }

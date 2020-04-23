@@ -1,6 +1,8 @@
 <?php
 
 use frontend\assets\AppAsset;
+use src\EventRibbonHelper\EventRibbonHelper;
+use src\UrlHelper\UrlHelper;
 use yii\helpers\Html;
 use yii\helpers\Url;
 
@@ -91,12 +93,15 @@ $events = $this->context->events;
                     <li class="site-list__item">
                         <?= Html::a('Исполнители', '/users'); ?>
                     </li>
-                    <li class="site-list__item">
-                        <?= Html::a('Создать задание', '/tasks/create'); ?>
-                    </li>
+                    <?php if ($user && !$user->getIsExecutor()): ?>
+                        <li class="site-list__item">
+                            <?= Html::a('Создать задание', '/tasks/create'); ?>
+                        </li>
+                    <?php endif; ?>
                     <li class="site-list__item">
                         <?= Html::a('Мой профиль',
-                            '/users/view/'.($user ? $user->id : '')); ?>
+                            ($user ? UrlHelper::createUserUrl($user->id)
+                                : Url::to('/'))); ?>
                     </li>
                 </ul>
             </div>
@@ -117,12 +122,12 @@ $events = $this->context->events;
                 <div class="lightbulb__pop-up">
                     <h3>Новые события</h3>
                     <?php foreach ($events as $event): ?>
-                        <p class="lightbulb__new-task <?= $event->iconClass; ?>">
-                            <?= Html::encode($event->description); ?>
+                        <p class="lightbulb__new-task <?= EventRibbonHelper::getIconClass($event->type); ?>">
+                            <?= Html::encode(EventRibbonHelper::getDescription($event->type)); ?>
                             <br>
                             <?php if ($event->task): ?>
                                 «<?= Html::a(Html::encode($event->task->title),
-                                    $event->task->getCurrentTaskUrl(),
+                                    UrlHelper::createTaskUrl($event->task->id),
                                     ['class' => 'link-regular']) ?>»
                             <?php endif; ?>
                         </p>

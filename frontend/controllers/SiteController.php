@@ -2,9 +2,10 @@
 
 namespace frontend\controllers;
 
+use src\AuthVKontakte\AuthVKontakte;
+use src\UrlHelper\UrlHelper;
 use yii\authclient\clients\VKontakte;
-use app\models\{Auth,
-    City,
+use app\models\{City,
     EventRibbon,
     SignupForm,
     Task,
@@ -122,7 +123,7 @@ class SiteController extends SecuredController
 
             Yii::$app->user->login(User::findOne(['email' => $model->email]));
 
-            $this->redirect(Task::getBaseTasksUrl());
+            $this->redirect(UrlHelper::getBaseTasksUrl());
         }
 
         return null;
@@ -179,10 +180,10 @@ class SiteController extends SecuredController
      */
     public function onAuthSuccess(VKontakte $client): Response
     {
-        if ($user = Auth::onAuthVKontakte($client)) {
+        if ($user = AuthVKontakte::auth($client)) {
             Yii::$app->user->login($user);
         }
 
-        return $this->redirect(Task::getBaseTasksUrl());
+        return $this->redirect(UrlHelper::getBaseTasksUrl());
     }
 }
