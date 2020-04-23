@@ -22,6 +22,8 @@
 
   dropzone.on("addedfile", file => {
     files.push(file);
-    photoBlock.style.display = `none`;
+    if(photoBlock) {
+      photoBlock.style.display = `none`;
+    }
   });
 })();
