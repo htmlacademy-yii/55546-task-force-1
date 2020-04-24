@@ -23,6 +23,29 @@ class TaskRespond extends ActiveRecord
     private const STATUS_DENIED = 'denied';
 
     /**
+     * Возвращает проверку, является ли отклик новым
+     *
+     * @return bool результат проверки
+     */
+    public function getIsStatusNew(): bool
+    {
+        return $this->status === self::STATUS_NEW;
+    }
+
+    /**
+     * Возвращает проверку, является ли пользователь
+     * с указанны id владельцем отклика
+     *
+     * @param int $userId идентификатор пользователя
+     *
+     * @return bool результат проверки
+     */
+    public function getIsPersonalRespond(int $userId): bool
+    {
+        return $this->user_id === $userId;
+    }
+
+    /**
      * Устанавливает статус отклику на задание - принят, или отклонён
      *
      * @param string $status статус отклика на задание

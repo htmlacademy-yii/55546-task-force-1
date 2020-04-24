@@ -32,6 +32,95 @@ class Task extends ActiveRecord
     public const STATUS_EXPIRED = 'expired';
 
     /**
+     * Возвращает проверку, является ли задание новым
+     *
+     * @param int $userId идентификатор пользователя
+     *
+     * @return bool результат проверки
+     */
+    public function getIsAvailableChat(int $userId): bool
+    {
+        return $this->executor_id
+            && ($this->getIsAuthor($userId)
+                || $this->getIsSelectedExecutor($userId));
+    }
+
+    /**
+     * Возвращает проверку, является ли задание новым
+     *
+     * @return bool результат проверки
+     */
+    public function getIsStatusNew(): bool
+    {
+        return $this->status === self::STATUS_NEW;
+    }
+
+    /**
+     * Возвращает проверку, может ли пользователь с указанным id выполните
+     * действие - отклик на задание
+     *
+     * @param int $userId идентификатор пользователя
+     *
+     * @return bool результат проверки
+     */
+    public function getIsAvailableActionRespond(int $userId): bool
+    {
+        return !$this->getIsAuthor($userId) && !$this->getIsUserRespond($userId);
+    }
+
+    /**
+     * Возвращает проверку, может ли пользователь с указанным id выполните
+     * действие - завершение задания
+     *
+     * @param int $userId идентификатор пользователя
+     *
+     * @return bool результат проверки
+     */
+    public function getIsAvailableActionCompleted(int $userId): bool
+    {
+        return $this->getIsAuthor($userId) && $this->status === self::STATUS_EXECUTION;
+    }
+
+    /**
+     * Возвращает проверку, может ли пользователь с указанным id выполните
+     * действие - отмена задания
+     *
+     * @param int $userId идентификатор пользователя
+     *
+     * @return bool результат проверки
+     */
+    public function getIsAvailableActionCanceled(int $userId): bool
+    {
+        return $this->getIsAuthor($userId) && $this->status === self::STATUS_NEW;
+    }
+
+    /**
+     * Возвращает проверку, может ли пользователь с указанным id выполните
+     * действие - отказ от задания
+     *
+     * @param int $userId идентификатор пользователя
+     *
+     * @return bool результат проверки
+     */
+    public function getIsAvailableActionRefusal(int $userId): bool
+    {
+        return !$this->getIsAuthor($userId) && $this->getIsUserRespond($userId)
+            && $this->getIsSelectedExecutor($userId);
+    }
+
+    /**
+     * Возвращает проверку, было ли заверщено данное задание
+     *
+     * @return bool результат проверки
+     */
+    public function getIsFinishing(): bool
+    {
+        return ($this->status === self::STATUS_COMPLETED
+                || $this->status === self::STATUS_FAILING)
+            && $this->executor;
+    }
+
+    /**
      * Назначение для данного задания нового исполнителя
      *
      * @param int $executorId идентификатор назначенного исполнителя

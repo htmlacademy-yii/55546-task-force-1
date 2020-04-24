@@ -5,8 +5,6 @@ use frontend\assets\YandexMapAsset;
 use src\TaskHelper\TaskHelper;
 use src\UrlHelper\UrlHelper;
 use yii\helpers\Html;
-use app\models\TaskRespond;
-use app\models\Task;
 use yii\helpers\Url;
 
 $this->title = "Задание: $task->title";
@@ -84,29 +82,28 @@ TaskViewAsset::register($this);
         </div>
         <div class="content-view__action-buttons">
             <?php
-            if ($isAuthor && $task->status === Task::STATUS_EXECUTION) {
+            if ($task->getIsAvailableActionCompleted($user->id)) {
                 echo Html::button('Завершить', [
                     'class' => 'button button__big-color request-button open-modal',
                     'data-for' => 'complete-form',
                 ]);
             }
-            if ($isAuthor && $task->status === Task::STATUS_NEW) {
+            if ($task->getIsAvailableActionCanceled($user->id)) {
                 echo Html::a('Отмена', "/tasks/cancel/$task->id", [
                     'class' => 'button button__big-color refusal-button open-modal',
                     'data-for' => 'canceled-form',
                 ]);
             }
-            if (!$isAuthor && $user->getIsExecutor()
-                && $task->getIsUserRespond($user->id)
-                && $task->getIsSelectedExecutor($user->id)
+            if ($user->getIsExecutor()
+                && $task->getIsAvailableActionRefusal($user->id)
             ) {
                 echo Html::button('Отказаться', [
                     'class' => 'button button__big-color refusal-button open-modal',
                     'data-for' => 'refuse-form',
                 ]);
             }
-            if (!$isAuthor && $user->getIsExecutor()
-                && !$task->getIsUserRespond($user->id)
+            if ($user->getIsExecutor()
+                && $task->getIsAvailableActionRespond($user->id)
             ) {
                 echo Html::button('Откликнуться', [
                     'class' => 'button button__big-color response-button open-modal',
@@ -121,9 +118,7 @@ TaskViewAsset::register($this);
             <h2>Отклики <span>(<?= $respondsCount; ?>)</span></h2>
             <div class="content-view__feedback-wrapper">
                 <?php foreach ($task->responds as $respond): ?>
-                    <?php if ($isAuthor
-                        || Yii::$app->user->identity->id === $respond->user_id
-                    ): ?>
+                    <?php if ($isAuthor || $respond->getIsPersonalRespond($user->id)): ?>
                         <div class="content-view__feedback-card">
                             <div class="feedback-card__top">
                                 <?= Html::a("<img src='{$respond->user->userData->getAvatar()}' width='55' height='55'>",
@@ -149,9 +144,8 @@ TaskViewAsset::register($this);
                             <div class="feedback-card__actions">
                                 <?php
                                 if ($isAuthor
-                                    && $respond->status
-                                    === TaskRespond::STATUS_NEW
-                                    && $task->status === Task::STATUS_NEW
+                                    && $respond->getIsStatusNew()
+                                    && $task->getIsStatusNew()
                                 ) {
                                     echo Html::a('Подтвердить',
                                         Url::to("/tasks/decision/{$respond->id}/accepted"),
@@ -182,10 +176,7 @@ TaskViewAsset::register($this);
     ]);
     ?>
 
-    <?php if ($task->executor_id
-        && ($isAuthor
-            || $task->getIsSelectedExecutor($user->id))
-    ): ?>
+    <?php if ($task->getIsAvailableChat($user->id)): ?>
         <div id="chat-container">
             <chat class="connect-desk__chat" task="<?= $task->id; ?>"></chat>
         </div>
