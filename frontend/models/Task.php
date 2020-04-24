@@ -65,7 +65,8 @@ class Task extends ActiveRecord
      */
     public function getIsAvailableActionRespond(int $userId): bool
     {
-        return !$this->getIsAuthor($userId) && !$this->getIsUserRespond($userId);
+        return !$this->getIsAuthor($userId)
+            && !$this->getIsUserRespond($userId);
     }
 
     /**
@@ -78,7 +79,8 @@ class Task extends ActiveRecord
      */
     public function getIsAvailableActionCompleted(int $userId): bool
     {
-        return $this->getIsAuthor($userId) && $this->status === self::STATUS_EXECUTION;
+        return $this->getIsAuthor($userId)
+            && $this->status === self::STATUS_EXECUTION;
     }
 
     /**
@@ -91,7 +93,8 @@ class Task extends ActiveRecord
      */
     public function getIsAvailableActionCanceled(int $userId): bool
     {
-        return $this->getIsAuthor($userId) && $this->status === self::STATUS_NEW;
+        return $this->getIsAuthor($userId)
+            && $this->status === self::STATUS_NEW;
     }
 
     /**

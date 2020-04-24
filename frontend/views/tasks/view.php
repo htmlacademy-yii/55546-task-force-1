@@ -118,7 +118,9 @@ TaskViewAsset::register($this);
             <h2>Отклики <span>(<?= $respondsCount; ?>)</span></h2>
             <div class="content-view__feedback-wrapper">
                 <?php foreach ($task->responds as $respond): ?>
-                    <?php if ($isAuthor || $respond->getIsPersonalRespond($user->id)): ?>
+                    <?php if ($isAuthor
+                        || $respond->getIsPersonalRespond($user->id)
+                    ): ?>
                         <div class="content-view__feedback-card">
                             <div class="feedback-card__top">
                                 <?= Html::a("<img src='{$respond->user->userData->getAvatar()}' width='55' height='55'>",
