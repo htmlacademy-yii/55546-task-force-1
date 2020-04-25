@@ -18,6 +18,7 @@
     uploadMultiple: true,
     acceptedFiles: 'image/*',
     previewTemplate: '<a href="#"><img data-dz-thumbnail alt="Фото работы"></a>',
+    autoProcessQueue: false
   });
 
   dropzone.on("addedfile", file => {
