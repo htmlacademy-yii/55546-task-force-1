@@ -108,7 +108,8 @@ class Task extends ActiveRecord
     public function getIsAvailableActionRefusal(int $userId): bool
     {
         return !$this->getIsAuthor($userId) && $this->getIsUserRespond($userId)
-            && $this->getIsSelectedExecutor($userId);
+            && $this->getIsSelectedExecutor($userId)
+            && $this->status === self::STATUS_EXECUTION;
     }
 
     /**

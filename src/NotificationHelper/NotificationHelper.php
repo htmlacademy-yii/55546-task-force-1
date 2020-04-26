@@ -153,7 +153,7 @@ class NotificationHelper
         } catch (\Exception $err) {
             Yii::error([
                 'Error while mail message send',
-                $err->getMessage()
+                $err->getMessage(),
             ]);
         }
     }

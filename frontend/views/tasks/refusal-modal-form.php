@@ -18,7 +18,10 @@ use yii\helpers\Url;
         'enableClientValidation' => false,
     ]);
     echo Html::button('Отмена',
-        ['class' => 'button__form-modal button close-modal', 'id' => 'close-modal']);
+        [
+            'class' => 'button__form-modal button close-modal',
+            'id' => 'close-modal',
+        ]);
     echo Html::submitButton('Отказаться', [
         'class' => 'button__form-modal refusal-button button',
         'name' => 'refusal-btn',
