@@ -25,6 +25,8 @@ class TaskCreate extends Model
     public $files;
     /** @var string строка с локацией задания */
     public $location;
+    /** @var string массив с разобранной строкой локации задания */
+    public $locationDataList;
     /** @var string строка с наградой за задание */
     public $price;
     /** @var string строка с датой завершения */
@@ -71,6 +73,17 @@ class TaskCreate extends Model
                 'message' => 'Категория не найдена',
             ],
             [['description', 'location'], 'string'],
+            [
+                'location',
+                'filter',
+                'filter' => function ($location) {
+                    $this->locationDataList = array_map(function ($item) {
+                        return mb_strtolower($item, 'utf8');
+                    }, explode(' ', $location));
+
+                    return $location;
+                },
+            ],
             ['location', 'validateCity'],
             ['location', 'validateLocation'],
             [
@@ -120,16 +133,23 @@ class TaskCreate extends Model
      */
     public function validateCity(): void
     {
-        if ($city = City::findOne([
-            'name' => explode(',', $this->location)[0],
-        ])
-        ) {
-            $this->cityId = $city->id;
+        if (!$city = City::findOne((int)Yii::$app->user->identity->city_id)) {
+            $this->addError('location',
+                'У вас не выбран город в настройках пользователя');
 
             return;
         }
-        $this->addError('location',
-            'Указанный город не найден в нашей базе данных');
+
+        if (!in_array(mb_strtolower($city->name, 'utf8'),
+            $this->locationDataList, true)
+        ) {
+            $this->addError('location',
+                'Указанный город не соответствует указанному вами городу в настройках');
+
+            return;
+        }
+
+        $this->cityId = $city->id;
     }
 
     /**
@@ -140,7 +160,7 @@ class TaskCreate extends Model
      */
     public function validateLocation(): void
     {
-        if (!empty($this->location)) {
+        if (empty($this->location)) {
             return;
         }
 

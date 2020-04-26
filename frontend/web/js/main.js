@@ -16,7 +16,7 @@ for (var i = 0; i < openModalLinks.length; i++) {
 }
 
 function closeModal(event) {
-  var modal = event.currentTarget.parentElement;
+  var modal = event.currentTarget.closest(`section.form-modal`);
 
   modal.removeAttribute("style");
   overlay.removeAttribute("style");

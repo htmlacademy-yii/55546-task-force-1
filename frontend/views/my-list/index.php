@@ -124,10 +124,7 @@ $currentItemClass = 'menu_toggle__item--current';
                     <div class="task-status done-status">Завершено</div>
                 <?php endif; ?>
                 <p class="new-task_description"><?= Html::encode($task->description); ?></p>
-                <?php if (($task->status === Task::STATUS_COMPLETED
-                        || $task->status === Task::STATUS_FAILING)
-                    && $task->executor
-                ): ?>
+                <?php if ($task->getIsFinishing()): ?>
                     <div class="feedback-card__top ">
                         <?= Html::a("<img src='{$task->executor->userData->getAvatar()}' width='36' height='36'>",
                             UrlHelper::createUserUrl($task->executor->id)); ?>

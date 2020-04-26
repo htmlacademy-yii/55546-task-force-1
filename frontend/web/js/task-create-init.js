@@ -14,7 +14,8 @@
     url: function () {
     },
     uploadMultiple: true,
-    acceptedFiles: 'image/*'
+    acceptedFiles: 'image/*',
+    autoProcessQueue: false
   });
   dropzone.on("addedfile", file => files.push(file));
 
