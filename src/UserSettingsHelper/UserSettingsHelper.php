@@ -54,7 +54,7 @@ class UserSettingsHelper
     {
         if ($files = $this->model->getFiles()) {
             UserPhoto::deleteAll(['user_id' => $this->user->id]);
-            if (file_exists($dir)) {
+            if (FileHelper::findFiles($dir)) {
                 FileHelper::removeDirectory($dir);
             }
             FileHelper::createDirectory($dir);

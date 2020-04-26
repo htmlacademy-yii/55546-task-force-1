@@ -143,11 +143,18 @@ class NotificationHelper
             'type' => $data['type'],
             'message' => $data['messageEvent'],
         ]))->save();
-        Yii::$app->mailer->compose()
-            ->setTo($user->email)
-            ->setFrom([Yii::$app->params['adminEmail'] => 'admin yii-taskforce'])
-            ->setSubject($data['titleMail'])
-            ->setHtmlBody($data['messageMail'])
-            ->send();
+        try {
+            Yii::$app->mailer->compose()
+                ->setTo($user->email)
+                ->setFrom([Yii::$app->params['adminEmail'] => 'admin yii-taskforce'])
+                ->setSubject($data['titleMail'])
+                ->setHtmlBody($data['messageMail'])
+                ->send();
+        } catch (\Exception $err) {
+            Yii::error([
+                'Error while mail message send',
+                $err->getMessage()
+            ]);
+        }
     }
 }
